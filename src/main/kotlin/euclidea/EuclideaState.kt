@@ -2,7 +2,11 @@ import euclidea.*
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 
-data class EuclideaContext(val points: List<Point>, val elements: List<Element>) {
+data class EuclideaContext(
+    val points: List<Point>,
+    val elements: List<Element>,
+    val pointSource: Map<Point, Pair<Element, Element>> = mapOf()
+) {
     fun nexts(): List<EuclideaContext> {
         val res = mutableListOf<EuclideaContext>()
         forEachPair(points) { point1, point2 ->
@@ -16,14 +20,22 @@ data class EuclideaContext(val points: List<Point>, val elements: List<Element>)
         return res.toList()
     }
 
+    @Suppress("SuspiciousCollectionReassignment")
     private fun withElement(element: Element): EuclideaContext {
         return if (elements.contains(element))
             this
         else {
-            val addPoints = elements.flatMap { e -> intersect(e, element).points() }
-            val allPoints =
-                addPoints.fold(points) { acc, point -> if (acc.any { p -> coincides(p, point) }) acc else acc + point }
-            EuclideaContext(allPoints, elements + element)
+            var updatedPoints = points
+            var updatedPointSource = pointSource
+            for (e in elements) {
+                for (point in intersect(e, element).points()) {
+                    if (updatedPoints.none { p -> coincides(p, point) }) {
+                        updatedPoints += point
+                        updatedPointSource += point to Pair(e, element)
+                    }
+                }
+            }
+            EuclideaContext(updatedPoints, elements + element, updatedPointSource)
         }
     }
 
