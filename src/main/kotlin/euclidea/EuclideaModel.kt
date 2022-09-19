@@ -78,7 +78,13 @@ fun distance(point1: Point, point2: Point): Double {
 }
 
 fun coincides(point1: Point, point2: Point): Boolean {
-    return point1 == point2
+    return coincides(point1.x, point2.x) && coincides(point1.y, point2.y)
+}
+
+private const val Epsilon = 0.00000001
+
+fun coincides(num1: Double, num2: Double): Boolean {
+    return abs(num2 - num1) < Epsilon
 }
 
 private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {

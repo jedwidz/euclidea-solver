@@ -1,9 +1,6 @@
-import euclidea.Element
+import euclidea.*
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
-import euclidea.Point
-import euclidea.forEachPair
-import euclidea.intersect
 
 data class EuclideaContext(val points: List<Point>, val elements: List<Element>) {
     fun nexts(): List<EuclideaContext> {
@@ -23,9 +20,10 @@ data class EuclideaContext(val points: List<Point>, val elements: List<Element>)
         return if (elements.contains(element))
             this
         else {
-            val newPoints =
-                elements.flatMap { e -> intersect(e, element).points() }.toSet().filter { !points.contains(it) }
-            EuclideaContext(points + newPoints, elements + element)
+            val addPoints = elements.flatMap { e -> intersect(e, element).points() }
+            val allPoints =
+                addPoints.fold(points) { acc, point -> if (acc.any { p -> coincides(p, point) }) acc else acc + point }
+            EuclideaContext(allPoints, elements + element)
         }
     }
 
