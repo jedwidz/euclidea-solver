@@ -4,6 +4,8 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 
 data class Point(val x: Double, val y: Double) {
+    val signature = PointSignature(x.toFloat(), y.toFloat())
+
     operator fun minus(point: Point): Point {
         return Point(x - point.x, y - point.y)
     }
@@ -17,8 +19,14 @@ data class Point(val x: Double, val y: Double) {
     }
 }
 
+data class PointSignature(val x: Float, val y: Float)
+
 sealed class Element {
+    abstract val signature: ElementSignature
+
     data class Line(val point1: Point, val point2: Point) : Element() {
+        override val signature = ElementSignature.LineSignature(point1.signature, point2.signature)
+
         override fun minus(point: Point): Line {
             return Line(point1 - point, point2 - point)
         }
@@ -29,6 +37,8 @@ sealed class Element {
     }
 
     data class Circle(val center: Point, val radius: Double) : Element() {
+        override val signature: ElementSignature = ElementSignature.CircleSignature(center.signature, radius.toFloat())
+
         override fun minus(point: Point): Circle {
             return Circle(center - point, radius)
         }
@@ -40,6 +50,11 @@ sealed class Element {
 
     abstract operator fun minus(point: Point): Element
     abstract operator fun plus(point: Point): Element
+}
+
+sealed class ElementSignature {
+    data class LineSignature(val point1: PointSignature, val point2: PointSignature) : ElementSignature()
+    data class CircleSignature(val center: PointSignature, val radius: Float) : ElementSignature()
 }
 
 sealed class Intersection {

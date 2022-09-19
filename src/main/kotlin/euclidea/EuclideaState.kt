@@ -8,12 +8,26 @@ data class EuclideaConfig(
     val circleToolEnabled: Boolean = true
 )
 
+data class EuclideaSignature(
+    val pointCount: Int,
+    val points: Set<PointSignature>,
+    val elementCount: Int,
+    val elements: Set<ElementSignature>
+)
+
 data class EuclideaContext(
     val config: EuclideaConfig = EuclideaConfig(),
     val points: List<Point>,
     val elements: List<Element>,
     val pointSource: Map<Point, Pair<Element, Element>> = mapOf()
 ) {
+    val signature = EuclideaSignature(
+        points.size,
+        points.map { it.signature }.toSet(),
+        elements.size,
+        elements.map { it.signature }.toSet()
+    )
+
     fun nexts(): List<EuclideaContext> {
         val res = mutableListOf<EuclideaContext>()
         fun tryAdd(e: Element?) {

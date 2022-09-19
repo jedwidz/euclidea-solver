@@ -34,13 +34,15 @@ class RoughSolveTest {
         val circle = Element.Circle(center, 1.0)
         val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
         val solution = Element.Line(Point(0.0, 0.0), Point(0.0, 1.0))
-        val givenPoints = listOf(center, Point(-1.0, 0.0))
+        val point1 = Point(-1.043215, 0.0)
+        val point2 = Point(-0.828934, 2.0)
+        val givenPoints = listOf(center, point1, point2)
         val initialContext = EuclideaContext(
             config = EuclideaConfig(circleToolEnabled = false),
             points = givenPoints,
-            elements = listOf(circle, line)
+            elements = listOf(circle, line, Element.Line(point1, point2))
         )
-        val solutionContext = solve(initialContext, 4) { context ->
+        val solutionContext = solve(initialContext, 5) { context ->
             context.hasElement(solution)
         }
         println(solutionContext)
@@ -53,6 +55,7 @@ class RoughSolveTest {
         maxDepth: Int,
         check: (EuclideaContext) -> Boolean
     ): EuclideaContext? {
+        val seen = mutableSetOf<EuclideaSignature>()
         val queue: ArrayDeque<SearchNode> = ArrayDeque(listOf(SearchNode(initialContext, 0)))
         while (true) {
             val node = queue.removeFirstOrNull()
@@ -63,10 +66,11 @@ class RoughSolveTest {
                 if (check(context)) {
                     return context
                 } else if (depth < maxDepth) {
-                    queue.addAll(context.nexts().map {
-                        val nextDepth = depth + 1
-                        SearchNode(it, nextDepth)
-                    })
+                    val nextDepth = depth + 1
+                    for (next in context.nexts()) {
+                        if (seen.add(next.signature))
+                            queue.add(SearchNode(next, nextDepth))
+                    }
                 }
             }
         }
