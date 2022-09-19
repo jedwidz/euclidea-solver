@@ -38,6 +38,21 @@ class EuclideaModelTest {
     }
 
     @Test
+    fun circleCircleIntersect_disjoint_concentric() {
+        val circle1 = Element.Circle(Point(1.0, 2.0), 1.0)
+        val circle2 = Element.Circle(Point(1.0, 2.0), 2.0)
+        val intersection = intersect(circle1, circle2)
+        Assertions.assertEquals(Intersection.Disjoint, intersection)
+    }
+
+    @Test
+    fun circleCircleIntersect_coincide() {
+        val circle = Element.Circle(Point(1.0, 2.0), 1.0)
+        val intersection = intersect(circle, circle)
+        Assertions.assertEquals(Intersection.Coincide, intersection)
+    }
+
+    @Test
     fun circleLineIntersect() {
         val circle = Element.Circle(Point(1.0, 2.0), 3.0)
         val line = Element.Line(Point(-1.0, 2.0), Point(3.0, 2.0))

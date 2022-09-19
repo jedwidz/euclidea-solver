@@ -83,18 +83,25 @@ private fun circlesIntersect(circle1: Element.Circle, circle2: Element.Circle): 
     val p = circle1.center - o
     val d2 = sq(p.x) + sq(p.y)
     val d = sqrt(d2)
-    val l = (sq(circle1.radius) - sq(circle2.radius)+d2)/(2.0*d)
-    val h2 = sq(circle1.radius) - sq(l)
-    return if (h2 < 0.0 || h2.isNaN())
-        Intersection.Disjoint
-    else {
-        if (h2 == 0.0)
-            Intersection.OnePoint(Point(l/d*p.x,l/d*p.y) + o)
-        else { val hod = sqrt(h2) / d
-            Intersection.TwoPoints(
-                Point(l/d*p.x + hod*p.y,l/d*p.y - hod *p.x) + o,
-                Point(l/d*p.x - hod*p.y,l/d*p.y + hod *p.x) + o
-            )
+    return if (d == 0.0) {
+        if (circle1.radius == circle2.radius)
+            Intersection.Coincide
+        else Intersection.Disjoint
+    } else {
+        val l = (sq(circle1.radius) - sq(circle2.radius) + d2) / (2.0 * d)
+        val h2 = sq(circle1.radius) - sq(l)
+        if (h2 < 0.0 || h2.isNaN())
+            Intersection.Disjoint
+        else {
+            if (h2 == 0.0)
+                Intersection.OnePoint(Point(l / d * p.x, l / d * p.y) + o)
+            else {
+                val hod = sqrt(h2) / d
+                Intersection.TwoPoints(
+                    Point(l / d * p.x + hod * p.y, l / d * p.y - hod * p.x) + o,
+                    Point(l / d * p.x - hod * p.y, l / d * p.y + hod * p.x) + o
+                )
+            }
         }
     }
 }
