@@ -73,6 +73,14 @@ fun intersect(element1: Element, element2: Element): Intersection {
     }
 }
 
+fun distance(point1: Point, point2: Point): Double {
+    return sqrt(sq(point1.x - point2.x) + sq(point1.y - point2.y))
+}
+
+fun coincides(point1: Point, point2: Point): Boolean {
+    return point1 == point2
+}
+
 private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {
     // Help from: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     val p1 = line1.point1
