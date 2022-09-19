@@ -32,6 +32,21 @@ class EuclideaModelTest {
     }
 
     @Test
+    fun lineIntersect_coincide() {
+        val line1 = Element.Line(Point(-5.0, 0.0), Point(10.0, 1.0))
+        val line2 = Element.Line(Point(-5.0, 0.0), Point(25.0, 2.0))
+        val intersection = intersect(line1, line2)
+        Assertions.assertEquals(Intersection.Coincide, intersection)
+    }
+
+    @Test
+    fun lineIntersect_coincide_identical() {
+        val line = Element.Line(Point(-5.0, 0.0), Point(10.0, 1.0))
+        val intersection = intersect(line, line)
+        Assertions.assertEquals(Intersection.Coincide, intersection)
+    }
+
+    @Test
     fun circleCircleIntersect_twoPoints() {
         val circle1 = Element.Circle(Point(-1.0, 2.0), 2.0)
         val circle2 = Element.Circle(Point(1.0, 2.0), 2.0)

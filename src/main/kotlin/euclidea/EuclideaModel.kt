@@ -81,7 +81,8 @@ private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersecti
     val p4 = line2.point2
     val d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
     return if (d == 0.0) {
-        if (false)
+        // Check if p1 is on line2
+        if ((p1.x - p4.x) * (p3.y - p4.y) - (p1.y - p4.y) * (p3.x - p4.x) == 0.0)
             Intersection.Coincide
         else
             Intersection.Disjoint
