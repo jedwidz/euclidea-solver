@@ -1,6 +1,5 @@
 package euclidea
 
-import EuclideaContext
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
@@ -20,8 +19,29 @@ class RoughSolveTest {
                 listOf(point1, point2).map { pointA -> lineTool(pointA, pointX)!! }
             }
         }
-        val solutionContext = solve(EuclideaContext(listOf(point1, point2), listOf(line)), 4) { context ->
-            solutions.any { context.hasElements(it) }
+        val solutionContext =
+            solve(EuclideaContext(points = listOf(point1, point2), elements = listOf(line)), 4) { context ->
+                solutions.any { context.hasElements(it) }
+            }
+        println(solutionContext)
+    }
+
+    @Test
+    fun puzzle15_7() {
+        // Drop a Perpendicular**
+        // (lines only)
+        val center = Point(0.0, 2.0)
+        val circle = Element.Circle(center, 1.0)
+        val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
+        val solution = Element.Line(Point(0.0, 0.0), Point(0.0, 1.0))
+        val givenPoints = listOf(center, Point(-1.0, 0.0))
+        val initialContext = EuclideaContext(
+            config = EuclideaConfig(circleToolEnabled = false),
+            points = givenPoints,
+            elements = listOf(circle, line)
+        )
+        val solutionContext = solve(initialContext, 4) { context ->
+            context.hasElement(solution)
         }
         println(solutionContext)
     }

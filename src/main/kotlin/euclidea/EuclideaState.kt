@@ -1,20 +1,33 @@
-import euclidea.*
+package euclidea
+
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 
+data class EuclideaConfig(
+    val lineToolEnabled: Boolean = true,
+    val circleToolEnabled: Boolean = true
+)
+
 data class EuclideaContext(
+    val config: EuclideaConfig = EuclideaConfig(),
     val points: List<Point>,
     val elements: List<Element>,
     val pointSource: Map<Point, Pair<Element, Element>> = mapOf()
 ) {
     fun nexts(): List<EuclideaContext> {
         val res = mutableListOf<EuclideaContext>()
+        fun tryAdd(e: Element?) {
+            when (val next = e?.let { this.withElement(it) }) {
+                this, null -> {; }
+                else -> res.add(next)
+            }
+        }
         forEachPair(points) { point1, point2 ->
-            listOf(lineTool(point1, point2), circleTool(point1, point2), circleTool(point2, point1)).forEach { e ->
-                when (val next = e?.let { this.withElement(it) }) {
-                    this, null -> {; }
-                    else -> res.add(next)
-                }
+            if (config.lineToolEnabled)
+                tryAdd(lineTool(point1, point2))
+            if (config.circleToolEnabled) {
+                tryAdd(circleTool(point1, point2))
+                tryAdd(circleTool(point2, point1))
             }
         }
         return res.toList()
@@ -35,7 +48,7 @@ data class EuclideaContext(
                     }
                 }
             }
-            EuclideaContext(updatedPoints, elements + element, updatedPointSource)
+            EuclideaContext(config, updatedPoints, elements + element, updatedPointSource)
         }
     }
 
@@ -43,7 +56,7 @@ data class EuclideaContext(
         return otherElements.all { hasElement(it) }
     }
 
-    private fun hasElement(element: Element): Boolean {
+    fun hasElement(element: Element): Boolean {
         return elements.any { e -> coincides(e, element) }
     }
 }
