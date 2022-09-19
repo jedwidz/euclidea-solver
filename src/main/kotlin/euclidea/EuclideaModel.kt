@@ -1,0 +1,113 @@
+package euclidea
+
+import kotlin.math.abs
+import kotlin.math.sqrt
+
+data class Point(val x: Double, val y: Double) {
+    operator fun minus(point: Point): Point {
+        return Point(x - point.x, y - point.y)
+    }
+
+    operator fun plus(point: Point): Point {
+        return Point(x + point.x, y + point.y)
+    }
+
+    companion object {
+        val Origin = Point(0.0, 0.0)
+    }
+}
+
+sealed class Element {
+    data class Line(val point1: Point, val point2: Point) : Element() {
+        override fun minus(point: Point): Line {
+            return Line(point1 - point, point2 - point)
+        }
+
+        override fun plus(point: Point): Line {
+            return Line(point1 + point, point2 + point)
+        }
+    }
+
+    data class Circle(val center: Point, val radius: Double) : Element() {
+        override fun minus(point: Point): Circle {
+            return Circle(center - point, radius)
+        }
+
+        override fun plus(point: Point): Circle {
+            return Circle(center + point, radius)
+        }
+    }
+
+    abstract operator fun minus(point: Point): Element
+    abstract operator fun plus(point: Point): Element
+}
+
+sealed class Intersection {
+    object Disjoint : Intersection()
+    data class OnePoint(val point: Point) : Intersection()
+    data class TwoPoints(val point1: Point, val point2: Point) : Intersection()
+
+    // Coincide at an infinite number of points
+    object Coincide : Intersection()
+
+    fun points(): List<Point> {
+        return when (this) {
+            Coincide -> emptyList()
+            Disjoint -> emptyList()
+            is OnePoint -> listOf(point)
+            is TwoPoints -> listOf(point1, point2)
+        }
+    }
+}
+
+fun intersect(element1: Element, element2: Element): Intersection {
+    return when (element1) {
+        is Element.Circle -> when (element2) {
+            is Element.Circle -> circlesIntersect(element1, element2)
+            is Element.Line -> circleLineIntersect(element1, element2)
+        }
+        is Element.Line -> when (element2) {
+            is Element.Circle -> circleLineIntersect(element2, element1)
+            is Element.Line -> linesIntersect(element1, element2)
+        }
+    }
+}
+
+private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {
+    TODO("Not yet implemented")
+}
+
+private fun circlesIntersect(circle1: Element.Circle, circle2: Element.Circle): Intersection {
+    TODO("Not yet implemented")
+}
+
+private fun circleLineIntersect(circle: Element.Circle, line: Element.Line): Intersection {
+    // Help from: https://mathworld.wolfram.com/Circle-LineIntersection.html
+    val o = circle.center
+    val lineO = line - o
+    val dx = lineO.point2.x - lineO.point1.x
+    val dy = lineO.point2.y - lineO.point1.y
+    val dr2 = sq(dx) + sq(dy)
+    val det = lineO.point1.x * lineO.point2.y - lineO.point2.x * lineO.point1.y
+    val disc = sq(circle.radius * sqrt(dr2)) - sq(det)
+    return if (disc
+        < 0.0 || disc.isNaN()
+    )
+        Intersection.Disjoint
+    else if (disc == 0.0) {
+        Intersection.OnePoint(Point(det * dy / dr2, -det * dx / dr2) + o)
+    } else {
+        val f = sqrt(disc)
+        val sgn = if (dy < 0.0) -1.0 else 1.0
+        val xf = sgn * dx * f
+        val yf = abs(dy) * f
+        Intersection.TwoPoints(
+            Point((det * dy - xf) / dr2, (-det * dx - yf) / dr2) + o,
+            Point((det * dy + xf) / dr2, (-det * dx + yf) / dr2) + o
+        )
+    }
+}
+
+private fun sq(v: Double): Double {
+    return v * v
+}
