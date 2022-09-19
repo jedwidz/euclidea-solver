@@ -21,7 +21,7 @@ class RoughSolveTest {
             }
         }
         val solutionContext = solve(EuclideaContext(listOf(point1, point2), listOf(line)), 4) { context ->
-            solutions.any { context.containsAll(it) }
+            solutions.any { context.hasElements(it) }
         }
         println(solutionContext)
     }

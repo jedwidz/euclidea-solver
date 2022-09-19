@@ -22,7 +22,7 @@ data class EuclideaContext(
 
     @Suppress("SuspiciousCollectionReassignment")
     private fun withElement(element: Element): EuclideaContext {
-        return if (elements.contains(element))
+        return if (hasElement(element))
             this
         else {
             var updatedPoints = points
@@ -39,8 +39,12 @@ data class EuclideaContext(
         }
     }
 
-    fun containsAll(otherElements: List<Element>): Boolean {
-        return otherElements.all { elements.contains(it) }
+    fun hasElements(otherElements: List<Element>): Boolean {
+        return otherElements.all { hasElement(it) }
+    }
+
+    private fun hasElement(element: Element): Boolean {
+        return elements.any { e -> coincides(e, element) }
     }
 }
 
