@@ -74,7 +74,24 @@ fun intersect(element1: Element, element2: Element): Intersection {
 }
 
 private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {
-    TODO("Not yet implemented")
+    // Help from: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+    val p1 = line1.point1
+    val p2 = line1.point2
+    val p3 = line2.point1
+    val p4 = line2.point2
+    val d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
+    return if (d == 0.0) {
+        if (false)
+            Intersection.Coincide
+        else
+            Intersection.Disjoint
+    } else {
+        val a = p1.x * p2.y - p1.y * p2.x
+        val b = p3.x * p4.y - p3.y * p4.x
+        val x = a * (p3.x - p4.x) - (p1.x - p2.x) * b
+        val y = a * (p3.y - p4.y) - (p1.y - p2.y) * b
+        Intersection.OnePoint(Point(x / d, y / d))
+    }
 }
 
 private fun circlesIntersect(circle1: Element.Circle, circle2: Element.Circle): Intersection {
