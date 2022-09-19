@@ -35,7 +35,7 @@ class RoughSolveTest {
         val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
         val solution = Element.Line(Point(0.0, 0.0), Point(0.0, 1.0))
         val point1 = Point(-1.043215, 0.0)
-        val point2 = Point(-0.828934, 2.0)
+        val point2 = Point(-0.828934, 3.0)
         val givenPoints = listOf(center, point1, point2)
         val initialContext = EuclideaContext(
             config = EuclideaConfig(circleToolEnabled = false),
