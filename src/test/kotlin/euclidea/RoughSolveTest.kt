@@ -84,7 +84,6 @@ class RoughSolveTest {
     ): EuclideaContext? {
         if (check(initialContext))
             return initialContext
-        val seen = mutableSetOf<EuclideaSignature>()
         val queue: ArrayDeque<SearchNode> = ArrayDeque(listOf(SearchNode(initialContext, 0)))
         while (true) {
             val node = queue.removeFirstOrNull()
@@ -93,11 +92,10 @@ class RoughSolveTest {
             with(node) {
                 val nextDepth = depth + 1
                 for (next in context.nexts())
-                    if (seen.add(next.signature))
-                        if (check(next))
-                            return next
-                        else if (nextDepth < maxDepth)
-                            queue.add(SearchNode(next, nextDepth))
+                    if (check(next))
+                        return next
+                    else if (nextDepth < maxDepth)
+                        queue.add(SearchNode(next, nextDepth))
             }
         }
     }
