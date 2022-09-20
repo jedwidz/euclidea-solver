@@ -34,15 +34,14 @@ class RoughSolveTest {
         val circle = Element.Circle(center, 1.0)
         val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
         val solution = Element.Line(Point(0.0, 0.0), Point(0.0, 1.0))
-        val point1 = Point(-1.043215, 0.0)
-        val point2 = Point(-0.828934, 3.0)
-        val givenPoints = listOf(center, point1, point2)
+        // 'probe' line to cut across the circle and line.
+        val probeLine = Element.Line(Point(-1.043215, 0.0), Point(-0.828934, 3.0))
         val initialContext = EuclideaContext(
             config = EuclideaConfig(circleToolEnabled = false),
-            points = givenPoints,
-            elements = listOf(circle, line, Element.Line(point1, point2))
-        )
-        val solutionContext = solve(initialContext, 5) { context ->
+            points = listOf(center),
+            elements = listOf(circle, line)
+        ).withElement(probeLine)
+        val solutionContext = solve(initialContext, 6) { context ->
             context.hasElement(solution)
         }
         println(solutionContext)

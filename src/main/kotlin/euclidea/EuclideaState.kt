@@ -48,7 +48,7 @@ data class EuclideaContext(
     }
 
     @Suppress("SuspiciousCollectionReassignment")
-    private fun withElement(element: Element): EuclideaContext {
+    fun withElement(element: Element): EuclideaContext {
         return if (hasElement(element))
             this
         else {
