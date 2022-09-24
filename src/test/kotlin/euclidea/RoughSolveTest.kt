@@ -63,7 +63,7 @@ class RoughSolveTest {
             points = listOf(center),
             elements = listOf(circle, line)
         ).withElement(probeLine1).withElement(probeLine2)
-        val solutionContext = solve(initialContext, 3) { context ->
+        val solutionContext = solve(initialContext, 6) { context ->
             context.elements.any {
                 it !== circle && it !== line && it !== probeLine1 && it !== probeLine2 && intersect(
                     line,
