@@ -28,13 +28,13 @@ sealed class Element {
         }
     }
 
-    data class Circle(val center: Point, val radius: Double) : Element() {
+    data class Circle(val center: Point, val radius: Double, val sample: Point? = null) : Element() {
         override fun minus(point: Point): Circle {
-            return Circle(center - point, radius)
+            return Circle(center - point, radius, sample?.let { it - point })
         }
 
         override fun plus(point: Point): Circle {
-            return Circle(center + point, radius)
+            return Circle(center + point, radius, sample?.let { it + point })
         }
     }
 
