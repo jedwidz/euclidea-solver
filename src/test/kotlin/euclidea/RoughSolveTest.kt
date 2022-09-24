@@ -41,7 +41,7 @@ class RoughSolveTest {
             points = listOf(center),
             elements = listOf(circle, line)
         ).withElement(probeLine)
-        val solutionContext = solve(initialContext, 6) { context ->
+        val solutionContext = solve(initialContext, 7) { context ->
             context.hasElement(solution)
         }
         println(solutionContext)
@@ -75,28 +75,22 @@ class RoughSolveTest {
         println(solutionContext)
     }
 
-    private data class SearchNode(val context: EuclideaContext, val depth: Int)
-
     private fun solve(
         initialContext: EuclideaContext,
         maxDepth: Int,
         check: (EuclideaContext) -> Boolean
     ): EuclideaContext? {
+        fun sub(context: EuclideaContext, depth: Int): EuclideaContext? {
+            val nextDepth = depth + 1
+            for (next in context.nexts())
+                if (check(next))
+                    return next
+                else if (nextDepth < maxDepth)
+                    sub(next, nextDepth)
+            return null
+        }
         if (check(initialContext))
             return initialContext
-        val queue: ArrayDeque<SearchNode> = ArrayDeque(listOf(SearchNode(initialContext, 0)))
-        while (true) {
-            val node = queue.removeFirstOrNull()
-            if (node === null)
-                return null
-            with(node) {
-                val nextDepth = depth + 1
-                for (next in context.nexts())
-                    if (check(next))
-                        return next
-                    else if (nextDepth < maxDepth)
-                        queue.add(SearchNode(next, nextDepth))
-            }
-        }
+        return sub(initialContext, 0)
     }
 }
