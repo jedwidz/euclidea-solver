@@ -56,16 +56,15 @@ class RoughSolveTest {
         val circle = Element.Circle(center, 1.0)
         val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
         // 'probe' line to cut across the circle and line.
-        val probeLine1 = Element.Line(Point(-1.043215, 0.0), Point(-0.828934, 3.0))
-        val probeLine2 = Element.Line(Point(1.134342, 0.0), Point(0.312323, 3.0))
+        val probeLine = Element.Line(Point(-1.043215, 0.0), Point(-0.828934, 3.0))
         val initialContext = EuclideaContext(
             config = EuclideaConfig(circleToolEnabled = false),
             points = listOf(center),
             elements = listOf(circle, line)
-        ).withElement(probeLine1).withElement(probeLine2)
+        ).withElement(probeLine)
         val solutionContext = solve(initialContext, 6) { context ->
             context.elements.any {
-                it !== circle && it !== line && it !== probeLine1 && it !== probeLine2 && intersect(
+                it !== circle && it !== line && it !== probeLine && intersect(
                     line,
                     it
                 ) == Intersection.Disjoint
