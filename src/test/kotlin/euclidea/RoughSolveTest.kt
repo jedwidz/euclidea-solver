@@ -55,7 +55,6 @@ class RoughSolveTest {
         val center = Point(0.0, 2.0)
         val circle = Element.Circle(center, 1.0)
         val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
-        val solution = Element.Line(Point(0.0, 0.0), Point(0.0, 1.0))
         // 'probe' line to cut across the circle and line.
         val probeLine1 = Element.Line(Point(-1.043215, 0.0), Point(-0.828934, 3.0))
         val probeLine2 = Element.Line(Point(1.134342, 0.0), Point(0.312323, 3.0))
