@@ -85,7 +85,7 @@ class RoughSolveTest {
                 if (check(next))
                     return next
                 else if (nextDepth < maxDepth)
-                    sub(next, nextDepth)
+                    sub(next, nextDepth)?.let { return@sub it }
             return null
         }
         if (check(initialContext))
