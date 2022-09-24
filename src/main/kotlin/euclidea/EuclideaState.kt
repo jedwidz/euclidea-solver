@@ -12,17 +12,21 @@ data class EuclideaContext(
     val config: EuclideaConfig = EuclideaConfig(),
     val points: List<Point>,
     val elements: List<Element>,
-    val pointSource: Map<Point, Pair<Element, Element>> = mapOf()
+    val pointSource: Map<Point, Pair<Element, Element>> = mapOf(),
+    val oldPoints: Set<Point> = setOf(),
+    val pendingElements: Set<Element> = setOf()
 ) {
     fun nexts(): List<EuclideaContext> {
-        val res = mutableListOf<EuclideaContext>()
+        val newPoints = points.filter { it !in oldPoints }
+        val nextOldPoints = oldPoints + newPoints
+
+        val newElements = mutableListOf<Element>()
         fun tryAdd(e: Element?) {
-            when (val next = e?.let { this.withElement(it) }) {
-                this, null -> {; }
-                else -> res.add(next)
-            }
+            if (e !== null && !hasElement(e))
+                newElements.add(e)
         }
-        forEachPair(points) { point1, point2 ->
+
+        fun visit(point1: Point, point2: Point) {
             if (config.lineToolEnabled)
                 tryAdd(lineTool(point1, point2))
             if (config.circleToolEnabled) {
@@ -30,7 +34,25 @@ data class EuclideaContext(
                 tryAdd(circleTool(point2, point1))
             }
         }
+        newPoints.forEachIndexed { i, newPoint ->
+            oldPoints.forEach { visit(newPoint, it) }
+            for (j in i + 1 until newPoints.size)
+                visit(newPoint, newPoints[j])
+        }
+
+        val newPendingElements = pendingElements + newElements
+
+        val res = mutableListOf<EuclideaContext>()
+        var nextPendingElements = newPendingElements
+        newPendingElements.forEach { newElement ->
+            nextPendingElements = nextPendingElements.minus(newElement)
+            res.add(this.withElement(newElement).withSearchState(nextOldPoints, nextPendingElements))
+        }
         return res.toList()
+    }
+
+    private fun withSearchState(nextOldPoints: Set<Point>, nextPendingElements: Set<Element>): EuclideaContext {
+        return EuclideaContext(config, points, elements, pointSource, nextOldPoints, nextPendingElements)
     }
 
     @Suppress("SuspiciousCollectionReassignment")
@@ -48,7 +70,7 @@ data class EuclideaContext(
                     }
                 }
             }
-            EuclideaContext(config, updatedPoints, elements + element, updatedPointSource)
+            EuclideaContext(config, updatedPoints, elements + element, updatedPointSource, oldPoints, pendingElements)
         }
     }
 
