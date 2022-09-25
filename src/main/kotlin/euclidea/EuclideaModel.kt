@@ -133,8 +133,8 @@ private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersecti
 
 private fun circlesIntersect(circle1: Element.Circle, circle2: Element.Circle): Intersection {
     // Help from: https://math.stackexchange.com/a/1033561
-    val o = circle2.center
-    val p = circle1.center - o
+    val o = circle1.center
+    val p = circle2.center - o
     val d2 = sq(p.x) + sq(p.y)
     val d = sqrt(d2)
     return if (coincides(d, 0.0)) {
@@ -147,13 +147,14 @@ private fun circlesIntersect(circle1: Element.Circle, circle2: Element.Circle): 
         if (h2 < 0.0 || h2.isNaN())
             Intersection.Disjoint
         else {
+            val lod = l / d
             if (coincides(h2, 0.0))
-                Intersection.OnePoint(Point(l / d * p.x, l / d * p.y) + o)
+                Intersection.OnePoint(Point(lod * p.x, lod * p.y) + o)
             else {
                 val hod = sqrt(h2) / d
                 Intersection.TwoPoints(
-                    Point(l / d * p.x + hod * p.y, l / d * p.y - hod * p.x) + o,
-                    Point(l / d * p.x - hod * p.y, l / d * p.y + hod * p.x) + o
+                    Point(lod * p.x + hod * p.y, lod * p.y - hod * p.x) + o,
+                    Point(lod * p.x - hod * p.y, lod * p.y + hod * p.x) + o
                 )
             }
         }

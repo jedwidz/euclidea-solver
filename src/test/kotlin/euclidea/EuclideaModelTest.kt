@@ -56,6 +56,16 @@ class EuclideaModelTest {
     }
 
     @Test
+    fun circleCircleIntersect_bugFix() {
+        val circle1 = Element.Circle(center = Point(x = 0.0, y = 0.0), radius = 1.0, sample = null)
+        val circle2 = Element.Circle(center = Point(x = -2.0, y = 0.0), radius = 2.0, sample = Point(x = 0.0, y = 0.0))
+        val intersection = intersect(circle1, circle2)
+        val x = -0.25
+        val s = sqrt(15.0 / 16.0)
+        Assertions.assertEquals(Intersection.TwoPoints(Point(x, s), Point(x, -s)), intersection)
+    }
+
+    @Test
     fun circleCircleIntersect_onePoint() {
         val circle1 = Element.Circle(Point(-1.0, 1.0), 1.0)
         val circle2 = Element.Circle(Point(1.0, 1.0), 1.0)
