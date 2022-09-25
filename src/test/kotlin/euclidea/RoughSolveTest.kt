@@ -95,7 +95,7 @@ class RoughSolveTest {
         // (circles only)
         val center = Point(0.0, 0.0)
         val circle = Element.Circle(center, 1.0)
-        val point = Point(-2.442897, 0.0)
+        val point = Point(-2.542897, 0.0)
         val initialContext = EuclideaContext(
             config = EuclideaConfig(lineToolEnabled = false),
             points = listOf(center, point),
@@ -106,9 +106,9 @@ class RoughSolveTest {
         fun checkSolution(a: Double, b: Double): Boolean {
             return coincides(a, 0.0) && solutionKnots.any { coincides(it, b) }
         }
-        // 6 - bingo (~15 sec)
+        // 6 - nothing
         val solutionContext = solve(initialContext, 6) { context ->
-            context.points.any { checkSolution(it.x, it.y) || checkSolution(it.y, it.x) }
+            context.points.any { checkSolution(it.y, it.x) }
         }
         dumpSolution(solutionContext)
     }
