@@ -48,10 +48,26 @@ class RoughSolveTest {
     }
 
     @Test
+    fun puzzle15_7_stages() {
+        // Drop a Perpendicular**
+        // (lines only)
+        val solution = Element.Line(Point(0.0, 0.0), Point(0.0, 1.0))
+        val solutionContext = solve(puzzle15_7_par_stage(), 5) { context ->
+            context.hasElement(solution)
+        }
+        dumpSolution(solutionContext)
+    }
+
+    @Test
     fun puzzle15_7_par() {
         // Drop a Perpendicular**
         // (lines only)
         // Look for a parallel line
+        val solutionContext = puzzle15_7_par_stage()
+        dumpSolution(solutionContext)
+    }
+
+    private fun puzzle15_7_par_stage(): EuclideaContext {
         val center = Point(0.0, 2.0)
         val circle = Element.Circle(center, 1.0)
         val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
@@ -70,7 +86,7 @@ class RoughSolveTest {
                 ) == Intersection.Disjoint
             }
         }
-        dumpSolution(solutionContext)
+        return solutionContext!!
     }
 
     private fun dumpSolution(solutionContext: EuclideaContext?) {
