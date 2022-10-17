@@ -133,23 +133,33 @@ class RoughSolveTest {
         assertTrue(solutionContext.nexts().any { it.hasElement(solutionLine) })
     }
 
-    private fun intersectOnePoint(element1: Element, element2: Element): Point =
+    private fun intersectOnePoint(element1: Element, element2: Element, name: String? = null): Point =
         when (val i = intersect(element1, element2)) {
-            is Intersection.OnePoint -> i.point
+            is Intersection.OnePoint -> i.point.copy(name = name)
             else -> error("One intersection point expected: $i")
         }
 
-    private fun intersectTwoPoints(element1: Element, element2: Element): Pair<Point, Point> =
+    private fun intersectTwoPoints(
+        element1: Element,
+        element2: Element,
+        name1: String? = null,
+        name2: String? = null
+    ): Pair<Point, Point> =
         when (val i = intersect(element1, element2)) {
-            is Intersection.TwoPoints -> Pair(i.point1, i.point2)
+            is Intersection.TwoPoints -> Pair(i.point1.copy(name = name1), i.point2.copy(name = name2))
             else -> error("Two intersection points expected: $i")
         }
 
-    private fun intersectTwoPointsOther(element1: Element, element2: Element, point1: Point): Point {
+    private fun intersectTwoPointsOther(
+        element1: Element,
+        element2: Element,
+        point1: Point,
+        name: String? = null
+    ): Point {
         val intersection = intersect(element1, element2)
         val points = intersection.points().filter { point2 -> !coincides(point1, point2) }
         return when (points.size) {
-            1 -> points.first()
+            1 -> points.first().copy(name = name)
             else -> error("Expected one point other than $point1: $intersection")
         }
     }
@@ -226,7 +236,7 @@ class RoughSolveTest {
         solutionContext?.let { printSteps(it) }
     }
 
-    private class Labeler<T>(val prefix: String) {
+    private class Labeler<T : HasName>(val prefix: String) {
         private val tags = mutableMapOf<T, Int>()
         private var nextTag = 1
 
@@ -235,16 +245,16 @@ class RoughSolveTest {
                 null -> {
                     val newTag = nextTag++
                     tags[item] = newTag
-                    val label = labelFor(newTag)
+                    val label = labelFor(newTag, item.name)
                     newAction?.let { it(label) }
                     label
                 }
-                else -> labelFor(tag)
+                else -> labelFor(tag, item.name)
             }
         }
 
-        private fun labelFor(tag: Int): String {
-            return prefix + tag
+        private fun labelFor(tag: Int, name: String?): String {
+            return "${prefix}${tag}${name?.let { "_${it}" } ?: ""}"
         }
     }
 
