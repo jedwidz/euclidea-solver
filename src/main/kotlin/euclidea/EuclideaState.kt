@@ -76,6 +76,10 @@ data class EuclideaContext(
         }
     }
 
+    fun withElements(elements: List<Element>): EuclideaContext {
+        return elements.fold(this) { acc, element -> acc.withElement(element) }
+    }
+
     fun hasElements(otherElements: List<Element>): Boolean {
         return otherElements.all { hasElement(it) }
     }

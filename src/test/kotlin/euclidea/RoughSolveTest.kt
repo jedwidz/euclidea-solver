@@ -3,6 +3,7 @@ package euclidea
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
+import kotlin.test.assertTrue
 
 class RoughSolveTest {
     @Test
@@ -69,6 +70,88 @@ class RoughSolveTest {
             context.points.any { point -> coincides(point.x, 0.0) && !coincides(point.y, 2.0) }
         }
         dumpSolution(solutionContext)
+    }
+
+    @Test
+    fun puzzle15_7_check_solution() {
+        // Drop a Perpendicular**
+        // (lines only)
+        // Reproduce and check my best solution so far
+        val center = Point(0.0, 2.0)
+        val circle = Element.Circle(center, 1.0)
+        val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
+        // 'probe' line to cut across the circle and line.
+        val probeLineIntercept = Point(-1.043215, 0.0)
+        val probeLine = Element.Line(probeLineIntercept, Point(-0.828934, 3.0))
+        // Solution works regardless of point 'order' here
+        val (xPoint1, xPoint2) = intersectTwoPoints(circle, probeLine)
+        val xLine1 = Element.Line(center, xPoint1)
+        val xLine2 = Element.Line(center, xPoint2)
+        val xPoint3 = intersectTwoPointsOther(circle, xLine1, xPoint1)
+        val xPoint4 = intersectTwoPointsOther(circle, xLine2, xPoint2)
+        val probeLineOpp = Element.Line(xPoint3, xPoint4)
+        val pivotLine = Element.Line(center, probeLineIntercept)
+        val pivotOppPoint = intersectOnePoint(pivotLine, probeLineOpp)
+        val apexPoint = intersectOnePoint(xLine1, line)
+        val adjacentLine = Element.Line(pivotOppPoint, apexPoint)
+        val farPoint = intersectOnePoint(adjacentLine, probeLine)
+        val probeLineOppIntercept = intersectOnePoint(probeLineOpp, line)
+        val crossLine = Element.Line(farPoint, probeLineOppIntercept)
+        val middlePoint = intersectOnePoint(crossLine, pivotLine)
+        val otherLine = Element.Line(middlePoint, apexPoint)
+        val nextPoint = intersectOnePoint(otherLine, probeLineOpp)
+        val apexPointOpp = intersectOnePoint(xLine2, line)
+        val line1 = Element.Line(apexPointOpp, nextPoint)
+        val parallelPoint = intersectOnePoint(line1, pivotLine)
+        val parallelLine = Element.Line(parallelPoint, xPoint2)
+        val symmetricalPoint = intersectTwoPointsOther(circle, parallelLine, xPoint2)
+        val symmetricalLine = Element.Line(symmetricalPoint, middlePoint)
+        val topPoint = intersectOnePoint(symmetricalLine, probeLine)
+        val solutionLine = Element.Line(topPoint, center)
+
+        val solutionContext = EuclideaContext(
+            config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(50.0)),
+            points = listOf(center),
+            elements = listOf(circle, line)
+        ).withElements(
+            listOf(
+                probeLine,
+                xLine1,
+                xLine2,
+                probeLineOpp,
+                pivotLine,
+                adjacentLine,
+                crossLine,
+                otherLine,
+                line1,
+                parallelLine,
+                symmetricalLine
+            )
+        )
+
+        dumpSolution(solutionContext)
+        assertTrue(solutionContext.nexts().any { it.hasElement(solutionLine) })
+    }
+
+    private fun intersectOnePoint(element1: Element, element2: Element): Point =
+        when (val i = intersect(element1, element2)) {
+            is Intersection.OnePoint -> i.point
+            else -> error("One intersection point expected: $i")
+        }
+
+    private fun intersectTwoPoints(element1: Element, element2: Element): Pair<Point, Point> =
+        when (val i = intersect(element1, element2)) {
+            is Intersection.TwoPoints -> Pair(i.point1, i.point2)
+            else -> error("Two intersection points expected: $i")
+        }
+
+    private fun intersectTwoPointsOther(element1: Element, element2: Element, point1: Point): Point {
+        val intersection = intersect(element1, element2)
+        val points = intersection.points().filter { point2 -> !coincides(point1, point2) }
+        return when (points.size) {
+            1 -> points.first()
+            else -> error("Expected one point other than $point1: $intersection")
+        }
     }
 
     @Test
