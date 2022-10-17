@@ -84,7 +84,7 @@ class RoughSolveTest {
         val probeLineIntercept = Point(-1.043215, 0.0, name = "probeIntercept")
         val probePoint = Point(-0.828934, 3.0, name = "probe")
         val solutionContext =
-            puzzle15_7_solution12E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
+            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
 
         dumpSolution(solutionContext)
         val checkSolutionLine = Element.Line(center, basePoint)
@@ -96,7 +96,6 @@ class RoughSolveTest {
         // Drop a Perpendicular**
         // (lines only)
         // Try to improve on my best solution so far
-        // >> found 11E solution
         val basePoint = Point(0.0, 0.0, name = "base")
         val basePoint2 = Point(1.0, 0.0)
         val center = Point(0.0, 2.0, name = "center")
@@ -106,13 +105,13 @@ class RoughSolveTest {
         val probeLineIntercept = Point(-1.043215, 0.0, name = "probeIntercept")
         val probePoint = Point(-0.828934, 3.0, name = "probe")
         val sampleSolutionContext =
-            puzzle15_7_solution12E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
+            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
 
         val probeLine = Element.Line(probeLineIntercept, probePoint, name = "probe")
         val startingContext = initialContext.withElement(probeLine)
 
-        val maxExtraElements = 1
-        val solutionContext = solve(startingContext, 11 - 1 - 1, prune = { next ->
+        val maxExtraElements = 3
+        val solutionContext = solve(startingContext, 10 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
             context.points.any { point -> coincides(point.x, 0.0) && !coincides(point.y, 2.0) }
@@ -120,7 +119,7 @@ class RoughSolveTest {
         dumpSolution(solutionContext)
     }
 
-    private fun puzzle15_7_solution12E(
+    private fun puzzle15_7_solution11E(
         center: Point,
         radius: Double,
         basePoint: Point,
@@ -148,11 +147,8 @@ class RoughSolveTest {
         val middlePoint = intersectOnePoint(crossLine, pivotLine, name = "middle")
         val otherLine = Element.Line(middlePoint, apexPoint, name = "other")
         val nextPoint = intersectOnePoint(otherLine, probeLineOpp, name = "next")
-        val apexPointOpp = intersectOnePoint(xLine1, line, name = "apexOpp")
-        val line1 = Element.Line(apexPointOpp, nextPoint, name = "line1")
-        val parallelPoint = intersectOnePoint(line1, pivotLine, name = "parallel")
-        val parallelLine = Element.Line(parallelPoint, xPoint1, name = "parallel")
-        val symmetricalPoint = intersectTwoPointsOther(circle, parallelLine, xPoint1, name = "symmetrical")
+        val parallelLine = Element.Line(middlePoint, xPoint2, name = "parallel")
+        val symmetricalPoint = intersectTwoPointsOther(circle, parallelLine, xPoint2, name = "symmetrical")
         val symmetricalLine = Element.Line(symmetricalPoint, nextPoint, name = "symmetrical")
         val topPoint = intersectOnePoint(symmetricalLine, probeLine, name = "top")
         val solutionLine = Element.Line(topPoint, center, name = "solution")
@@ -167,7 +163,6 @@ class RoughSolveTest {
                 adjacentLine,
                 crossLine,
                 otherLine,
-                line1,
                 parallelLine,
                 symmetricalLine,
                 solutionLine
