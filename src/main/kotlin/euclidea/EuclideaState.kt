@@ -5,7 +5,8 @@ import euclidea.EuclideaTools.lineTool
 
 data class EuclideaConfig(
     val lineToolEnabled: Boolean = true,
-    val circleToolEnabled: Boolean = true
+    val circleToolEnabled: Boolean = true,
+    val maxSqDistance: Double = Double.MAX_VALUE
 )
 
 data class EuclideaContext(
@@ -64,10 +65,11 @@ data class EuclideaContext(
             var updatedPointSource = pointSource
             for (e in elements) {
                 for (point in intersect(e, element).points()) {
-                    if (updatedPoints.none { p -> coincides(p, point) }) {
-                        updatedPoints += point
-                        updatedPointSource += point to Pair(e, element)
-                    }
+                    if (point.sqDistance < config.maxSqDistance)
+                        if (updatedPoints.none { p -> coincides(p, point) }) {
+                            updatedPoints += point
+                            updatedPointSource += point to Pair(e, element)
+                        }
                 }
             }
             EuclideaContext(config, updatedPoints, elements + element, updatedPointSource, oldPoints, pendingElements)

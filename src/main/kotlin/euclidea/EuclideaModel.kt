@@ -4,6 +4,8 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 
 data class Point(val x: Double, val y: Double) {
+    val sqDistance: Double = sq(x) + sq(y)
+
     operator fun minus(point: Point): Point {
         return Point(x - point.x, y - point.y)
     }
@@ -188,6 +190,6 @@ private fun circleLineIntersect(circle: Element.Circle, line: Element.Line): Int
     }
 }
 
-private fun sq(v: Double): Double {
+fun sq(v: Double): Double {
     return v * v
 }
