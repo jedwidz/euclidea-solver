@@ -107,6 +107,7 @@ class RoughSolveTest {
             return coincides(a, 0.0) && solutionKnots.any { coincides(it, b) }
         }
         // 6 - nothing
+        // 7 - coincidence? (~3 hours)
         val solutionContext = solve(initialContext, 6) { context ->
             context.points.any { checkSolution(it.y, it.x) }
         }
