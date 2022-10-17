@@ -77,37 +77,38 @@ class RoughSolveTest {
         // Drop a Perpendicular**
         // (lines only)
         // Reproduce and check my best solution so far
-        val center = Point(0.0, 2.0)
-        val circle = Element.Circle(center, 1.0)
-        val line = Element.Line(Point(0.0, 0.0), Point(1.0, 0.0))
+        val center = Point(0.0, 2.0, name = "center")
+        val basePoint = Point(0.0, 0.0, name = "base")
+        val circle = Element.Circle(center, 1.0, name = "circle")
+        val line = Element.Line(basePoint, Point(1.0, 0.0))
         // 'probe' line to cut across the circle and line.
-        val probeLineIntercept = Point(-1.043215, 0.0)
-        val probeLine = Element.Line(probeLineIntercept, Point(-0.828934, 3.0))
+        val probeLineIntercept = Point(-1.043215, 0.0, name = "probeIntercept")
+        val probeLine = Element.Line(probeLineIntercept, Point(-0.828934, 3.0), name = "probe")
         // Solution works regardless of point 'order' here
-        val (xPoint1, xPoint2) = intersectTwoPoints(circle, probeLine)
-        val xLine1 = Element.Line(center, xPoint1)
-        val xLine2 = Element.Line(center, xPoint2)
-        val xPoint3 = intersectTwoPointsOther(circle, xLine1, xPoint1)
-        val xPoint4 = intersectTwoPointsOther(circle, xLine2, xPoint2)
-        val probeLineOpp = Element.Line(xPoint3, xPoint4)
-        val pivotLine = Element.Line(center, probeLineIntercept)
-        val pivotOppPoint = intersectOnePoint(pivotLine, probeLineOpp)
-        val apexPoint = intersectOnePoint(xLine1, line)
-        val adjacentLine = Element.Line(pivotOppPoint, apexPoint)
-        val farPoint = intersectOnePoint(adjacentLine, probeLine)
-        val probeLineOppIntercept = intersectOnePoint(probeLineOpp, line)
-        val crossLine = Element.Line(farPoint, probeLineOppIntercept)
-        val middlePoint = intersectOnePoint(crossLine, pivotLine)
-        val otherLine = Element.Line(middlePoint, apexPoint)
-        val nextPoint = intersectOnePoint(otherLine, probeLineOpp)
-        val apexPointOpp = intersectOnePoint(xLine2, line)
-        val line1 = Element.Line(apexPointOpp, nextPoint)
-        val parallelPoint = intersectOnePoint(line1, pivotLine)
-        val parallelLine = Element.Line(parallelPoint, xPoint2)
-        val symmetricalPoint = intersectTwoPointsOther(circle, parallelLine, xPoint2)
-        val symmetricalLine = Element.Line(symmetricalPoint, middlePoint)
-        val topPoint = intersectOnePoint(symmetricalLine, probeLine)
-        val solutionLine = Element.Line(topPoint, center)
+        val (xPoint1, xPoint2) = intersectTwoPoints(circle, probeLine, name1 = "x1", name2 = "x2")
+        val xLine1 = Element.Line(center, xPoint1, name = "x1")
+        val xLine2 = Element.Line(center, xPoint2, name = "x2")
+        val xPoint3 = intersectTwoPointsOther(circle, xLine1, xPoint1, name = "x3")
+        val xPoint4 = intersectTwoPointsOther(circle, xLine2, xPoint2, name = "x4")
+        val probeLineOpp = Element.Line(xPoint3, xPoint4, name = "probeOpp")
+        val pivotLine = Element.Line(center, probeLineIntercept, name = "pivot")
+        val pivotOppPoint = intersectOnePoint(pivotLine, probeLineOpp, name = "probeOpp")
+        val apexPoint = intersectOnePoint(xLine2, line, name = "apex")
+        val adjacentLine = Element.Line(pivotOppPoint, apexPoint, name = "adjacent")
+        val farPoint = intersectOnePoint(adjacentLine, probeLine, name = "far")
+        val probeLineOppIntercept = intersectOnePoint(probeLineOpp, line, name = "probeOppIntercept")
+        val crossLine = Element.Line(farPoint, probeLineOppIntercept, name = "cross")
+        val middlePoint = intersectOnePoint(crossLine, pivotLine, name = "middle")
+        val otherLine = Element.Line(middlePoint, apexPoint, name = "other")
+        val nextPoint = intersectOnePoint(otherLine, probeLineOpp, name = "next")
+        val apexPointOpp = intersectOnePoint(xLine1, line, name = "apexOpp")
+        val line1 = Element.Line(apexPointOpp, nextPoint, name = "line1")
+        val parallelPoint = intersectOnePoint(line1, pivotLine, name = "parallel")
+        val parallelLine = Element.Line(parallelPoint, xPoint1, name = "parallel")
+        val symmetricalPoint = intersectTwoPointsOther(circle, parallelLine, xPoint1, name = "symmetrical")
+        val symmetricalLine = Element.Line(symmetricalPoint, nextPoint, name = "symmetrical")
+        val topPoint = intersectOnePoint(symmetricalLine, probeLine, name = "top")
+        val solutionLine = Element.Line(topPoint, center, name = "solution")
 
         val solutionContext = EuclideaContext(
             config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(50.0)),
@@ -125,12 +126,14 @@ class RoughSolveTest {
                 otherLine,
                 line1,
                 parallelLine,
-                symmetricalLine
+                symmetricalLine,
+                solutionLine
             )
         )
 
         dumpSolution(solutionContext)
-        assertTrue(solutionContext.nexts().any { it.hasElement(solutionLine) })
+        val checkSolutionLine = Element.Line(center, basePoint)
+        assertTrue(solutionContext.hasElement(checkSolutionLine))
     }
 
     private fun intersectOnePoint(element1: Element, element2: Element, name: String? = null): Point =
