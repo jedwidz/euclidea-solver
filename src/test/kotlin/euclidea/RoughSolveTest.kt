@@ -96,6 +96,7 @@ class RoughSolveTest {
         // Drop a Perpendicular**
         // (lines only)
         // Try to improve on my best solution so far
+        // >> found 11E solution
         val basePoint = Point(0.0, 0.0, name = "base")
         val basePoint2 = Point(1.0, 0.0)
         val center = Point(0.0, 2.0, name = "center")
@@ -110,8 +111,8 @@ class RoughSolveTest {
         val probeLine = Element.Line(probeLineIntercept, probePoint, name = "probe")
         val startingContext = initialContext.withElement(probeLine)
 
-        val maxExtraElements = 0
-        val solutionContext = solve(startingContext, 12 - 1 - 1, prune = { next ->
+        val maxExtraElements = 1
+        val solutionContext = solve(startingContext, 11 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
             context.points.any { point -> coincides(point.x, 0.0) && !coincides(point.y, 2.0) }
