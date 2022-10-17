@@ -77,13 +77,59 @@ class RoughSolveTest {
         // Drop a Perpendicular**
         // (lines only)
         // Reproduce and check my best solution so far
-        val center = Point(0.0, 2.0, name = "center")
         val basePoint = Point(0.0, 0.0, name = "base")
-        val circle = Element.Circle(center, 1.0, name = "circle")
-        val line = Element.Line(basePoint, Point(1.0, 0.0))
-        // 'probe' line to cut across the circle and line.
+        val basePoint2 = Point(1.0, 0.0)
+        val center = Point(0.0, 2.0, name = "center")
+        val radius = 1.0
         val probeLineIntercept = Point(-1.043215, 0.0, name = "probeIntercept")
-        val probeLine = Element.Line(probeLineIntercept, Point(-0.828934, 3.0), name = "probe")
+        val probePoint = Point(-0.828934, 3.0, name = "probe")
+        val solutionContext =
+            puzzle15_7_solution12E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
+
+        dumpSolution(solutionContext)
+        val checkSolutionLine = Element.Line(center, basePoint)
+        assertTrue(solutionContext.hasElement(checkSolutionLine))
+    }
+
+    @Test
+    fun puzzle15_7_improve_solution() {
+        // Drop a Perpendicular**
+        // (lines only)
+        // Try to improve on my best solution so far
+        val basePoint = Point(0.0, 0.0, name = "base")
+        val basePoint2 = Point(1.0, 0.0)
+        val center = Point(0.0, 2.0, name = "center")
+        val radius = 1.0
+        val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2)
+
+        val probeLineIntercept = Point(-1.043215, 0.0, name = "probeIntercept")
+        val probePoint = Point(-0.828934, 3.0, name = "probe")
+        val sampleSolutionContext =
+            puzzle15_7_solution12E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
+
+        val probeLine = Element.Line(probeLineIntercept, probePoint, name = "probe")
+        val startingContext = initialContext.withElement(probeLine)
+
+        val maxExtraElements = 0
+        val solutionContext = solve(startingContext, 12 - 1 - 1, prune = { next ->
+            next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
+        }) { context ->
+            context.points.any { point -> coincides(point.x, 0.0) && !coincides(point.y, 2.0) }
+        }
+        dumpSolution(solutionContext)
+    }
+
+    private fun puzzle15_7_solution12E(
+        center: Point,
+        radius: Double,
+        basePoint: Point,
+        basePoint2: Point,
+        probeLineIntercept: Point,
+        probePoint: Point
+    ): EuclideaContext {
+        val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2)
+        // 'probe' line to cut across the circle and line.
+        val probeLine = Element.Line(probeLineIntercept, probePoint, name = "probe")
         // Solution works regardless of point 'order' here
         val (xPoint1, xPoint2) = intersectTwoPoints(circle, probeLine, name1 = "x1", name2 = "x2")
         val xLine1 = Element.Line(center, xPoint1, name = "x1")
@@ -110,11 +156,7 @@ class RoughSolveTest {
         val topPoint = intersectOnePoint(symmetricalLine, probeLine, name = "top")
         val solutionLine = Element.Line(topPoint, center, name = "solution")
 
-        val solutionContext = EuclideaContext(
-            config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(50.0)),
-            points = listOf(center),
-            elements = listOf(circle, line)
-        ).withElements(
+        val solutionContext = initialContext.withElements(
             listOf(
                 probeLine,
                 xLine1,
@@ -130,10 +172,23 @@ class RoughSolveTest {
                 solutionLine
             )
         )
+        return solutionContext
+    }
 
-        dumpSolution(solutionContext)
-        val checkSolutionLine = Element.Line(center, basePoint)
-        assertTrue(solutionContext.hasElement(checkSolutionLine))
+    private fun puzzle15_7_initialContext(
+        center: Point,
+        radius: Double,
+        basePoint: Point,
+        basePoint2: Point
+    ): Triple<Element.Circle, Element.Line, EuclideaContext> {
+        val circle = Element.Circle(center, radius, name = "circle")
+        val line = Element.Line(basePoint, basePoint2)
+        val baseContext = EuclideaContext(
+            config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(50.0)),
+            points = listOf(center),
+            elements = listOf(circle, line)
+        )
+        return Triple(circle, line, baseContext)
     }
 
     private fun intersectOnePoint(element1: Element, element2: Element, name: String? = null): Point =
@@ -325,6 +380,7 @@ class RoughSolveTest {
     private fun solve(
         initialContext: EuclideaContext,
         maxDepth: Int,
+        prune: ((EuclideaContext) -> Boolean)? = null,
         check: (EuclideaContext) -> Boolean
     ): EuclideaContext? {
         fun sub(context: EuclideaContext, depth: Int): EuclideaContext? {
@@ -332,7 +388,7 @@ class RoughSolveTest {
             for (next in context.nexts())
                 if (check(next))
                     return next
-                else if (nextDepth < maxDepth)
+                else if (nextDepth < maxDepth && (prune == null || !prune(next)))
                     sub(next, nextDepth)?.let { return@sub it }
             return null
         }
