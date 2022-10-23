@@ -81,7 +81,7 @@ class RoughSolveTest {
         val basePoint2 = Point(1.0, 0.0)
         val center = Point(0.0, 2.0, name = "center")
         val radius = 1.0
-        val probeLineIntercept = Point(-1.043215, 0.0, name = "probeIntercept")
+        val probeLineIntercept = Point(-0.943215, 0.0, name = "probeIntercept")
         val probePoint = Point(-0.828934, 3.0, name = "probe")
         val solutionContext =
             puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
@@ -102,7 +102,7 @@ class RoughSolveTest {
         val radius = 1.0
         val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2)
 
-        val probeLineIntercept = Point(-1.043215, 0.0, name = "probeIntercept")
+        val probeLineIntercept = Point(-0.943215, 0.0, name = "probeIntercept")
         val probePoint = Point(-0.828934, 3.0, name = "probe")
         val sampleSolutionContext =
             puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
@@ -110,7 +110,8 @@ class RoughSolveTest {
         val probeLine = Element.Line(probeLineIntercept, probePoint, name = "probe")
         val startingContext = initialContext.withElement(probeLine)
 
-        val maxExtraElements = 3
+        // 4 - nothing (23 min)
+        val maxExtraElements = 5
         val solutionContext = solve(startingContext, 10 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
