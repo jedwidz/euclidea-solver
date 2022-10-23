@@ -9,11 +9,13 @@ data class EuclideaConfig(
     val maxSqDistance: Double = Double.MAX_VALUE
 )
 
+data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)
+
 data class EuclideaContext(
     val config: EuclideaConfig = EuclideaConfig(),
     val points: List<Point>,
     val elements: List<Element>,
-    val pointSource: Map<Point, Pair<Element, Element>> = mapOf(),
+    val pointSource: Map<Point, IntersectionSource> = mapOf(),
     val oldPoints: Set<Point> = setOf(),
     val pendingElements: Set<Element> = setOf()
 ) {
@@ -64,11 +66,12 @@ data class EuclideaContext(
             var updatedPoints = points
             var updatedPointSource = pointSource
             for (e in elements) {
-                for (point in intersect(e, element).points()) {
+                val intersection = intersect(e, element)
+                for (point in intersection.points()) {
                     if (point.sqDistance < config.maxSqDistance)
                         if (updatedPoints.none { p -> coincides(p, point) }) {
                             updatedPoints += point
-                            updatedPointSource += point to Pair(e, element)
+                            updatedPointSource += point to IntersectionSource(e, element, intersection)
                         }
                 }
             }

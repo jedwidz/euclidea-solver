@@ -352,12 +352,15 @@ class RoughSolveTest {
                 fun explainPoint(point: Point): String {
                     return pointLabeler.label(point) { pointLabel ->
                         val coordinates = "(${point.x}, ${point.y})"
-                        when (val pair = pointSource[point]) {
+                        when (val intersectionSource = pointSource[point]) {
                             null -> println("$pointLabel at $coordinates")
                             else -> {
-                                val elementLabel1 = elementLabel(pair.first)
-                                val elementLabel2 = elementLabel(pair.second)
-                                println("$pointLabel at intersection of $elementLabel1 and $elementLabel2 $coordinates")
+                                val elementLabel1 = elementLabel(intersectionSource.element1)
+                                val elementLabel2 = elementLabel(intersectionSource.element2)
+                                val points = intersectionSource.intersection.points()
+                                val num = points.indexOf(point) + 1
+                                val count = points.size
+                                println("$pointLabel at intersection ($num/$count) of $elementLabel1 and $elementLabel2 $coordinates")
                             }
                         }
                     }
