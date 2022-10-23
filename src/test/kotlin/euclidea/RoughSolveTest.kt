@@ -77,16 +77,17 @@ class RoughSolveTest {
         // Drop a Perpendicular**
         // (lines only)
         // Reproduce and check my best solution so far
-        val basePoint = Point(0.0, 0.0, name = "base")
-        val basePoint2 = Point(1.0, 0.0)
-        val center = Point(0.0, 2.0, name = "center")
+        val namer = Namer()
+        val basePoint = namer.set("base", Point(0.0, 0.0))
+        val basePoint2 = namer.set("base2", Point(1.0, 0.0))
+        val center = namer.set("center", Point(0.0, 2.0))
         val radius = 1.0
-        val probeLineIntercept = Point(-0.943215, 0.0, name = "probeIntercept")
-        val probePoint = Point(-0.828934, 3.0, name = "probe")
+        val probeLineIntercept = namer.set("probeIntercept", Point(-0.943215, 0.0))
+        val probePoint = namer.set("probe", Point(-0.828934, 3.0))
         val solutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
+            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint, namer)
 
-        dumpSolution(solutionContext)
+        dumpSolution(solutionContext, namer)
         val checkSolutionLine = Element.Line(center, basePoint)
         assertTrue(solutionContext.hasElement(checkSolutionLine))
     }
@@ -96,18 +97,19 @@ class RoughSolveTest {
         // Drop a Perpendicular**
         // (lines only)
         // Try to improve on my best solution so far
-        val basePoint = Point(0.0, 0.0, name = "base")
-        val basePoint2 = Point(1.0, 0.0)
-        val center = Point(0.0, 2.0, name = "center")
+        val namer = Namer()
+        val basePoint = namer.set("base", Point(0.0, 0.0))
+        val basePoint2 = namer.set("base2", Point(1.0, 0.0))
+        val center = namer.set("center", Point(0.0, 2.0))
         val radius = 1.0
-        val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2)
+        val (_, _, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2, namer)
 
-        val probeLineIntercept = Point(-0.943215, 0.0, name = "probeIntercept")
-        val probePoint = Point(-0.828934, 3.0, name = "probe")
+        val probeLineIntercept = namer.set("probeIntercept", Point(-0.943215, 0.0))
+        val probePoint = namer.set("probe", Point(-0.828934, 3.0))
         val sampleSolutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint)
+            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint, namer)
 
-        val probeLine = Element.Line(probeLineIntercept, probePoint, name = "probe")
+        val probeLine = namer.set("probe", Element.Line(probeLineIntercept, probePoint))
         val startingContext = initialContext.withElement(probeLine)
 
         // 4 - nothing (23 min)
@@ -117,7 +119,7 @@ class RoughSolveTest {
         }) { context ->
             context.points.any { point -> coincides(point.x, 0.0) && !coincides(point.y, 2.0) }
         }
-        dumpSolution(solutionContext)
+        dumpSolution(solutionContext, namer)
     }
 
     private fun puzzle15_7_solution11E(
@@ -126,33 +128,34 @@ class RoughSolveTest {
         basePoint: Point,
         basePoint2: Point,
         probeLineIntercept: Point,
-        probePoint: Point
+        probePoint: Point,
+        namer: Namer
     ): EuclideaContext {
-        val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2)
+        val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2, namer)
         // 'probe' line to cut across the circle and line.
-        val probeLine = Element.Line(probeLineIntercept, probePoint, name = "probe")
+        val probeLine = namer.set("probe", Element.Line(probeLineIntercept, probePoint))
         // Solution works regardless of point 'order' here
-        val (xPoint1, xPoint2) = intersectTwoPoints(circle, probeLine, name1 = "x1", name2 = "x2")
-        val xLine1 = Element.Line(center, xPoint1, name = "x1")
-        val xLine2 = Element.Line(center, xPoint2, name = "x2")
-        val xPoint3 = intersectTwoPointsOther(circle, xLine1, xPoint1, name = "x3")
-        val xPoint4 = intersectTwoPointsOther(circle, xLine2, xPoint2, name = "x4")
-        val probeLineOpp = Element.Line(xPoint3, xPoint4, name = "probeOpp")
-        val pivotLine = Element.Line(center, probeLineIntercept, name = "pivot")
-        val pivotOppPoint = intersectOnePoint(pivotLine, probeLineOpp, name = "probeOpp")
-        val apexPoint = intersectOnePoint(xLine2, line, name = "apex")
-        val adjacentLine = Element.Line(pivotOppPoint, apexPoint, name = "adjacent")
-        val farPoint = intersectOnePoint(adjacentLine, probeLine, name = "far")
-        val probeLineOppIntercept = intersectOnePoint(probeLineOpp, line, name = "probeOppIntercept")
-        val crossLine = Element.Line(farPoint, probeLineOppIntercept, name = "cross")
-        val middlePoint = intersectOnePoint(crossLine, pivotLine, name = "middle")
-        val otherLine = Element.Line(middlePoint, apexPoint, name = "other")
-        val nextPoint = intersectOnePoint(otherLine, probeLineOpp, name = "next")
-        val parallelLine = Element.Line(middlePoint, xPoint2, name = "parallel")
-        val symmetricalPoint = intersectTwoPointsOther(circle, parallelLine, xPoint2, name = "symmetrical")
-        val symmetricalLine = Element.Line(symmetricalPoint, nextPoint, name = "symmetrical")
-        val topPoint = intersectOnePoint(symmetricalLine, probeLine, name = "top")
-        val solutionLine = Element.Line(topPoint, center, name = "solution")
+        val (xPoint1, xPoint2) = namer.setAll("x1", "x2", intersectTwoPoints(circle, probeLine))
+        val xLine1 = namer.set("x1", Element.Line(center, xPoint1))
+        val xLine2 = namer.set("x2", Element.Line(center, xPoint2))
+        val xPoint3 = namer.set("x3", intersectTwoPointsOther(circle, xLine1, xPoint1))
+        val xPoint4 = namer.set("x4", intersectTwoPointsOther(circle, xLine2, xPoint2))
+        val probeLineOpp = namer.set("probeOpp", Element.Line(xPoint3, xPoint4))
+        val pivotLine = namer.set("pivot", Element.Line(center, probeLineIntercept))
+        val pivotOppPoint = namer.set("probeOpp", intersectOnePoint(pivotLine, probeLineOpp))
+        val apexPoint = namer.set("apex", intersectOnePoint(xLine2, line))
+        val adjacentLine = namer.set("adjacent", Element.Line(pivotOppPoint, apexPoint))
+        val farPoint = namer.set("far", intersectOnePoint(adjacentLine, probeLine))
+        val probeLineOppIntercept = namer.set("probeOppIntercept", intersectOnePoint(probeLineOpp, line))
+        val crossLine = namer.set("cross", Element.Line(farPoint, probeLineOppIntercept))
+        val middlePoint = namer.set("middle", intersectOnePoint(crossLine, pivotLine))
+        val otherLine = namer.set("other", Element.Line(middlePoint, apexPoint))
+        val nextPoint = namer.set("next", intersectOnePoint(otherLine, probeLineOpp))
+        val parallelLine = namer.set("parallel", Element.Line(middlePoint, xPoint2))
+        val symmetricalPoint = namer.set("symmetrical", intersectTwoPointsOther(circle, parallelLine, xPoint2))
+        val symmetricalLine = namer.set("symmetrical", Element.Line(symmetricalPoint, nextPoint))
+        val topPoint = namer.set("top", intersectOnePoint(symmetricalLine, probeLine))
+        val solutionLine = namer.set("solution", Element.Line(topPoint, center))
 
         val solutionContext = initialContext.withElements(
             listOf(
@@ -172,14 +175,34 @@ class RoughSolveTest {
         return solutionContext
     }
 
+    class Namer {
+        private val names: MutableMap<Any, String> = mutableMapOf()
+
+        fun <T : Any> set(name: String, named: T): T {
+            names[named] = name
+            return named
+        }
+
+        fun <T : Pair<Any, Any>> setAll(name1: String, name2: String, namedPair: T): T {
+            names[namedPair.first] = name1
+            names[namedPair.second] = name2
+            return namedPair
+        }
+
+        fun get(named: Any): String? {
+            return names[named]
+        }
+    }
+
     private fun puzzle15_7_initialContext(
         center: Point,
         radius: Double,
         basePoint: Point,
-        basePoint2: Point
+        basePoint2: Point,
+        namer: Namer
     ): Triple<Element.Circle, Element.Line, EuclideaContext> {
-        val circle = Element.Circle(center, radius, name = "circle")
-        val line = Element.Line(basePoint, basePoint2)
+        val circle = namer.set("circle", Element.Circle(center, radius))
+        val line = namer.set("base", Element.Line(basePoint, basePoint2))
         val baseContext = EuclideaContext(
             config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(50.0)),
             points = listOf(center),
@@ -188,33 +211,30 @@ class RoughSolveTest {
         return Triple(circle, line, baseContext)
     }
 
-    private fun intersectOnePoint(element1: Element, element2: Element, name: String? = null): Point =
+    private fun intersectOnePoint(element1: Element, element2: Element): Point =
         when (val i = intersect(element1, element2)) {
-            is Intersection.OnePoint -> i.point.copy(name = name)
+            is Intersection.OnePoint -> i.point
             else -> error("One intersection point expected: $i")
         }
 
     private fun intersectTwoPoints(
         element1: Element,
-        element2: Element,
-        name1: String? = null,
-        name2: String? = null
+        element2: Element
     ): Pair<Point, Point> =
         when (val i = intersect(element1, element2)) {
-            is Intersection.TwoPoints -> Pair(i.point1.copy(name = name1), i.point2.copy(name = name2))
+            is Intersection.TwoPoints -> Pair(i.point1, i.point2)
             else -> error("Two intersection points expected: $i")
         }
 
     private fun intersectTwoPointsOther(
         element1: Element,
         element2: Element,
-        point1: Point,
-        name: String? = null
+        point1: Point
     ): Point {
         val intersection = intersect(element1, element2)
         val points = intersection.points().filter { point2 -> !coincides(point1, point2) }
         return when (points.size) {
-            1 -> points.first().copy(name = name)
+            1 -> points.first()
             else -> error("Expected one point other than $point1: $intersection")
         }
     }
@@ -286,12 +306,12 @@ class RoughSolveTest {
         dumpSolution(solutionContext)
     }
 
-    private fun dumpSolution(solutionContext: EuclideaContext?) {
+    private fun dumpSolution(solutionContext: EuclideaContext?, namer: Namer = Namer()) {
         println(solutionContext)
-        solutionContext?.let { printSteps(it) }
+        solutionContext?.let { printSteps(it, namer) }
     }
 
-    private class Labeler<T : HasName>(val prefix: String) {
+    private class Labeler<T : Any>(val prefix: String, val namer: Namer) {
         private val tags = mutableMapOf<T, Int>()
         private var nextTag = 1
 
@@ -300,25 +320,27 @@ class RoughSolveTest {
                 null -> {
                     val newTag = nextTag++
                     tags[item] = newTag
-                    val label = labelFor(newTag, item.name)
+                    val label = labelFor(newTag, nameOf(item))
                     newAction?.let { it(label) }
                     label
                 }
-                else -> labelFor(tag, item.name)
+                else -> labelFor(tag, nameOf(item))
             }
         }
+
+        private fun nameOf(item: T) = namer.get(item)
 
         private fun labelFor(tag: Int, name: String?): String {
             return "${prefix}${tag}${name?.let { "_${it}" } ?: ""}"
         }
     }
 
-    private fun printSteps(context: EuclideaContext) {
+    private fun printSteps(context: EuclideaContext, namer: Namer) {
         with(context) {
             object {
-                val pointLabeler = Labeler<Point>("point")
-                val circleLabeler = Labeler<Element.Circle>("circle")
-                val lineLabeler = Labeler<Element.Line>("line")
+                val pointLabeler = Labeler<Point>("point", namer)
+                val circleLabeler = Labeler<Element.Circle>("circle", namer)
+                val lineLabeler = Labeler<Element.Line>("line", namer)
 
                 fun elementLabel(element: Element): String {
                     return when (element) {

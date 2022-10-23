@@ -3,11 +3,7 @@ package euclidea
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-interface HasName {
-    val name: String?
-}
-
-data class Point(val x: Double, val y: Double, override val name: String? = null) : HasName {
+data class Point(val x: Double, val y: Double) {
     val sqDistance: Double = sq(x) + sq(y)
 
     operator fun minus(point: Point): Point {
@@ -23,10 +19,9 @@ data class Point(val x: Double, val y: Double, override val name: String? = null
     }
 }
 
-sealed class Element : HasName {
-    abstract override val name: String?
+sealed class Element {
 
-    data class Line(val point1: Point, val point2: Point, override val name: String? = null) : Element() {
+    data class Line(val point1: Point, val point2: Point) : Element() {
         override fun minus(point: Point): Line {
             return Line(point1 - point, point2 - point)
         }
@@ -39,8 +34,7 @@ sealed class Element : HasName {
     data class Circle(
         val center: Point,
         val radius: Double,
-        val sample: Point? = null,
-        override val name: String? = null
+        val sample: Point? = null
     ) : Element() {
         override fun minus(point: Point): Circle {
             return Circle(center - point, radius, sample?.let { it - point })
