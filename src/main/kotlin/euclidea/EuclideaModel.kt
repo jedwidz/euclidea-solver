@@ -185,9 +185,8 @@ private fun circleLineIntersect(circle: Element.Circle, line: Element.Line): Int
         Intersection.OnePoint(Point(det * dy / dr2, -det * dx / dr2) + o)
     } else {
         val f = sqrt(disc)
-        val sgn = if (dy < 0.0) -1.0 else 1.0
-        val xf = sgn * dx * f
-        val yf = abs(dy) * f
+        val xf = dx * f
+        val yf = dy * f
         Intersection.TwoPoints(
             Point((det * dy - xf) / dr2, (-det * dx - yf) / dr2) + o,
             Point((det * dy + xf) / dr2, (-det * dx + yf) / dr2) + o
