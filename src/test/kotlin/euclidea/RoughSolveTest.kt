@@ -131,9 +131,16 @@ class RoughSolveTest {
         probePoint: Point,
         namer: Namer
     ): EuclideaContext {
-        val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2, namer)
-        // 'probe' line to cut across the circle and line.
-        val probeLine = namer.set("probe", Element.Line(probeLineIntercept, probePoint))
+        val (temp, probeLineContext) = puzzle15_7_probeLineContext(
+            center,
+            radius,
+            basePoint,
+            basePoint2,
+            probeLineIntercept,
+            probePoint,
+            namer
+        )
+        val (circle, line, probeLine) = temp
         // Solution works regardless of point 'order' here
         val (xPoint1, xPoint2) = namer.setAll("x1", "x2", intersectTwoPoints(circle, probeLine))
         val xLine1 = namer.set("x1", Element.Line(center, xPoint1))
@@ -157,9 +164,8 @@ class RoughSolveTest {
         val topPoint = namer.set("top", intersectOnePoint(symmetricalLine, probeLine))
         val solutionLine = namer.set("solution", Element.Line(topPoint, center))
 
-        val solutionContext = initialContext.withElements(
+        val solutionContext = probeLineContext.withElements(
             listOf(
-                probeLine,
                 xLine1,
                 xLine2,
                 probeLineOpp,
@@ -209,6 +215,22 @@ class RoughSolveTest {
             elements = listOf(circle, line)
         )
         return Triple(circle, line, baseContext)
+    }
+
+    private fun puzzle15_7_probeLineContext(
+        center: Point,
+        radius: Double,
+        basePoint: Point,
+        basePoint2: Point,
+        probeLineIntercept: Point,
+        probePoint: Point,
+        namer: Namer
+    ): Pair<Triple<Element.Circle, Element.Line, Element.Line>, EuclideaContext> {
+        val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2, namer)
+        // 'probe' line to cut across the circle and line.
+        val probeLine = namer.set("probe", Element.Line(probeLineIntercept, probePoint))
+        val probeLineContext = initialContext.withElement(probeLine)
+        return Pair(Triple(circle, line, probeLine), probeLineContext)
     }
 
     private fun intersectOnePoint(element1: Element, element2: Element): Point =
