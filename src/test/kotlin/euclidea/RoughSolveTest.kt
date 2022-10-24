@@ -111,12 +111,13 @@ class RoughSolveTest {
         val checkSolutionLine = Element.Line(center, basePoint)
         assertTrue(solutionContext.hasElement(checkSolutionLine))
 
-        val replayBasePoint = namer.set("base", Point(0.0, 0.0))
-        val replayBasePoint2 = namer.set("base2", Point(1.0, 0.0))
-        val replayCenter = namer.set("center", Point(0.0, 2.0))
+        val replayNamer = Namer()
+        val replayBasePoint = replayNamer.set("base", Point(0.0, 0.0))
+        val replayBasePoint2 = replayNamer.set("base2", Point(1.0, 0.0))
+        val replayCenter = replayNamer.set("center", Point(0.0, 2.0))
         val replayRadius = 1.0
-        val replayProbePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
-        val replayProbePoint = namer.set("probe2", Point(-0.828934, 3.0))
+        val replayProbePoint1 = replayNamer.set("probe1", Point(-0.943215, 0.0))
+        val replayProbePoint = replayNamer.set("probe2", Point(-0.828934, 3.0))
         val (_, replayInitialContext) = puzzle15_7_probeLineContext(
             replayCenter,
             replayRadius,
@@ -124,13 +125,13 @@ class RoughSolveTest {
             replayBasePoint2,
             replayProbePoint1,
             replayProbePoint,
-            namer
+            replayNamer
         )
 
         val replaySolutionContext =
             replaySteps(solutionContext, replayInitialContext)
 
-        dumpSolution(replaySolutionContext, namer)
+        dumpSolution(replaySolutionContext, replayNamer)
         val replayCheckSolutionLine = Element.Line(replayCenter, replayBasePoint)
         assertTrue(replaySolutionContext.hasElement(replayCheckSolutionLine))
     }
