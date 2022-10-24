@@ -82,10 +82,10 @@ class RoughSolveTest {
         val basePoint2 = namer.set("base2", Point(1.0, 0.0))
         val center = namer.set("center", Point(0.0, 2.0))
         val radius = 1.0
-        val probeLineIntercept = namer.set("probeIntercept", Point(-0.943215, 0.0))
-        val probePoint = namer.set("probe", Point(-0.828934, 3.0))
+        val probePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
+        val probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
         val solutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint, namer)
+            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
 
         dumpSolution(solutionContext, namer)
         val checkSolutionLine = Element.Line(center, basePoint)
@@ -101,11 +101,11 @@ class RoughSolveTest {
         val basePoint = namer.set("base", Point(0.0, 0.0))
         val basePoint2 = namer.set("base2", Point(1.0, 0.0))
         val center = namer.set("center", Point(0.0, 2.0))
-        val radius = 1.0
-        val probeLineIntercept = namer.set("probeIntercept", Point(-0.943215, 0.0))
-        val probePoint = namer.set("probe", Point(-0.828934, 3.0))
+        val radius = 1.01
+        val probePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
+        val probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
         val solutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint, namer)
+            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
 
         // Double-check that solution works
         val checkSolutionLine = Element.Line(center, basePoint)
@@ -114,15 +114,15 @@ class RoughSolveTest {
         val replayBasePoint = namer.set("base", Point(0.0, 0.0))
         val replayBasePoint2 = namer.set("base2", Point(1.0, 0.0))
         val replayCenter = namer.set("center", Point(0.0, 2.0))
-        val replayRadius = 1.01
-        val replayProbeLineIntercept = namer.set("probeIntercept", Point(-0.943215, 0.0))
-        val replayProbePoint = namer.set("probe", Point(-0.828934, 3.0))
+        val replayRadius = 1.0
+        val replayProbePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
+        val replayProbePoint = namer.set("probe2", Point(-0.828934, 3.0))
         val (_, replayInitialContext) = puzzle15_7_probeLineContext(
             replayCenter,
             replayRadius,
             replayBasePoint,
             replayBasePoint2,
-            replayProbeLineIntercept,
+            replayProbePoint1,
             replayProbePoint,
             namer
         )
@@ -147,12 +147,12 @@ class RoughSolveTest {
         val radius = 1.0
         val (_, _, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2, namer)
 
-        val probeLineIntercept = namer.set("probeIntercept", Point(-0.943215, 0.0))
-        val probePoint = namer.set("probe", Point(-0.828934, 3.0))
+        val probePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
+        val probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
         val sampleSolutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probeLineIntercept, probePoint, namer)
+            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
 
-        val probeLine = namer.set("probe", Element.Line(probeLineIntercept, probePoint))
+        val probeLine = namer.set("probe", Element.Line(probePoint1, probePoint2))
         val startingContext = initialContext.withElement(probeLine)
 
         // 4 - nothing (23 min)
@@ -170,8 +170,8 @@ class RoughSolveTest {
         radius: Double,
         basePoint: Point,
         basePoint2: Point,
-        probeLineIntercept: Point,
-        probePoint: Point,
+        probePoint1: Point,
+        probePoint2: Point,
         namer: Namer
     ): EuclideaContext {
         val (temp, probeLineContext) = puzzle15_7_probeLineContext(
@@ -179,8 +179,8 @@ class RoughSolveTest {
             radius,
             basePoint,
             basePoint2,
-            probeLineIntercept,
-            probePoint,
+            probePoint1,
+            probePoint2,
             namer
         )
         val (circle, line, probeLine) = temp
@@ -191,6 +191,7 @@ class RoughSolveTest {
         val xPoint3 = namer.set("x3", intersectTwoPointsOther(circle, xLine1, xPoint1))
         val xPoint4 = namer.set("x4", intersectTwoPointsOther(circle, xLine2, xPoint2))
         val probeLineOpp = namer.set("probeOpp", Element.Line(xPoint3, xPoint4))
+        val probeLineIntercept = namer.set("probeIntercept", intersect(line, probeLine).points().first())
         val pivotLine = namer.set("pivot", Element.Line(center, probeLineIntercept))
         val pivotOppPoint = namer.set("probeOpp", intersectOnePoint(pivotLine, probeLineOpp))
         val apexPoint = namer.set("apex", intersectOnePoint(xLine2, line))
@@ -265,13 +266,13 @@ class RoughSolveTest {
         radius: Double,
         basePoint: Point,
         basePoint2: Point,
-        probeLineIntercept: Point,
-        probePoint: Point,
+        probePoint1: Point,
+        probePoint2: Point,
         namer: Namer
     ): Pair<Triple<Element.Circle, Element.Line, Element.Line>, EuclideaContext> {
         val (circle, line, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2, namer)
         // 'probe' line to cut across the circle and line.
-        val probeLine = namer.set("probe", Element.Line(probeLineIntercept, probePoint))
+        val probeLine = namer.set("probe", Element.Line(probePoint1, probePoint2))
         val probeLineContext = initialContext.withElement(probeLine)
         return Pair(Triple(circle, line, probeLine), probeLineContext)
     }
