@@ -86,7 +86,7 @@ class RoughSolveTest {
         val probePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
         val probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
         val solutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
+            puzzle15_7_solution10E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
 
         dumpSolution(solutionContext, namer)
         val checkSolutionLine = Element.Line(center, basePoint)
@@ -106,7 +106,7 @@ class RoughSolveTest {
         val probePoint1 = namer.set("probe1", Point(-0.9432151, 0.05))
         val probePoint2 = namer.set("probe2", Point(-0.8289344, 3.0555))
         val solutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
+            puzzle15_7_solution10E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
 
         // Double-check that solution works
         val base = lineTool(basePoint, basePoint2)!!
@@ -154,7 +154,7 @@ class RoughSolveTest {
         val probePoint1 = namer.set("probe1", Point(-0.943215, 0.1))
         val probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
         val sampleSolutionContext =
-            puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
+            puzzle15_7_solution10E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
 
         val probeLine = namer.set("probe", Element.Line(probePoint1, probePoint2))
         val startingContext = initialContext.withElement(probeLine)
@@ -193,16 +193,15 @@ class RoughSolveTest {
 
         assertTrue(isSolution(sampleSolutionContext))
 
-        // 5 - success! (1 hr 14 min)
-        val maxExtraElements = 5
-        val solutionContext = solve(startingContext, 10 - 1 - 1, prune = { next ->
+        // Not expected to get a better solution than 10E
+        val maxExtraElements = 3
+        val solutionContext = solve(startingContext, 9 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
             isSolution(context) && checkSolution(context)
         }
         dumpSolution(solutionContext, namer)
         println("Count: ${solutionContext?.elements?.size}")
-
     }
 
     fun puzzle15_7_isSolution(basePoint: Point, basePoint2: Point, center: Point): (EuclideaContext) -> Boolean {
@@ -218,7 +217,7 @@ class RoughSolveTest {
         }
     }
 
-    private fun puzzle15_7_solution11E(
+    private fun puzzle15_7_solution10E(
         center: Point,
         radius: Double,
         basePoint: Point,
@@ -240,38 +239,41 @@ class RoughSolveTest {
         // Solution works regardless of point 'order' here
         val (xPoint1, xPoint2) = namer.setAll("x1", "x2", intersectTwoPoints(circle, probeLine))
         val xLine1 = namer.set("x1", Element.Line(center, xPoint1))
-        val xLine2 = namer.set("x2", Element.Line(center, xPoint2))
         val xPoint3 = namer.set("x3", intersectTwoPointsOther(circle, xLine1, xPoint1))
-        val xPoint4 = namer.set("x4", intersectTwoPointsOther(circle, xLine2, xPoint2))
-        val probeLineOpp = namer.set("probeOpp", Element.Line(xPoint3, xPoint4))
         val probeLineIntercept = namer.set("probeIntercept", intersect(line, probeLine).points().first())
         val pivotLine = namer.set("pivot", Element.Line(center, probeLineIntercept))
-        val pivotOppPoint = namer.set("probeOpp", intersectOnePoint(pivotLine, probeLineOpp))
-        val apexPoint = namer.set("apex", intersectOnePoint(xLine2, line))
-        val adjacentLine = namer.set("adjacent", Element.Line(pivotOppPoint, apexPoint))
-        val farPoint = namer.set("far", intersectOnePoint(adjacentLine, probeLine))
-        val probeLineOppIntercept = namer.set("probeOppIntercept", intersectOnePoint(probeLineOpp, line))
-        val crossLine = namer.set("cross", Element.Line(farPoint, probeLineOppIntercept))
-        val middlePoint = namer.set("middle", intersectOnePoint(crossLine, pivotLine))
-        val otherLine = namer.set("other", Element.Line(middlePoint, apexPoint))
-        val nextPoint = namer.set("next", intersectOnePoint(otherLine, probeLineOpp))
-        val parallelLine = namer.set("parallel", Element.Line(middlePoint, xPoint2))
-        val symmetricalPoint = namer.set("symmetrical", intersectTwoPointsOther(circle, parallelLine, xPoint2))
-        val symmetricalLine = namer.set("symmetrical", Element.Line(symmetricalPoint, nextPoint))
-        val topPoint = namer.set("top", intersectOnePoint(symmetricalLine, probeLine))
-        val solutionLine = namer.set("solution", Element.Line(topPoint, center))
+        val pegLine1 = namer.set("peg1", Element.Line(xPoint3, xPoint2))
+        val pegPoint1 = namer.set("peg1", intersectOnePoint(line, pegLine1))
+        val (pivotCirclePoint1, pivotCirclePoint2) = namer.setAll(
+            "pivotCircle1",
+            "pivotCircle2",
+            intersectTwoPoints(circle, pivotLine)
+        )
+        val pincerLine1 = namer.set("pincer1", Element.Line(pivotCirclePoint1, pegPoint1))
+        val pincerLine2 = namer.set("pincer2", Element.Line(pivotCirclePoint2, pegPoint1))
+
+        val bracketPoint1 = namer.set("bracket1", intersectTwoPointsOther(circle, pincerLine1, pivotCirclePoint1))
+        val crossLine1 = namer.set("cross1", Element.Line(bracketPoint1, pivotCirclePoint2))
+
+        val bracketPoint2 = namer.set("bracket2", intersectTwoPointsOther(circle, pincerLine2, pivotCirclePoint2))
+        val crossLine2 = namer.set("cross2", Element.Line(bracketPoint2, pivotCirclePoint1))
+
+        val topPoint = namer.set("top", intersectOnePoint(crossLine1, crossLine2))
+        val pegPoint2 = namer.set("peg2", intersectOnePoint(line, xLine1))
+        val pegLine2 = namer.set("peg2", Element.Line(topPoint, pegPoint2))
+        val solutionPoint = namer.set("solution", intersectOnePoint(probeLine, pegLine2))
+        val solutionLine = namer.set("solution", Element.Line(solutionPoint, center))
 
         val solutionContext = probeLineContext.withElements(
             listOf(
                 xLine1,
-                xLine2,
-                probeLineOpp,
                 pivotLine,
-                adjacentLine,
-                crossLine,
-                otherLine,
-                parallelLine,
-                symmetricalLine,
+                pegLine1,
+                pincerLine1,
+                pincerLine2,
+                crossLine1,
+                crossLine2,
+                pegLine2,
                 solutionLine
             )
         )
