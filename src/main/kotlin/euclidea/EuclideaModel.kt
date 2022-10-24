@@ -119,7 +119,7 @@ fun coincides(num1: Double, num2: Double): Boolean {
 fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {
     val d1 = line.point2.minus(line.point1)
     val d2 = line.point1.minus(point)
-    val measure = d1.x * d2.y - d2.x * d1.y
+    val measure = (d1.x * d2.y - d2.x * d1.y) // / sqrt(d1.sqDistance)
     return coincides(measure, 0.0)
 }
 

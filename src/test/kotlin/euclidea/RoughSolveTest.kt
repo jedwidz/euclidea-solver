@@ -151,7 +151,7 @@ class RoughSolveTest {
         val radius = 1.0
         val (_, _, initialContext) = puzzle15_7_initialContext(center, radius, basePoint, basePoint2, namer)
 
-        val probePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
+        val probePoint1 = namer.set("probe1", Point(-0.943215, 0.1))
         val probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
         val sampleSolutionContext =
             puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
@@ -162,10 +162,10 @@ class RoughSolveTest {
         val isSolution = puzzle15_7_isSolution(basePoint, basePoint2, center)
 
         val replayNamer = Namer()
-        val replayBasePoint = replayNamer.set("base", Point(0.00129, 0.0124))
-        val replayBasePoint2 = replayNamer.set("base2", Point(1.0222, 0.01111))
-        val replayCenter = replayNamer.set("center", Point(0.0111, 2.0241))
-        val replayRadius = 1.0123
+        val replayBasePoint = replayNamer.set("base", Point(0.01, 0.0))
+        val replayBasePoint2 = replayNamer.set("base2", Point(1.0, 0.1))
+        val replayCenter = replayNamer.set("center", Point(0.02, 2.000))
+        val replayRadius = 1.0124
         val replayProbePoint1 = replayNamer.set("probe1", Point(-0.943215, 0.0))
         val replayProbePoint = replayNamer.set("probe2", Point(-0.828934, 3.0))
         val (_, replayInitialContext) = puzzle15_7_probeLineContext(
@@ -191,14 +191,18 @@ class RoughSolveTest {
             }
         }
 
-        // 4 - nothing (23 min)
-        val maxExtraElements = 1
-        val solutionContext = solve(startingContext, 11 - 1 - 1, prune = { next ->
+        assertTrue(isSolution(sampleSolutionContext))
+
+        // 5 - success! (1 hr 14 min)
+        val maxExtraElements = 5
+        val solutionContext = solve(startingContext, 10 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
             isSolution(context) && checkSolution(context)
         }
         dumpSolution(solutionContext, namer)
+        println("Count: ${solutionContext?.elements?.size}")
+
     }
 
     fun puzzle15_7_isSolution(basePoint: Point, basePoint2: Point, center: Point): (EuclideaContext) -> Boolean {
@@ -303,7 +307,7 @@ class RoughSolveTest {
         val circle = namer.set("circle", Element.Circle(center, radius))
         val line = namer.set("base", Element.Line(basePoint, basePoint2))
         val baseContext = EuclideaContext(
-            config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(50.0)),
+            config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(100.0)),
             points = listOf(center),
             elements = listOf(circle, line)
         )
@@ -352,6 +356,20 @@ class RoughSolveTest {
             1 -> points.first()
             else -> error("Expected one point other than $point1: $intersection")
         }
+    }
+
+    @Test
+    fun linePointCoincideTest() {
+        val basePoint = Point(0.01, 0.0)
+        val basePoint2 = Point(1.0, 0.1)
+        val center = Point(0.01, 2.000)
+        val base = lineTool(basePoint, basePoint2)!!
+        val perpendicularLine = perpendicularTool(base, center)!!
+
+        assertTrue(pointAndLineCoincide(center, perpendicularLine))
+
+        val intersectionPoint = intersect(base, perpendicularLine).points().first()
+        assertTrue(pointAndLineCoincide(intersectionPoint, perpendicularLine))
     }
 
     @Test
