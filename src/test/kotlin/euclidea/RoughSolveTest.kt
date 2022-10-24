@@ -2,6 +2,7 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
@@ -98,17 +99,18 @@ class RoughSolveTest {
         // (lines only)
         // Test replaying a solution, with different starting points
         val namer = Namer()
-        val basePoint = namer.set("base", Point(0.0, 0.0))
-        val basePoint2 = namer.set("base2", Point(1.0, 0.0))
-        val center = namer.set("center", Point(0.0, 2.0))
+        val basePoint = namer.set("base", Point(0.0134, 0.0134))
+        val basePoint2 = namer.set("base2", Point(1.01111, 0.01134))
+        val center = namer.set("center", Point(0.0343, 2.011))
         val radius = 1.01
-        val probePoint1 = namer.set("probe1", Point(-0.943215, 0.0))
-        val probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
+        val probePoint1 = namer.set("probe1", Point(-0.9432151, 0.05))
+        val probePoint2 = namer.set("probe2", Point(-0.8289344, 3.0555))
         val solutionContext =
             puzzle15_7_solution11E(center, radius, basePoint, basePoint2, probePoint1, probePoint2, namer)
 
         // Double-check that solution works
-        val checkSolutionLine = Element.Line(center, basePoint)
+        val base = lineTool(basePoint, basePoint2)!!
+        val checkSolutionLine = perpendicularTool(base, center)!!
         assertTrue(solutionContext.hasElement(checkSolutionLine))
 
         val replayNamer = Namer()
@@ -132,7 +134,8 @@ class RoughSolveTest {
             replaySteps(solutionContext, replayInitialContext)
 
         dumpSolution(replaySolutionContext, replayNamer)
-        val replayCheckSolutionLine = Element.Line(replayCenter, replayBasePoint)
+        val replayBase = lineTool(replayBasePoint, replayBasePoint2)!!
+        val replayCheckSolutionLine = perpendicularTool(replayBase, replayCenter)!!
         assertTrue(replaySolutionContext.hasElement(replayCheckSolutionLine))
     }
 
