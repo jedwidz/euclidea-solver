@@ -159,14 +159,29 @@ class RoughSolveTest {
         val probeLine = namer.set("probe", Element.Line(probePoint1, probePoint2))
         val startingContext = initialContext.withElement(probeLine)
 
+        val isSolution = puzzle15_7_isSolution(basePoint, basePoint2, center)
+
         // 4 - nothing (23 min)
-        val maxExtraElements = 5
-        val solutionContext = solve(startingContext, 10 - 1 - 1, prune = { next ->
+        val maxExtraElements = 1
+        val solutionContext = solve(startingContext, 11 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
-            context.points.any { point -> coincides(point.x, 0.0) && !coincides(point.y, 2.0) }
+            isSolution(context)
         }
         dumpSolution(solutionContext, namer)
+    }
+
+    fun puzzle15_7_isSolution(basePoint: Point, basePoint2: Point, center: Point): (EuclideaContext) -> Boolean {
+        val base = lineTool(basePoint, basePoint2)!!
+        val checkSolutionLine = perpendicularTool(base, center)!!
+        return { context ->
+            context.points.any { point ->
+                pointAndLineCoincide(point, checkSolutionLine) && !coincides(point, center) && !coincides(
+                    point,
+                    basePoint
+                ) && !coincides(point, basePoint2)
+            }
+        }
     }
 
     private fun puzzle15_7_solution11E(

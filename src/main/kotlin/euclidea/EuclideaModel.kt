@@ -116,6 +116,13 @@ fun coincides(num1: Double, num2: Double): Boolean {
     return abs(num2 - num1) < Epsilon
 }
 
+fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {
+    val d1 = line.point2.minus(line.point1)
+    val d2 = line.point1.minus(point)
+    val measure = d1.x * d2.y - d2.x * d1.y
+    return coincides(measure, 0.0)
+}
+
 private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {
     // Help from: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     val p1 = line1.point1
