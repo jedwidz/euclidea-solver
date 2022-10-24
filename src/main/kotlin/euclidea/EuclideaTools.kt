@@ -10,6 +10,12 @@ object EuclideaTools {
         return makeCircle(center, distance(center, sample), sample)
     }
 
+    fun perpendicularTool(line: Element.Line, point: Point): Element.Line? {
+        val direction = line.point2.minus(line.point1)
+        val point2 = Point(point.x + direction.y, point.y - direction.x)
+        return makeLine(point, point2)
+    }
+
     private fun makeLine(point1: Point, point2: Point): Element.Line? {
         return if (coincides(point1, point2)) null else Element.Line(point1, point2)
     }
