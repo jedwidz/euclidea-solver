@@ -114,7 +114,7 @@ class RoughSolveTest {
         val replayBasePoint = namer.set("base", Point(0.0, 0.0))
         val replayBasePoint2 = namer.set("base2", Point(1.0, 0.0))
         val replayCenter = namer.set("center", Point(0.0, 2.0))
-        val replayRadius = 1.0
+        val replayRadius = 1.01
         val replayProbeLineIntercept = namer.set("probeIntercept", Point(-0.943215, 0.0))
         val replayProbePoint = namer.set("probe", Point(-0.828934, 3.0))
         val (_, replayInitialContext) = puzzle15_7_probeLineContext(
@@ -495,8 +495,7 @@ class RoughSolveTest {
         fun unifyPoint(referencePoint: Point, replayPoint: Point) {
             val existing = fromReferencePoint.putIfAbsent(referencePoint, replayPoint)
             if (existing !== null) {
-                // TODO: Maybe check coincides rather than equality?
-                if (existing != replayPoint)
+                if (!coincides(existing, replayPoint))
                     replayFail("Failed to unify reference point $referencePoint with replay point $replayPoint: reference point already unified with $existing")
             }
         }
@@ -514,8 +513,7 @@ class RoughSolveTest {
             }
             val existing = fromReferenceElement.putIfAbsent(referenceElement, replayElement)
             if (existing !== null) {
-                // TODO: Maybe check coincides rather than equality?
-                if (existing != replayElement)
+                if (!coincides(existing, replayElement))
                     replayFail("Failed to unify reference element $referenceElement with replay element $replayElement: reference element already unified with $existing")
             }
         }
