@@ -52,7 +52,7 @@ class EuclideaModelTest {
         val circle2 = Element.Circle(Point(1.0, 2.0), 2.0)
         val intersection = intersect(circle1, circle2)
         val s = sqrt(3.0)
-        Assertions.assertEquals(Intersection.TwoPoints(Point(0.0, 2.0 + s), Point(0.0, 2.0 - s)), intersection)
+        Assertions.assertEquals(Intersection.TwoPoints(Point(0.0, 2.0 - s), Point(0.0, 2.0 + s)), intersection)
     }
 
     @Test
