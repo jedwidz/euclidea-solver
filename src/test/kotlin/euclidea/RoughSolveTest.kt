@@ -161,12 +161,42 @@ class RoughSolveTest {
 
         val isSolution = puzzle15_7_isSolution(basePoint, basePoint2, center)
 
+        val replayNamer = Namer()
+        val replayBasePoint = replayNamer.set("base", Point(0.00129, 0.0124))
+        val replayBasePoint2 = replayNamer.set("base2", Point(1.0222, 0.01111))
+        val replayCenter = replayNamer.set("center", Point(0.0111, 2.0241))
+        val replayRadius = 1.0123
+        val replayProbePoint1 = replayNamer.set("probe1", Point(-0.943215, 0.0))
+        val replayProbePoint = replayNamer.set("probe2", Point(-0.828934, 3.0))
+        val (_, replayInitialContext) = puzzle15_7_probeLineContext(
+            replayCenter,
+            replayRadius,
+            replayBasePoint,
+            replayBasePoint2,
+            replayProbePoint1,
+            replayProbePoint,
+            replayNamer
+        )
+
+        val isReplaySolution = puzzle15_7_isSolution(replayBasePoint, replayBasePoint2, replayCenter)
+
+        fun checkSolution(context: EuclideaContext): Boolean {
+            return try {
+                val replaySolutionContext =
+                    replaySteps(context, replayInitialContext)
+                isReplaySolution(replaySolutionContext)
+            } catch (e: IllegalStateException) {
+                // Failed replay
+                false
+            }
+        }
+
         // 4 - nothing (23 min)
         val maxExtraElements = 1
         val solutionContext = solve(startingContext, 11 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
-            isSolution(context)
+            isSolution(context) && checkSolution(context)
         }
         dumpSolution(solutionContext, namer)
     }
