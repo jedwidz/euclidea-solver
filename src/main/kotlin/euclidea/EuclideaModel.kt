@@ -1,6 +1,8 @@
 package euclidea
 
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.sqrt
 
 data class Point(val x: Double, val y: Double) {
@@ -82,6 +84,12 @@ fun intersect(element1: Element, element2: Element): Intersection {
 
 fun distance(point1: Point, point2: Point): Double {
     return sqrt(sq(point1.x - point2.x) + sq(point1.y - point2.y))
+}
+
+// Heading in degrees, in range (-90, 90) from positive y-axis
+fun heading(point1: Point, point2: Point): Double {
+    val d = if (point2.y > point1.y) point2.minus(point1) else point1.minus(point2)
+    return atan2(d.x, d.y) * 180.0 / PI
 }
 
 fun coincides(element1: Element, element2: Element): Boolean {

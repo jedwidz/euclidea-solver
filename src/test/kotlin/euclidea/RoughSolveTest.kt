@@ -546,6 +546,13 @@ class RoughSolveTest {
                         }
                         println()
                     }
+                    for ((heading, segments) in coincidences.headings) {
+                        println("Segments with heading $heading:")
+                        for (segment in segments) {
+                            explainSegment(segment)
+                        }
+                        println()
+                    }
                 }
 
                 fun explain() {
