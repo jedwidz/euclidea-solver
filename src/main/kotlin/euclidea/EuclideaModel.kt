@@ -1,9 +1,6 @@
 package euclidea
 
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.sqrt
+import kotlin.math.*
 
 data class Point(val x: Double, val y: Double) {
     val sqDistance: Double = sq(x) + sq(y)
@@ -96,6 +93,14 @@ fun midpoint(point1: Point, point2: Point): Point {
     return Point((point1.x + point2.x) * 0.5, (point1.y + point2.y) * 0.5)
 }
 
+// Angle aob in degrees, in range (0, 180)
+fun angle(a: Point, o: Point, b: Point): Double {
+    val va = a.minus(o)
+    val vb = b.minus(o)
+    val cosTh = (va.x * vb.x + va.y * vb.y) / sqrt(va.sqDistance * vb.sqDistance)
+    return acos(cosTh) * 180.0 / PI
+}
+
 fun coincides(element1: Element, element2: Element): Boolean {
     return when (element1) {
         is Element.Circle -> when (element2) {
@@ -123,9 +128,14 @@ fun coincides(point1: Point, point2: Point): Boolean {
 }
 
 private const val Epsilon = 0.0000000001
+private const val EpsilonRough = Epsilon * 100000
 
 fun coincides(num1: Double, num2: Double): Boolean {
     return abs(num2 - num1) < Epsilon
+}
+
+fun coincidesRough(num1: Double, num2: Double): Boolean {
+    return abs(num2 - num1) < EpsilonRough
 }
 
 fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {

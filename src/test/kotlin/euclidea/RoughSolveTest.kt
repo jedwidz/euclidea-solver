@@ -531,18 +531,25 @@ class RoughSolveTest {
                     }
                 }
 
-                private fun printSegment(segment: Segment) {
+                private fun explainSegment(segment: Segment): String {
                     val point1Label = explainPoint(segment.first)
                     val point2Label = explainPoint(segment.second)
-                    println("$point1Label to $point2Label")
+                    return "$point1Label to $point2Label"
                 }
 
-                private fun printLine(line: Element.Line) {
-                    println(explainLine(line))
+                private fun explainSegmentWithLine(segmentWithLine: SegmentWithLine): String {
+                    val segment = explainSegment(segmentWithLine.segment)
+                    return when (val line = segmentWithLine.line) {
+                        null -> segment
+                        else -> "${explainLine(line)} ($segment)"
+                    }
                 }
 
-                private fun printCircle(circle: Element.Circle) {
-                    println(explainCircle(circle))
+                private fun explainSegmentOrCircle(segmentOrCircle: SegmentOrCircle): String {
+                    return when (segmentOrCircle) {
+                        is SegmentOrCircle.Circle -> explainCircle(segmentOrCircle.circle)
+                        is SegmentOrCircle.Segment -> explainSegment(segmentOrCircle.segment)
+                    }
                 }
 
                 private fun reportCoincidences() {
@@ -550,20 +557,21 @@ class RoughSolveTest {
                     for ((distance, segmentOrCircles) in coincidences.distances) {
                         println("Segments with distance and circles with radius $distance:")
                         for (segmentOrCircle in segmentOrCircles) {
-                            when (segmentOrCircle) {
-                                is SegmentOrCircle.Circle -> printCircle(segmentOrCircle.circle)
-                                is SegmentOrCircle.Segment -> printSegment(segmentOrCircle.segment)
-                            }
+                            println(explainSegmentOrCircle(segmentOrCircle))
                         }
                         println()
                     }
                     for ((heading, segmentsWithLine) in coincidences.headings) {
                         println("Segment or lines with heading $heading:")
                         for (segmentWithLine in segmentsWithLine) {
-                            when (val line = segmentWithLine.line) {
-                                null -> printSegment(segmentWithLine.segment)
-                                else -> printLine(line)
-                            }
+                            println(explainSegmentWithLine(segmentWithLine))
+                        }
+                        println()
+                    }
+                    for ((angles, triangles) in coincidences.triangles) {
+                        println("Triangles with angles $angles:")
+                        for (triangle in triangles.toList()) {
+                            println(triangle.toList().map { explainSegmentWithLine(it) })
                         }
                         println()
                     }

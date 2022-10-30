@@ -1,6 +1,6 @@
 package euclidea
 
-typealias Segment = Pair<Point, Point>
+typealias Segment = Two<Point>
 
 data class SegmentWithLine(val segment: Segment, val line: Element.Line?)
 
@@ -11,11 +11,51 @@ sealed class SegmentOrCircle {
 
 data class Coincidences(
     val distances: List<Pair<Double, List<SegmentOrCircle>>>,
-    val headings: List<Pair<Double, List<SegmentWithLine>>>
+    val headings: List<Pair<Double, List<SegmentWithLine>>>,
+    val triangles: List<Pair<Three<Double>, List<Three<SegmentWithLine>>>>
 )
 
 fun EuclideaContext.coincidences(): Coincidences {
-    return Coincidences(distances = distanceCoincidences(), headings = headingCoincidences())
+    return Coincidences(
+        distances = distanceCoincidences(),
+        headings = headingCoincidences(),
+        triangles = triangleCoincidences()
+    )
+}
+
+private fun EuclideaContext.triangleCoincidences(): List<Pair<Three<Double>, List<Three<SegmentWithLine>>>> {
+    // Algorithm of complexity O(yikes!)
+    val triangles = points.triples().map { pointsTriple ->
+        val (a, b, c) = pointsTriple
+        val angles = threeFrom(listOf(angle(a, b, c), angle(b, a, c), angle(a, c, b)).sorted())
+        angles to pointsTriple
+    }
+        // Exclude degenerate triangles with three collinear points
+        .filter { !coincidesRough(it.first.third, 180.0) }
+    val contextLines = elements.filterIsInstance<Element.Line>()
+    fun contextLineFor(point1: Point, point2: Point): SegmentWithLine {
+        val contextLine = contextLines.firstOrNull { e ->
+            val line = Element.Line(point1, point2)
+            coincides(e, line)
+        }
+        return SegmentWithLine(point1 to point2, contextLine)
+    }
+
+    val res = mutableListOf<Pair<Three<Double>, List<Three<SegmentWithLine>>>>()
+    for ((angle1, triangles2) in coalesceOnCoincide(triangles) { it to it.first.first }) {
+        for ((angle2, triangles3) in coalesceOnCoincide(triangles2) { it to it.first.second }) {
+            for ((angle3, triangles4) in coalesceOnCoincide(triangles3) { it to it.first.third }) {
+                res.add(Triple(angle1, angle2, angle3) to triangles4.map { (_, points) ->
+                    Triple(
+                        contextLineFor(points.first, points.second),
+                        contextLineFor(points.second, points.third),
+                        contextLineFor(points.third, points.first),
+                    )
+                })
+            }
+        }
+    }
+    return res
 }
 
 private fun EuclideaContext.distanceCoincidences(): List<Pair<Double, List<SegmentOrCircle>>> {
@@ -40,30 +80,8 @@ private fun EuclideaContext.distanceCoincidences(): List<Pair<Double, List<Segme
     val segmentOrCircleToMeasure = (segmentToMeasure.map { SegmentOrCircle.Segment(it.first) to it.second }
             + contextCircles.map { SegmentOrCircle.Circle(it) to it.radius }
             + contextCircles.map { SegmentOrCircle.Circle(it) to it.radius * 2.0 })
-        .sortedBy { e -> e.second }
-    val res = mutableMapOf<Double, List<SegmentOrCircle>>()
-    val acc = mutableListOf<Pair<SegmentOrCircle, Double>>()
-    fun cut() {
-        if (acc.isNotEmpty()) {
-            val size = acc.size
-            if (size > 1) {
-                val middleMeasure = acc[size / 2].second
-                val segments = acc.map { it.first }
-                res[middleMeasure] = segments
-            }
-            acc.clear()
-        }
-    }
 
-    var prevDistance: Double? = null
-    for ((segmentOrCircle, distance) in segmentOrCircleToMeasure) {
-        if (prevDistance?.let { coincides(it, distance) } == true)
-            acc.add(segmentOrCircle to distance)
-        else cut()
-        prevDistance = distance
-    }
-    cut()
-    return res.toList()
+    return coalesceOnCoincide(segmentOrCircleToMeasure) { it }
 }
 
 private fun EuclideaContext.headingCoincidences(): List<Pair<Double, List<SegmentWithLine>>> {
@@ -92,26 +110,31 @@ fun segmentFor(line: Element.Line): Segment {
 }
 
 private fun EuclideaContext.segmentCoincidences(measureFor: (Segment) -> Double): List<Pair<Double, List<Segment>>> {
-    val segmentToMeasure =
-        points.pairs().map { pair -> pair to measureFor(pair) }.sortedBy { e -> e.second }
-    val res = mutableMapOf<Double, List<Segment>>()
-    val acc = mutableListOf<Pair<Segment, Double>>()
+    return coalesceOnCoincide(points.pairs()) { it to measureFor(it) }
+}
+
+private fun <T, R> coalesceOnCoincide(
+    items: List<T>,
+    resultAndMeasureFor: (T) -> Pair<R, Double>
+): List<Pair<Double, List<R>>> {
+    val itemToMeasure = items.map(resultAndMeasureFor).sortedBy { e -> e.second }
+    val res = mutableMapOf<Double, List<R>>()
+    val acc = mutableListOf<Pair<R, Double>>()
     fun cut() {
         if (acc.isNotEmpty()) {
             val size = acc.size
             if (size > 1) {
                 val middleMeasure = acc[size / 2].second
-                val segments = acc.map { it.first }
-                res[middleMeasure] = segments
+                res[middleMeasure] = acc.map { it.first }
             }
             acc.clear()
         }
     }
 
     var prevMeasure: Double? = null
-    for ((pair, measure) in segmentToMeasure) {
-        if (prevMeasure?.let { coincides(it, measure) } == true)
-            acc.add(pair to measure)
+    for ((item, measure) in itemToMeasure) {
+        if (prevMeasure?.let { coincidesRough(it, measure) } == true)
+            acc.add(item to measure)
         else cut()
         prevMeasure = measure
     }
