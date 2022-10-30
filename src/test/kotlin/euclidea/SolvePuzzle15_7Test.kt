@@ -1,33 +1,12 @@
 package euclidea
 
-import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import solve
 import kotlin.test.assertTrue
 
-class RoughSolveTest {
-    @Test
-    fun alphaTutorial1() {
-        // Equilateral Triangle
-        // TODO line segment rather than infinite line
-        val point1 = Point.Origin
-        val point2 = Point(1.0, 0.0)
-        val line = Element.Line(point1, point2)
-        val solutions = run {
-            val circle1 = circleTool(point1, point2)!!
-            val circle2 = circleTool(point2, point1)!!
-            intersect(circle1, circle2).points().map { pointX ->
-                listOf(point1, point2).map { pointA -> lineTool(pointA, pointX)!! }
-            }
-        }
-        val solutionContext =
-            solve(EuclideaContext(points = listOf(point1, point2), elements = listOf(line)), 4) { context ->
-                solutions.any { context.hasElements(it) }
-            }
-        dumpSolution(solutionContext)
-    }
+class SolvePuzzle15_7Test {
 
     @Test
     fun puzzle15_7() {
@@ -354,30 +333,5 @@ class RoughSolveTest {
             }
         }
         return solutionContext!!
-    }
-
-    @Test
-    fun puzzle15_8() {
-        // Line-Circle Intersection*
-        // (circles only)
-        val center = Point(0.0, 0.0)
-        val circle = Element.Circle(center, 1.0)
-        val point = Point(-2.542897, 0.0)
-        val initialContext = EuclideaContext(
-            config = EuclideaConfig(lineToolEnabled = false),
-            points = listOf(center, point),
-            elements = listOf(circle)
-        )
-        // Check for either solution point, or a useful waypoint
-        val solutionKnots = listOf(-1.0, 1.0, -2.0, 2.0)
-        fun checkSolution(a: Double, b: Double): Boolean {
-            return coincides(a, 0.0) && solutionKnots.any { coincides(it, b) }
-        }
-        // 6 - nothing
-        // 7 - coincidence? (~3 hours)
-        val solutionContext = solve(initialContext, 6) { context ->
-            context.points.any { checkSolution(it.y, it.x) }
-        }
-        dumpSolution(solutionContext)
     }
 }
