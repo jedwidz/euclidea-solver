@@ -68,8 +68,8 @@ class SolvePuzzle15_3Test {
 
         assertTrue(isSolution(sampleSolutionContext))
 
-        val maxExtraElements = 0
-        val solutionContext = solve(startingContext, 6, prune = { next ->
+        val maxExtraElements = 3
+        val solutionContext = solve(startingContext, 4, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
             isSolution(context) && checkSolution(context)
