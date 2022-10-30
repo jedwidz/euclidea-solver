@@ -92,6 +92,10 @@ fun heading(point1: Point, point2: Point): Double {
     return atan2(d.x, d.y) * 180.0 / PI
 }
 
+fun midpoint(point1: Point, point2: Point): Point {
+    return Point((point1.x + point2.x) * 0.5, (point1.y + point2.y) * 0.5)
+}
+
 fun coincides(element1: Element, element2: Element): Boolean {
     return when (element1) {
         is Element.Circle -> when (element2) {

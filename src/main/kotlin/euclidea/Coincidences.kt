@@ -21,14 +21,20 @@ private fun EuclideaContext.distanceCoincidences(): List<Pair<Double, List<Segme
                 contextCircles.any { coincides(it, circle) }
             } ?: false
         }
-        return matches(segment.first, segment.second) || matches(segment.second, segment.first)
+        return matches(segment.first, segment.second) || matches(segment.second, segment.first) || matches(
+            midpoint(
+                segment.first,
+                segment.second
+            ), segment.first
+        )
     }
 
     val segmentToMeasure =
         points.pairs().map { pair -> pair to distance(pair.first, pair.second) }
             .filter { !matchesContextCircle(it.first) }
     val segmentOrCircleToMeasure = (segmentToMeasure.map { SegmentOrCircle.Segment(it.first) to it.second }
-            + contextCircles.map { SegmentOrCircle.Circle(it) to it.radius })
+            + contextCircles.map { SegmentOrCircle.Circle(it) to it.radius }
+            + contextCircles.map { SegmentOrCircle.Circle(it) to it.radius * 2.0 })
         .sortedBy { e -> e.second }
     val res = mutableMapOf<Double, List<SegmentOrCircle>>()
     val acc = mutableListOf<Pair<SegmentOrCircle, Double>>()
