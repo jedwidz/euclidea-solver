@@ -26,7 +26,7 @@ class UtilsTest {
 
     private fun forEachPair_impl(list: List<Int>, expected: List<Int>) {
         val res = mutableListOf<Int>()
-        forEachPair(list) { a, b -> res.add(a * 10 + b) }
+        list.forEachPair { a, b -> res.add(a * 10 + b) }
         assertEquals(expected, res.toList())
     }
 

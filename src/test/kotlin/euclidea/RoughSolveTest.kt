@@ -522,7 +522,7 @@ class RoughSolveTest {
                     }
                 }
 
-                fun explainSteps() {
+                private fun explainSteps() {
                     for (element in elements) {
                         when (element) {
                             is Element.Circle -> explainCircle(element)
@@ -530,7 +530,30 @@ class RoughSolveTest {
                         }
                     }
                 }
-            }.explainSteps()
+
+                private fun explainSegment(segment: Segment) {
+                    val point1Label = explainPoint(segment.first)
+                    val point2Label = explainPoint(segment.second)
+                    println("$point1Label to $point2Label")
+                }
+
+                private fun reportCoincidences() {
+                    val coincidences = context.coincidences()
+                    for ((distance, segments) in coincidences.distances) {
+                        println("Segments with distance $distance:")
+                        for (segment in segments) {
+                            explainSegment(segment)
+                        }
+                        println()
+                    }
+                }
+
+                fun explain() {
+                    explainSteps()
+                    println()
+                    reportCoincidences()
+                }
+            }.explain()
         }
     }
 
