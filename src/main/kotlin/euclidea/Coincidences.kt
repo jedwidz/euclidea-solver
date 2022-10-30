@@ -2,6 +2,8 @@ package euclidea
 
 typealias Segment = Pair<Point, Point>
 
+data class SegmentWithLine(val segment: Segment, val line: Element.Line?)
+
 fun EuclideaContext.coincidences(): Coincidences {
     return Coincidences(distances = distanceCoincidences(), headings = headingCoincidences())
 }
@@ -10,15 +12,16 @@ private fun EuclideaContext.distanceCoincidences(): List<Pair<Double, List<Segme
     return segmentCoincidences { segment -> distance(segment.first, segment.second) }
 }
 
-private fun EuclideaContext.headingCoincidences(): List<Pair<Double, List<Segment>>> {
-    val res = mutableListOf<Pair<Double, List<Segment>>>()
+private fun EuclideaContext.headingCoincidences(): List<Pair<Double, List<SegmentWithLine>>> {
+    val res = mutableListOf<Pair<Double, List<SegmentWithLine>>>()
     for ((heading, segments) in segmentCoincidences { segment -> heading(segment.first, segment.second) }) {
-        val filteredSegments = mutableListOf<Segment>()
+        val filteredSegments = mutableListOf<SegmentWithLine>()
         var remainingLines = segments.map { lineFor(it) }
         while (remainingLines.isNotEmpty()) {
             val line = remainingLines.first()
+            val contextLine = elements.filterIsInstance<Element.Line>().firstOrNull { e -> coincides(e, line) }
             remainingLines = remainingLines.filter { !coincides(line, it) }
-            filteredSegments.add(segmentFor(line))
+            filteredSegments.add(SegmentWithLine(segmentFor(line), contextLine))
         }
         if (filteredSegments.size > 1)
             res.add(heading to filteredSegments)
@@ -64,5 +67,5 @@ private fun EuclideaContext.segmentCoincidences(measureFor: (Segment) -> Double)
 
 data class Coincidences(
     val distances: List<Pair<Double, List<Segment>>>,
-    val headings: List<Pair<Double, List<Segment>>>
+    val headings: List<Pair<Double, List<SegmentWithLine>>>
 )

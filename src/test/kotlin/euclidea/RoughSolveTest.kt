@@ -531,10 +531,14 @@ class RoughSolveTest {
                     }
                 }
 
-                private fun explainSegment(segment: Segment) {
+                private fun printSegment(segment: Segment) {
                     val point1Label = explainPoint(segment.first)
                     val point2Label = explainPoint(segment.second)
                     println("$point1Label to $point2Label")
+                }
+
+                private fun printLine(line: Element.Line) {
+                    println(explainLine(line))
                 }
 
                 private fun reportCoincidences() {
@@ -542,14 +546,17 @@ class RoughSolveTest {
                     for ((distance, segments) in coincidences.distances) {
                         println("Segments with distance $distance:")
                         for (segment in segments) {
-                            explainSegment(segment)
+                            printSegment(segment)
                         }
                         println()
                     }
-                    for ((heading, segments) in coincidences.headings) {
-                        println("Segments with heading $heading:")
-                        for (segment in segments) {
-                            explainSegment(segment)
+                    for ((heading, segmentsWithLine) in coincidences.headings) {
+                        println("Segment or lines with heading $heading:")
+                        for (segmentWithLine in segmentsWithLine) {
+                            when (val line = segmentWithLine.line) {
+                                null -> printSegment(segmentWithLine.segment)
+                                else -> printLine(line)
+                            }
                         }
                         println()
                     }
