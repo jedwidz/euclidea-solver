@@ -9,6 +9,11 @@ sealed class SegmentOrCircle {
     data class Circle(val circle: Element.Circle) : SegmentOrCircle()
 }
 
+data class Coincidences(
+    val distances: List<Pair<Double, List<SegmentOrCircle>>>,
+    val headings: List<Pair<Double, List<SegmentWithLine>>>
+)
+
 fun EuclideaContext.coincidences(): Coincidences {
     return Coincidences(distances = distanceCoincidences(), headings = headingCoincidences())
 }
@@ -113,8 +118,3 @@ private fun EuclideaContext.segmentCoincidences(measureFor: (Segment) -> Double)
     cut()
     return res.toList()
 }
-
-data class Coincidences(
-    val distances: List<Pair<Double, List<SegmentOrCircle>>>,
-    val headings: List<Pair<Double, List<SegmentWithLine>>>
-)
