@@ -18,7 +18,7 @@ class SolvePuzzle15_3Test {
         val center = namer.set("center", Point(0.02, -0.1234))
         val radius = 0.3123
         val (circle, solutionContext) =
-            puzzle15_3_solution6E(base1, base2, center, radius, namer)
+            puzzle15_3_solution4E(base1, base2, center, radius, namer)
 
         dumpSolution(solutionContext, namer)
         assertTrue { puzzle15_3_isSolution(base1, base2, circle).invoke(solutionContext) }
@@ -26,7 +26,6 @@ class SolvePuzzle15_3Test {
 
     @Test
     fun puzzle15_3_improve_solution() {
-        // No further improvement expected
         val namer = Namer()
         val base1 = namer.set("base1", Point(-1.0, 0.0))
         val base2 = namer.set("base2", Point(1.0, 0.0))
@@ -36,7 +35,7 @@ class SolvePuzzle15_3Test {
             puzzle15_3_initialContext(base1, base2, center, radius, namer)
 
         val (sampleSolutionCircle, sampleSolutionContext) =
-            puzzle15_3_solution6E(base1, base2, center, radius, namer)
+            puzzle15_3_solution4E(base1, base2, center, radius, namer)
 
         val isSolution = puzzle15_3_isSolution(base1, base2, sampleSolutionCircle)
 
@@ -68,7 +67,7 @@ class SolvePuzzle15_3Test {
 
         assertTrue(isSolution(sampleSolutionContext))
 
-        val maxExtraElements = 3
+        val maxExtraElements = 0
         val solutionContext = solve(startingContext, 4, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
@@ -90,7 +89,7 @@ class SolvePuzzle15_3Test {
         }
     }
 
-    private fun puzzle15_3_solution6E(
+    private fun puzzle15_3_solution4E(
         base1: Point,
         base2: Point,
         center: Point,
@@ -106,19 +105,16 @@ class SolvePuzzle15_3Test {
         )
         val start1 = namer.set("start1", circleTool(base1, center)!!)
         val start2 = namer.set("start2", circleTool(base2, center)!!)
+        val upper = namer.set("upper", intersectAnyPoint(start1, circle))
+        val tweak = namer.set("tweak", circleTool(base2, upper)!!)
+        val lower = namer.set("lower", intersectTwoPointsOther(start1, tweak, upper))
         val up = namer.set("up", intersectTwoPointsOther(start1, start2, center))
-        val top = namer.set("top", circleTool(up, center)!!)
-        val bottom = namer.set("bottom", circleTool(center, up)!!)
-        val side = namer.set("side", intersectAnyPoint(top, bottom))
-        val slantUp = namer.set("slantUp", intersectAnyPoint(top, circle))
-        val straddle = namer.set("straddle", circleTool(side, slantUp)!!)
-        val slantDown = namer.set("slantDown", intersectAnyPoint(straddle, bottom))
-        val dupe = namer.set("dupe", circleTool(up, slantDown)!!)
+        val dupe = namer.set("dupe", circleTool(up, lower)!!)
         namer.setAll("solution1", "solution2", intersectTwoPoints(dupe, circle))
 
         val solutionContext = initialContext.withElements(
             listOf(
-                start1, start2, top, bottom, straddle, dupe
+                start1, start2, tweak, dupe
             )
         )
         return Pair(circle, solutionContext)
