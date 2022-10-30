@@ -541,12 +541,19 @@ class RoughSolveTest {
                     println(explainLine(line))
                 }
 
+                private fun printCircle(circle: Element.Circle) {
+                    println(explainCircle(circle))
+                }
+
                 private fun reportCoincidences() {
                     val coincidences = context.coincidences()
-                    for ((distance, segments) in coincidences.distances) {
-                        println("Segments with distance $distance:")
-                        for (segment in segments) {
-                            printSegment(segment)
+                    for ((distance, segmentOrCircles) in coincidences.distances) {
+                        println("Segments with distance and circles with radius $distance:")
+                        for (segmentOrCircle in segmentOrCircles) {
+                            when (segmentOrCircle) {
+                                is SegmentOrCircle.Circle -> printCircle(segmentOrCircle.circle)
+                                is SegmentOrCircle.Segment -> printSegment(segmentOrCircle.segment)
+                            }
                         }
                         println()
                     }
