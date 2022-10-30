@@ -4,6 +4,7 @@ import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import solve
 import kotlin.test.assertTrue
 
 class RoughSolveTest {
@@ -313,48 +314,6 @@ class RoughSolveTest {
         return Pair(Triple(circle, line, probeLine), probeLineContext)
     }
 
-    private fun intersectOnePoint(element1: Element, element2: Element): Point =
-        when (val i = intersect(element1, element2)) {
-            is Intersection.OnePoint -> i.point
-            else -> error("One intersection point expected: $i")
-        }
-
-    private fun intersectTwoPoints(
-        element1: Element,
-        element2: Element
-    ): Pair<Point, Point> =
-        when (val i = intersect(element1, element2)) {
-            is Intersection.TwoPoints -> Pair(i.point1, i.point2)
-            else -> error("Two intersection points expected: $i")
-        }
-
-    private fun intersectTwoPointsOther(
-        element1: Element,
-        element2: Element,
-        point1: Point
-    ): Point {
-        val intersection = intersect(element1, element2)
-        val points = intersection.points().filter { point2 -> !coincides(point1, point2) }
-        return when (points.size) {
-            1 -> points.first()
-            else -> error("Expected one point other than $point1: $intersection")
-        }
-    }
-
-    @Test
-    fun linePointCoincideTest() {
-        val basePoint = Point(0.01, 0.0)
-        val basePoint2 = Point(1.0, 0.1)
-        val center = Point(0.01, 2.000)
-        val base = lineTool(basePoint, basePoint2)!!
-        val perpendicularLine = perpendicularTool(base, center)!!
-
-        assertTrue(pointAndLineCoincide(center, perpendicularLine))
-
-        val intersectionPoint = intersect(base, perpendicularLine).points().first()
-        assertTrue(pointAndLineCoincide(intersectionPoint, perpendicularLine))
-    }
-
     @Test
     fun puzzle15_7_stages() {
         // Drop a Perpendicular**
@@ -420,150 +379,5 @@ class RoughSolveTest {
             context.points.any { checkSolution(it.y, it.x) }
         }
         dumpSolution(solutionContext)
-    }
-
-    private fun solve(
-        initialContext: EuclideaContext,
-        maxDepth: Int,
-        prune: ((EuclideaContext) -> Boolean)? = null,
-        check: (EuclideaContext) -> Boolean
-    ): EuclideaContext? {
-        fun sub(context: EuclideaContext, depth: Int): EuclideaContext? {
-            val nextDepth = depth + 1
-            for (next in context.nexts())
-                if (check(next))
-                    return next
-                else if (nextDepth < maxDepth && (prune == null || !prune(next)))
-                    sub(next, nextDepth)?.let { return@sub it }
-            return null
-        }
-        if (check(initialContext))
-            return initialContext
-        return sub(initialContext, 0)
-    }
-
-    private fun replaySteps(referenceContext: EuclideaContext, replayInitialContext: EuclideaContext): EuclideaContext {
-        val fromReferencePoint = mutableMapOf<Point, Point>()
-        val fromReferenceElement = mutableMapOf<Element, Element>()
-
-        fun replayFail(message: String): Nothing {
-            throw IllegalStateException(message)
-        }
-
-        fun unifyPoint(referencePoint: Point, replayPoint: Point) {
-            val existing = fromReferencePoint.putIfAbsent(referencePoint, replayPoint)
-            if (existing !== null) {
-                if (!coincides(existing, replayPoint))
-                    replayFail("Failed to unify reference point $referencePoint with replay point $replayPoint: reference point already unified with $existing")
-            }
-        }
-
-        fun unifyElement(referenceElement: Element, replayElement: Element) {
-            when {
-                referenceElement is Element.Circle && replayElement is Element.Circle -> {
-                    unifyPoint(referenceElement.center, replayElement.center)
-                }
-                referenceElement is Element.Line && replayElement is Element.Line -> {
-                    unifyPoint(referenceElement.point1, replayElement.point1)
-                    unifyPoint(referenceElement.point2, replayElement.point2)
-                }
-                else -> replayFail("Failed to unify reference point $referenceElement with replay point $replayElement: mismatched element type")
-            }
-            val existing = fromReferenceElement.putIfAbsent(referenceElement, replayElement)
-            if (existing !== null) {
-                if (!coincides(existing, replayElement))
-                    replayFail("Failed to unify reference element $referenceElement with replay element $replayElement: reference element already unified with $existing")
-            }
-        }
-
-        fun unifyIntersection(referenceIntersection: Intersection, replayIntersection: Intersection) {
-            when {
-                referenceIntersection is Intersection.Disjoint && replayIntersection is Intersection.Disjoint -> {
-                    // OK, but not really expected in practice
-                }
-                referenceIntersection is Intersection.OnePoint && replayIntersection is Intersection.OnePoint -> {
-                    unifyPoint(referenceIntersection.point, replayIntersection.point)
-                }
-                referenceIntersection is Intersection.TwoPoints && replayIntersection is Intersection.TwoPoints -> {
-                    unifyPoint(referenceIntersection.point1, replayIntersection.point1)
-                    unifyPoint(referenceIntersection.point2, replayIntersection.point2)
-                }
-            }
-        }
-
-        fun replayPointFor(referencePoint: Point): Point {
-            return fromReferencePoint.getOrElse(referencePoint) {
-                replayFail("No replay point unified with reference point $referencePoint")
-            }
-        }
-
-        fun replayElementFor(referenceElement: Element): Element {
-            return fromReferenceElement.getOrElse(referenceElement) {
-                replayFail("No replay element unified with reference element $referenceElement")
-            }
-        }
-
-        fun findReplayPoint(referencePoint: Point): Point {
-            return fromReferencePoint.getOrElse(referencePoint) {
-                when (val intersectionSource = referenceContext.pointSource[referencePoint]) {
-                    null -> replayFail("Failed to find replay point for $referencePoint: no reference point source")
-                    else -> with(intersectionSource) {
-                        val replayElement1 = replayElementFor(element1)
-                        val replayElement2 = replayElementFor(element2)
-                        val replayIntersection = intersect(replayElement1, replayElement2)
-                        unifyIntersection(intersection, replayIntersection)
-                        replayPointFor(referencePoint)
-                    }
-                }
-            }
-        }
-
-        fun generateReplayElement(referenceElement: Element): Element {
-            return when (referenceElement) {
-                is Element.Circle -> {
-                    val sample = referenceElement.sample
-                    if (sample === null)
-                        replayFail("Failed to generate replay element for $referenceElement: no sample point on circle")
-                    val replayCenter = findReplayPoint(referenceElement.center)
-                    val replaySample = findReplayPoint(sample)
-                    val replayCircle = circleTool(replayCenter, replaySample)
-                    if (replayCircle === null)
-                        replayFail("Failed to generate replay circle for $referenceElement: replay has degenerate circle with center $replayCenter and sample point $replaySample")
-                    replayCircle
-                }
-                is Element.Line -> {
-                    val replayPoint1 = findReplayPoint(referenceElement.point1)
-                    val replayPoint2 = findReplayPoint(referenceElement.point2)
-                    val replayLine = lineTool(replayPoint1, replayPoint2)
-                    if (replayLine === null)
-                        replayFail("Failed to generate replay line for $referenceElement: replay has degenerate line with points $replayPoint1 and $replayPoint2")
-                    replayLine
-                }
-            }
-        }
-
-        // Unify initial context
-        val initialPairedElements = referenceContext.elements.zip(replayInitialContext.elements)
-        initialPairedElements.forEach { (referenceElement, replayElement): Pair<Element, Element> ->
-            unifyElement(referenceElement, replayElement)
-        }
-        val initialPairedReferenceElements = initialPairedElements.map { it.first }.toSet()
-
-        // Unify remaining steps
-        var replayContext = replayInitialContext
-        referenceContext.elements.forEach { referenceElement ->
-            if (!initialPairedReferenceElements.contains(referenceElement)) {
-                val existingReplayElement = fromReferenceElement[referenceElement]
-                if (existingReplayElement !== null)
-                    replayFail("Reference element $referenceElement from new step already unified with $existingReplayElement")
-                val newReplayElement = generateReplayElement(referenceElement)
-                unifyElement(referenceElement, newReplayElement)
-                replayContext = replayContext.withElement(newReplayElement)
-            }
-        }
-
-        // TODO ? check all point sources are consistent?
-
-        return replayContext
     }
 }

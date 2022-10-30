@@ -145,6 +145,34 @@ fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {
     return coincides(measure, 0.0)
 }
 
+fun intersectOnePoint(element1: Element, element2: Element): Point =
+    when (val i = intersect(element1, element2)) {
+        is Intersection.OnePoint -> i.point
+        else -> error("One intersection point expected: $i")
+    }
+
+fun intersectTwoPoints(
+    element1: Element,
+    element2: Element
+): Pair<Point, Point> =
+    when (val i = intersect(element1, element2)) {
+        is Intersection.TwoPoints -> Pair(i.point1, i.point2)
+        else -> error("Two intersection points expected: $i")
+    }
+
+fun intersectTwoPointsOther(
+    element1: Element,
+    element2: Element,
+    point1: Point
+): Point {
+    val intersection = intersect(element1, element2)
+    val points = intersection.points().filter { point2 -> !coincides(point1, point2) }
+    return when (points.size) {
+        1 -> points.first()
+        else -> error("Expected one point other than $point1: $intersection")
+    }
+}
+
 private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {
     // Help from: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     val p1 = line1.point1

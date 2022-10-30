@@ -4,6 +4,7 @@ import euclidea.Point.Companion.Origin
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
+import kotlin.test.assertTrue
 
 class EuclideaModelTest {
 
@@ -114,5 +115,19 @@ class EuclideaModelTest {
         val line2 = Element.Line(point2, point1)
         val intersection2 = intersect(line2, circle)
         Assertions.assertEquals(Intersection.TwoPoints(expectedPoint2, expectedPoint1), intersection2)
+    }
+
+    @Test
+    fun linePointCoincideTest() {
+        val basePoint = Point(0.01, 0.0)
+        val basePoint2 = Point(1.0, 0.1)
+        val center = Point(0.01, 2.000)
+        val base = EuclideaTools.lineTool(basePoint, basePoint2)!!
+        val perpendicularLine = EuclideaTools.perpendicularTool(base, center)!!
+
+        assertTrue(pointAndLineCoincide(center, perpendicularLine))
+
+        val intersectionPoint = intersect(base, perpendicularLine).points().first()
+        assertTrue(pointAndLineCoincide(intersectionPoint, perpendicularLine))
     }
 }
