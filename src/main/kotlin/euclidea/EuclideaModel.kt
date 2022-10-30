@@ -145,6 +145,13 @@ fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {
     return coincides(measure, 0.0)
 }
 
+fun intersectAnyPoint(element1: Element, element2: Element): Point =
+    when (val i = intersect(element1, element2)) {
+        is Intersection.OnePoint -> i.point
+        is Intersection.TwoPoints -> i.point1
+        else -> error("At least one intersection point expected: $i")
+    }
+
 fun intersectOnePoint(element1: Element, element2: Element): Point =
     when (val i = intersect(element1, element2)) {
         is Intersection.OnePoint -> i.point

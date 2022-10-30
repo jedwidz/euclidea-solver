@@ -90,5 +90,9 @@ data class EuclideaContext(
     fun hasElement(element: Element): Boolean {
         return elements.any { e -> coincides(e, element) }
     }
+
+    fun hasPoint(point: Point): Boolean {
+        return points.any { p -> coincides(p, point) }
+    }
 }
 
