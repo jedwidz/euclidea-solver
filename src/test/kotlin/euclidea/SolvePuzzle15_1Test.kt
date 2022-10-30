@@ -2,6 +2,7 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import org.junit.jupiter.api.Test
+import solve
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_1Test {
@@ -21,63 +22,53 @@ class SolvePuzzle15_1Test {
         assertTrue { puzzle15_1_isSolution(basePoint1, basePoint2).invoke(solutionContext) }
     }
 
-//    @Test
-//    fun puzzle15_1_improve_solution() {
-//        // Drop a Perpendicular**
-//        // (lines only)
-//        // Try to improve on my best solution so far
-//        val namer = Namer()
-//        val basePoint = namer.set("base", Point(0.0, 0.0))
-//        val basePoint2 = namer.set("base2", Point(1.0, 0.0))
-//        val (_, _, initialContext) = puzzle15_1_initialContext(basePoint, basePoint2, namer)
-//
-//        val sampleSolutionContext =
-//            puzzle15_1_solution7E(basePoint, basePoint2, namer)
-//
-//        val isSolution = puzzle15_1_isSolution(basePoint, basePoint2)
-//
-//        val replayNamer = Namer()
-//        val replayBasePoint = replayNamer.set("base", Point(0.01, 0.0))
-//        val replayBasePoint2 = replayNamer.set("base2", Point(1.0, 0.1))
-//        val replayCenter = replayNamer.set("center", Point(0.02, 2.000))
-//        val replayRadius = 1.0124
-//        val replayProbePoint1 = replayNamer.set("probe1", Point(-0.943215, 0.0))
-//        val replayProbePoint = replayNamer.set("probe2", Point(-0.828934, 3.0))
-//        val (_, replayInitialContext) = puzzle15_1_probeLineContext(
-//            replayCenter,
-//            replayRadius,
-//            replayBasePoint,
-//            replayBasePoint2,
-//            replayProbePoint1,
-//            replayProbePoint,
-//            replayNamer
-//        )
-//
-//        val isReplaySolution = puzzle15_1_isSolution(replayBasePoint, replayBasePoint2)
-//
-//        fun checkSolution(context: EuclideaContext): Boolean {
-//            return try {
-//                val replaySolutionContext =
-//                    replaySteps(context, replayInitialContext)
-//                isReplaySolution(replaySolutionContext)
-//            } catch (e: IllegalStateException) {
-//                // Failed replay
-//                false
-//            }
-//        }
-//
-//        assertTrue(isSolution(sampleSolutionContext))
-//
-//        // Not expected to get a better solution than 10E
-//        val maxExtraElements = 3
-//        val solutionContext = solve(startingContext, 9 - 1 - 1, prune = { next ->
-//            next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
-//        }) { context ->
-//            isSolution(context) && checkSolution(context)
-//        }
-//        dumpSolution(solutionContext, namer)
-//        println("Count: ${solutionContext?.elements?.size}")
-//    }
+    @Test
+    fun puzzle15_1_improve_solution() {
+        // Try to improve on my best solution so far
+        val namer = Namer()
+        val basePoint1 = namer.set("base1", Point(0.0, 0.0))
+        val basePoint2 = namer.set("base2", Point(1.0, 0.0))
+        val startingContext =
+            puzzle15_1_initialContext(basePoint1, basePoint2, namer)
+
+        val sampleSolutionContext =
+            puzzle15_1_solution7E(basePoint1, basePoint2, namer)
+
+        val isSolution = puzzle15_1_isSolution(basePoint1, basePoint2)
+
+        val replayNamer = Namer()
+        val replayBasePoint1 = replayNamer.set("base1", Point(0.01, 0.0))
+        val replayBasePoint2 = replayNamer.set("base2", Point(1.0, 0.1))
+        val replayInitialContext = puzzle15_1_initialContext(
+            replayBasePoint1,
+            replayBasePoint2,
+            replayNamer
+        )
+
+        val isReplaySolution = puzzle15_1_isSolution(replayBasePoint1, replayBasePoint2)
+
+        fun checkSolution(context: EuclideaContext): Boolean {
+            return try {
+                val replaySolutionContext =
+                    replaySteps(context, replayInitialContext)
+                isReplaySolution(replaySolutionContext)
+            } catch (e: IllegalStateException) {
+                // Failed replay
+                false
+            }
+        }
+
+        assertTrue(isSolution(sampleSolutionContext))
+
+        val maxExtraElements = 0
+        val solutionContext = solve(startingContext, 7, prune = { next ->
+            next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
+        }) { context ->
+            isSolution(context) && checkSolution(context)
+        }
+        dumpSolution(solutionContext, namer)
+        println("Count: ${solutionContext?.elements?.size}")
+    }
 
     fun puzzle15_1_isSolution(basePoint1: Point, basePoint2: Point): (EuclideaContext) -> Boolean {
         val checkSolutionPoint = midpoint(basePoint1, basePoint2)
@@ -123,7 +114,7 @@ class SolvePuzzle15_1Test {
         namer: Namer
     ): EuclideaContext {
         val baseContext = EuclideaContext(
-            config = EuclideaConfig(lineToolEnabled = true, maxSqDistance = sq(100.0)),
+            config = EuclideaConfig(lineToolEnabled = false, maxSqDistance = sq(100.0)),
             points = listOf(basePoint1, basePoint2),
             elements = listOf()
         )

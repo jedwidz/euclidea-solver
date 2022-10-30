@@ -101,6 +101,12 @@ fun replaySteps(referenceContext: EuclideaContext, replayInitialContext: Euclide
     }
 
     // Unify initial context
+    val initialPairedPoints = referenceContext.points.zip(replayInitialContext.points)
+    initialPairedPoints.forEach { (referencePoint, replayPoint): Pair<Point, Point> ->
+        unifyPoint(referencePoint, replayPoint)
+    }
+    // val initialPairedReferencePoints = initialPairedPoints.map { it.first }.toSet()
+
     val initialPairedElements = referenceContext.elements.zip(replayInitialContext.elements)
     initialPairedElements.forEach { (referenceElement, replayElement): Pair<Element, Element> ->
         unifyElement(referenceElement, replayElement)
