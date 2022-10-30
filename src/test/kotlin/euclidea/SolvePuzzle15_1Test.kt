@@ -16,7 +16,7 @@ class SolvePuzzle15_1Test {
         val basePoint1 = namer.set("base1", Point(0.0, 0.0))
         val basePoint2 = namer.set("base2", Point(1.0, 0.0))
         val solutionContext =
-            puzzle15_1_solution7E(basePoint1, basePoint2, namer)
+            puzzle15_1_solution6E(basePoint1, basePoint2, namer)
 
         dumpSolution(solutionContext, namer)
         assertTrue { puzzle15_1_isSolution(basePoint1, basePoint2).invoke(solutionContext) }
@@ -24,7 +24,7 @@ class SolvePuzzle15_1Test {
 
     @Test
     fun puzzle15_1_improve_solution() {
-        // Try to improve on my best solution so far
+        // No further improvement expected
         val namer = Namer()
         val basePoint1 = namer.set("base1", Point(0.0, 0.0))
         val basePoint2 = namer.set("base2", Point(1.0, 0.0))
@@ -32,7 +32,7 @@ class SolvePuzzle15_1Test {
             puzzle15_1_initialContext(basePoint1, basePoint2, namer)
 
         val sampleSolutionContext =
-            puzzle15_1_solution7E(basePoint1, basePoint2, namer)
+            puzzle15_1_solution6E(basePoint1, basePoint2, namer)
 
         val isSolution = puzzle15_1_isSolution(basePoint1, basePoint2)
 
@@ -60,7 +60,7 @@ class SolvePuzzle15_1Test {
 
         assertTrue(isSolution(sampleSolutionContext))
 
-        val maxExtraElements = 1
+        val maxExtraElements = 0
         val solutionContext = solve(startingContext, 6, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
@@ -77,7 +77,7 @@ class SolvePuzzle15_1Test {
         }
     }
 
-    private fun puzzle15_1_solution7E(
+    private fun puzzle15_1_solution6E(
         basePoint1: Point,
         basePoint2: Point,
         namer: Namer
@@ -89,11 +89,9 @@ class SolvePuzzle15_1Test {
         )
         val start1 = namer.set("start1", circleTool(basePoint1, basePoint2)!!)
         val start2 = namer.set("start2", circleTool(basePoint2, basePoint1)!!)
-        val start = namer.set("start", intersectAnyPoint(start1, start2))
-        val top = namer.set("top", circleTool(start, basePoint1)!!)
-        val next = namer.set("next", intersectTwoPointsOther(start2, top, basePoint1))
-        val side = namer.set("side", circleTool(next, basePoint2)!!)
-        val two = namer.set("two", intersectTwoPointsOther(start2, side, start))
+        val (up, down) = namer.setAll("up", "down", intersectTwoPoints(start1, start2))
+        val top = namer.set("top", circleTool(up, down)!!)
+        val two = namer.set("two", intersectTwoPointsOther(start2, top, down))
         val big = namer.set("big", circleTool(two, basePoint1)!!)
         val (x1, x2) = namer.setAll("x1", "x2", intersectTwoPoints(big, start1))
         val target1 = namer.set("target1", circleTool(x1, basePoint1)!!)
@@ -102,7 +100,7 @@ class SolvePuzzle15_1Test {
 
         val solutionContext = initialContext.withElements(
             listOf(
-                start1, start2, top, side, big, target1, target2
+                start1, start2, top, big, target1, target2
             )
         )
         return solutionContext
