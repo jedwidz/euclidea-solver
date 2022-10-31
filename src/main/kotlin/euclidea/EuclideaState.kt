@@ -19,7 +19,7 @@ data class EuclideaContext(
     val oldPoints: Set<Point> = setOf(),
     val pendingElements: Set<Element> = setOf()
 ) {
-    fun nexts(): List<EuclideaContext> {
+    fun nexts() = sequence {
         val newPoints = points.filter { it !in oldPoints }
         val nextOldPoints = oldPoints + newPoints
 
@@ -45,13 +45,11 @@ data class EuclideaContext(
 
         val newPendingElements = pendingElements + newElements
 
-        val res = mutableListOf<EuclideaContext>()
         var nextPendingElements = newPendingElements
         newPendingElements.forEach { newElement ->
             nextPendingElements = nextPendingElements.minus(newElement)
-            res.add(this.withElement(newElement).withSearchState(nextOldPoints, nextPendingElements))
+            yield(withElement(newElement).withSearchState(nextOldPoints, nextPendingElements))
         }
-        return res.toList()
     }
 
     private fun withSearchState(nextOldPoints: Set<Point>, nextPendingElements: Set<Element>): EuclideaContext {
