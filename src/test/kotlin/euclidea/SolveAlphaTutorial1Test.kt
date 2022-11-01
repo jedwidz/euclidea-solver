@@ -3,7 +3,6 @@ package euclidea
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
-import solve
 
 class SolveAlphaTutorial1Test {
     @Test

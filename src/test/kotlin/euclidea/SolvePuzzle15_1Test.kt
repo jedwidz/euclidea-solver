@@ -2,7 +2,6 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import org.junit.jupiter.api.Test
-import solve
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_1Test {

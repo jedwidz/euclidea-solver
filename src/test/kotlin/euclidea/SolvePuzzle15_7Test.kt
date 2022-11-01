@@ -3,7 +3,6 @@ package euclidea
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
-import solve
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_7Test {

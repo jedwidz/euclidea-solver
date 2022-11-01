@@ -1,7 +1,6 @@
 package euclidea
 
 import org.junit.jupiter.api.Test
-import solve
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_8Test {
