@@ -5,8 +5,7 @@ import euclidea.EuclideaTools.lineTool
 
 private data class SolveState(
     val context: EuclideaContext,
-    val oldPoints: Set<Point>,
-    val pendingElements: Set<Element>
+    val oldPoints: Set<Point>
 )
 
 fun solve(
@@ -15,11 +14,12 @@ fun solve(
     prune: ((EuclideaContext) -> Boolean)? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
+    val pendingElements = mutableSetOf<Element>()
     fun sub(
         solveState: SolveState, depth: Int,
     ): EuclideaContext? {
         val nextDepth = depth + 1
-        val (context, oldPoints, pendingElements) = solveState
+        val (context, oldPoints) = solveState
         with(context) {
             val newPoints = points.filter { it !in oldPoints }
             val nextOldPoints = oldPoints + newPoints
@@ -44,23 +44,32 @@ fun solve(
                     visit(newPoint, newPoints[j])
             }
 
-            val newPendingElements = pendingElements + newElements
 
-            var nextPendingElements = newPendingElements
-            newPendingElements.forEach { newElement ->
-                nextPendingElements = nextPendingElements.minus(newElement)
-                val next = SolveState(withElement(newElement), nextOldPoints, nextPendingElements)
+            val addedElements = mutableSetOf<Element>()
+            for (element in newElements) {
+                if (pendingElements.add(element))
+                    addedElements.add(element)
+            }
+
+            val removedElements = mutableSetOf<Element>()
+            while (true) {
+                val newElement = pendingElements.firstOrNull() ?: break
+                pendingElements.remove(newElement)
+                if (newElement !in addedElements)
+                    removedElements.add(newElement)
+                val next = SolveState(withElement(newElement), nextOldPoints)
                 val nextContext = next.context
                 if (check(nextContext))
                     return nextContext
                 else if (nextDepth < maxDepth && (prune == null || !prune(nextContext)))
                     sub(next, nextDepth)?.let { return@sub it }
             }
+            pendingElements.addAll(removedElements)
         }
         return null
     }
     if (check(initialContext))
         return initialContext
-    return sub(SolveState(initialContext, setOf(), setOf()), 0)
+    return sub(SolveState(initialContext, setOf()), 0)
 }
 
