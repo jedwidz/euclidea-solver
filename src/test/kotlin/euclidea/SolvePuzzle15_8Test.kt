@@ -62,9 +62,13 @@ class SolvePuzzle15_8Test {
 
         assertTrue(isSolution(sampleSolutionContext))
 
-        val maxExtraElements = 0
+        // maxExtraElements = 4, maxDepth = 11, initialSameElements = 0 - chugging after ~12 hours
+        // maxExtraElements = 3, maxDepth = 7, initialSameElements = 0 - chugging after a few hours
+        val maxExtraElements = 1
+        val initialSameElements = 11
         val solutionContext = solve(startingContext, 12, prune = { next ->
-            next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
+            val extraElements = next.elements.count { !sampleSolutionContext.hasElement(it) }
+            extraElements > maxExtraElements || next.elements.size <= initialSameElements && extraElements > 0
         }) { context ->
             isSolution(context) && checkSolution(context)
         }
