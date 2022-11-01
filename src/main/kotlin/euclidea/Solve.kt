@@ -15,6 +15,7 @@ fun solve(
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
     val pendingElements = mutableSetOf<Element>()
+    val passedElements = mutableSetOf<Element>()
     fun sub(
         solveState: SolveState, depth: Int,
     ): EuclideaContext? {
@@ -26,7 +27,7 @@ fun solve(
 
             val newElements = mutableListOf<Element>()
             fun tryAdd(e: Element?) {
-                if (e !== null && !hasElement(e))
+                if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e))
                     newElements.add(e)
             }
 
@@ -44,18 +45,16 @@ fun solve(
                     visit(newPoint, newPoints[j])
             }
 
-
-            val addedElements = mutableSetOf<Element>()
-            for (element in newElements) {
-                if (pendingElements.add(element))
-                    addedElements.add(element)
-            }
+            pendingElements.addAll(newElements)
 
             val removedElements = mutableSetOf<Element>()
+            val newPassedElements = mutableSetOf<Element>()
             while (true) {
                 val newElement = pendingElements.firstOrNull() ?: break
                 pendingElements.remove(newElement)
-                if (newElement !in addedElements)
+                passedElements.add(newElement)
+                newPassedElements.add(newElement)
+                if (newElement !in newElements)
                     removedElements.add(newElement)
                 val next = SolveState(withElement(newElement), nextOldPoints)
                 val nextContext = next.context
@@ -65,6 +64,7 @@ fun solve(
                     sub(next, nextDepth)?.let { return@sub it }
             }
             pendingElements.addAll(removedElements)
+            passedElements.removeAll(newPassedElements)
         }
         return null
     }
