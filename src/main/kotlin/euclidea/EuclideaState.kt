@@ -20,8 +20,8 @@ data class EuclideaContext(
         return if (hasElement(element))
             this
         else {
-            var updatedPoints = points
-            var updatedPointSource = pointSource
+            val updatedPoints = points.toMutableList()
+            val updatedPointSource = pointSource.toMutableMap()
             for (e in elements) {
                 val intersection = intersect(e, element)
                 for (point in intersection.points()) {
