@@ -46,19 +46,11 @@ abstract class IndexedSet<T>(
     }
 
     override fun add(item: T): Boolean {
-        return if (contains(item)) false else {
-            val added = set.add(item)
-            assert(added)
-            added
-        }
+        return set.add(item)
     }
 
     override fun remove(item: T): Boolean {
-        return if (!contains(item)) false else {
-            val removed = set.remove(item)
-            assert(removed)
-            removed
-        }
+        return set.remove(item)
     }
 
     override fun removeOne(): T? {
