@@ -5,9 +5,15 @@ import euclidea.Element.Line
 
 interface EuclideaSet<T> {
     operator fun contains(item: T): Boolean
-    operator fun plusAssign(item: T)
     fun add(item: T): Boolean
-    operator fun plusAssign(items: Collection<T>)
+
+    operator fun plusAssign(item: T) {
+        add(item)
+    }
+
+    operator fun plusAssign(items: Collection<T>) {
+        items.forEach { add(it) }
+    }
 }
 
 abstract class IndexedSet<T>(
@@ -23,6 +29,7 @@ abstract class IndexedSet<T>(
     override operator fun contains(item: T): Boolean {
         val primary = primaryDim(item)
         val range = coincidingRange(primary)
+        // Take some liberty here at the edge points of the range
         val subSet = set.subSet(range.first, false, range.second, false)
         return subSet.any { coincides(it, item) }
     }
@@ -31,20 +38,12 @@ abstract class IndexedSet<T>(
         return bound(primary - Epsilon) to bound(primary + Epsilon)
     }
 
-    override operator fun plusAssign(item: T) {
-        add(item)
-    }
-
     override fun add(item: T): Boolean {
         return if (contains(item)) false else {
             val added = set.add(item)
             assert(added)
             added
         }
-    }
-
-    override operator fun plusAssign(items: Collection<T>) {
-        items.forEach { add(it) }
     }
 }
 
@@ -92,6 +91,26 @@ class CircleSet : IndexedSet<Circle>(compareBy({ it.center.x }, { it.center.y },
 
     override fun bound(d: Double): Circle {
         return Circle(Point(d, 0.0), 0.0)
+    }
+}
+
+class ElementSet : EuclideaSet<Element> {
+
+    val lineSet = LineSet()
+    val circleSet = CircleSet()
+
+    override fun contains(item: Element): Boolean {
+        return when (item) {
+            is Line -> lineSet.contains(item)
+            is Circle -> circleSet.contains(item)
+        }
+    }
+
+    override fun add(item: Element): Boolean {
+        return when (item) {
+            is Line -> lineSet.add(item)
+            is Circle -> circleSet.add(item)
+        }
     }
 }
 

@@ -19,43 +19,75 @@ class EuclideaSetsTest {
         )
     }
 
+    private val line = Line(Point(0.0, 0.0), Point(1.0, 2.0))
+
+    private val sameLines = listOf(
+        Line(Point(0.0 - d, 0.0), Point(1.0, 2.0)),
+        Line(Point(0.0 + d, 0.0), Point(1.0, 2.0)),
+        Line(Point(0.0 - d, 0.0 - d), Point(1.0 - d, 2.0 - d)),
+        Line(Point(0.0 + d, 0.0 + d), Point(1.0 + d, 2.0 + d)),
+        Line(Point(0.0, 0.0 - d), Point(1.0 + d, 2.0 - d))
+    )
+
+    private val differentLines = listOf(
+        Line(Point(0.0, 1.0), Point(1.0, 2.0)),
+        Line(Point(0.0, 1.0), Point(0.0, 2.0)),
+        Line(Point(0.0, 1.0), Point(1.0, 0.0)),
+        Line(Point(1.0, 0.0), Point(1.0, 2.0))
+    )
+
     @Test
     fun lineSet() {
         euclideaSetTest(
             set = LineSet(),
-            item = Line(Point(0.0, 0.0), Point(1.0, 2.0)),
-            sameItems = listOf(
-                Line(Point(0.0 - d, 0.0), Point(1.0, 2.0)),
-                Line(Point(0.0 + d, 0.0), Point(1.0, 2.0)),
-                Line(Point(0.0 - d, 0.0 - d), Point(1.0 - d, 2.0 - d)),
-                Line(Point(0.0 + d, 0.0 + d), Point(1.0 + d, 2.0 + d)),
-                Line(Point(0.0, 0.0 - d), Point(1.0 + d, 2.0 - d))
-            ),
-            differentItems = listOf(
-                Line(Point(0.0, 1.0), Point(1.0, 2.0)),
-                Line(Point(0.0, 1.0), Point(0.0, 2.0)),
-                Line(Point(0.0, 1.0), Point(1.0, 0.0)),
-                Line(Point(1.0, 0.0), Point(1.0, 2.0))
-            )
+            item = line,
+            sameItems = sameLines,
+            differentItems = differentLines
         )
     }
+
+    private val circle = Circle(Point(0.0, 0.0), 1.0)
+
+    private val sameCircles = listOf(
+        Circle(Point(0.0 - d, 0.0), 1.0),
+        Circle(Point(0.0 + d, 0.0), 1.0),
+        Circle(Point(0.0 - d, 0.0 - d), 1.0 - d),
+        Circle(Point(0.0 + d, 0.0 + d), 1.0 + d)
+    )
+
+    private val differentCircles = listOf(
+        Circle(Point(0.0, 0.0), 2.0),
+        Circle(Point(0.0, 1.0), 1.0),
+        Circle(Point(1.0, 0.0), 1.0)
+    )
 
     @Test
     fun circleSet() {
         euclideaSetTest(
             set = CircleSet(),
-            item = Circle(Point(0.0, 0.0), 1.0),
-            sameItems = listOf(
-                Circle(Point(0.0 - d, 0.0), 1.0),
-                Circle(Point(0.0 + d, 0.0), 1.0),
-                Circle(Point(0.0 - d, 0.0 - d), 1.0 - d),
-                Circle(Point(0.0 + d, 0.0 + d), 1.0 + d)
-            ),
-            differentItems = listOf(
-                Circle(Point(0.0, 0.0), 2.0),
-                Circle(Point(0.0, 1.0), 1.0),
-                Circle(Point(1.0, 0.0), 1.0)
-            )
+            item = circle,
+            sameItems = sameCircles,
+            differentItems = differentCircles
+        )
+    }
+
+    @Test
+    fun elementSet_circle() {
+        euclideaSetTest(
+            set = ElementSet(),
+            item = circle,
+            sameItems = sameCircles,
+            differentItems = listOf(line) + sameLines + differentLines + differentCircles
+        )
+    }
+
+    @Test
+    fun elementSet_line() {
+        euclideaSetTest(
+            set = ElementSet(),
+            item = line,
+            sameItems = sameLines,
+            differentItems = listOf(circle) + sameCircles + differentLines + differentCircles
         )
     }
 
