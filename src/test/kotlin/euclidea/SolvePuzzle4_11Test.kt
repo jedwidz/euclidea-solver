@@ -57,9 +57,9 @@ class SolvePuzzle4_11Test {
 
         assertTrue(isSolution(sampleSolutionContext))
 
-        val maxExtraElements = 1
+        val maxExtraElements = 2
         val initialSameElements = 0
-        val solutionContext = solve(startingContext, 8, prune = { next ->
+        val solutionContext = solve(startingContext, 7, prune = { next ->
             val extraElements = next.elements.count { !sampleSolutionContext.hasElement(it) }
             extraElements > maxExtraElements || next.elements.size <= initialSameElements && extraElements > 0
         }) { context ->
