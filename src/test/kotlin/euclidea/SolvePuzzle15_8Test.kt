@@ -15,7 +15,7 @@ class SolvePuzzle15_8Test {
         val center = namer.set("center", Point(0.02, 0.0))
         val radius = 0.3123
         val (circle, solutionContext) =
-            puzzle15_8_solution12E(base1, center, radius, namer)
+            puzzle15_8_solution7E(base1, center, radius, namer)
 
         dumpSolution(solutionContext, namer)
         assertTrue { puzzle15_8_isSolution(base1, circle).invoke(solutionContext) }
@@ -31,7 +31,7 @@ class SolvePuzzle15_8Test {
             puzzle15_8_initialContext(base1, center, radius, namer)
 
         val (sampleSolutionCircle, sampleSolutionContext) =
-            puzzle15_8_solution12E(base1, center, radius, namer)
+            puzzle15_8_solution7E(base1, center, radius, namer)
 
         val isSolution = puzzle15_8_isSolution(base1, sampleSolutionCircle)
 
@@ -66,7 +66,7 @@ class SolvePuzzle15_8Test {
         // maxExtraElements = 2, maxDepth = 7, initialSameElements = 0 - nothing after ~4 mins
         // maxExtraElements = 4, maxDepth = 7, initialSameElements = 0 - nothing after 25h 31m 11s
         // maxExtraElements = 5, maxDepth = 7, initialSameElements = 0 - found 2h 31m
-        val maxExtraElements = 5
+        val maxExtraElements = 1
         val initialSameElements = 0
         val solutionContext = solve(startingContext, 7, prune = { next ->
             val extraElements = next.elements.count { !sampleSolutionContext.hasElement(it) }
@@ -89,7 +89,7 @@ class SolvePuzzle15_8Test {
         }
     }
 
-    private fun puzzle15_8_solution12E(
+    private fun puzzle15_8_solution7E(
         base1: Point,
         center: Point,
         radius: Double,
@@ -101,33 +101,25 @@ class SolvePuzzle15_8Test {
             radius,
             namer
         )
-        val start1 = namer.set("start1", EuclideaTools.circleTool(base1, center)!!)
-        val start2 = namer.set("start2", EuclideaTools.circleTool(center, base1)!!)
-        val triangleP = namer.set("triangleP", intersectAnyPoint(start1, start2))
-        val triangleC = namer.set("triangleC", EuclideaTools.circleTool(triangleP, base1)!!)
-        val triangleP2 = namer.set("triangleP2", intersectAnyPoint(triangleC, start2))
-        val (next1, next2) = namer.setAll("next1", "next2", intersectTwoPoints(start1, circle))
-        val nextCircle1 = namer.set("nextCircle1", EuclideaTools.circleTool(next1, base1)!!)
-        val nextCircle2 = namer.set("nextCircle2", EuclideaTools.circleTool(next2, base1)!!)
-        val eye = namer.set("eye", intersectTwoPointsOther(nextCircle1, nextCircle2, base1))
-        val start1Opp = namer.set("start1Opp", EuclideaTools.circleTool(eye, triangleP2)!!)
-        val downP = namer.set("downP", intersectAnyPoint(start1Opp, circle))
-        val downC = namer.set("downC", EuclideaTools.circleTool(downP, center)!!)
-        val (leftP, rightP) = namer.setAll("leftP", "rightP", intersectTwoPoints(downC, circle))
-        val rightC = namer.set("rightC", EuclideaTools.circleTool(rightP, downP)!!)
-        val cross = namer.set("cross", EuclideaTools.circleTool(rightP, leftP)!!)
-        val midP = namer.set("midP", intersectTwoPointsOther(downC, rightC, center))
-        val midC = namer.set("midC", EuclideaTools.circleTool(center, midP)!!)
-        val midP2 = namer.set("midP2", intersectTwoPointsOther(downC, cross, leftP))
-        val midC2 = namer.set("midC2", EuclideaTools.circleTool(midP2, leftP)!!)
-        val eye2 = namer.set("eye2", intersectAnyPoint(midC, midC2))
-        val cut = namer.set("cut", EuclideaTools.circleTool(downP, eye2)!!)
+        val start = namer.set("start", EuclideaTools.circleTool(base1, center)!!)
+        val (adj1, adj2) = namer.set("shiftP", intersectTwoPoints(start, circle))
+        val shift = namer.set("shift", EuclideaTools.circleTool(adj1, center)!!)
+        val span = namer.set("span", EuclideaTools.circleTool(adj1, adj2)!!)
+        val opp = namer.set("opp", intersectTwoPointsOther(shift, start, center))
+        val eye = namer.set("eye", EuclideaTools.circleTool(center, opp)!!)
+        val perpP = namer.set("perpP", intersectTwoPointsOther(eye, shift, opp))
+        val perpC = namer.set("perpC", EuclideaTools.circleTool(perpP, adj1)!!)
+        val focus = namer.set("focus", intersectAnyPoint(shift, perpC))
+        val bigP = namer.set("bigP", intersectTwoPointsOther(eye, start, opp))
+        val bigC = namer.set("bigC", EuclideaTools.circleTool(bigP, focus)!!)
+        val finalP = namer.set("finalP", intersectAnyPoint(bigC, span))
+        val finalC = namer.set("finalC", EuclideaTools.circleTool(perpP, finalP)!!)
 
-        namer.setAll("solution1", "solution2", intersectTwoPoints(cut, circle))
+        namer.setAll("solution1", "solution2", intersectTwoPoints(finalC, circle))
 
         val solutionContext = initialContext.withElements(
             listOf(
-                start1, start2, triangleC, nextCircle1, nextCircle2, start1Opp, downC, rightC, cross, midC, midC2, cut
+                start, shift, span, eye, perpC, bigC, finalC
             )
         )
         return Pair(circle, solutionContext)
