@@ -174,7 +174,7 @@ class SolvePuzzle15_7Test {
 
         // Not expected to get a better solution than 10E
         val maxExtraElements = 3
-        val solutionContext = solve(startingContext, 9 - 1 - 1, prune = { next ->
+        val solutionContext = solve(startingContext, 10 - 1 - 1, prune = { next ->
             next.elements.count { !sampleSolutionContext.hasElement(it) } > maxExtraElements
         }) { context ->
             isSolution(context) && checkSolution(context)
