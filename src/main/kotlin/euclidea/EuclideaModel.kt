@@ -21,6 +21,17 @@ data class Point(val x: Double, val y: Double) {
 sealed class Element {
 
     data class Line(val point1: Point, val point2: Point) : Element() {
+
+        val xIntercept: Double?
+        val yIntercept: Double?
+
+        init {
+            val dx = point2.x - point1.x
+            val dy = point2.y - point1.y
+            xIntercept = if (dy == 0.0) null else point1.x - (dx / dy) * point1.y
+            yIntercept = if (dx == 0.0) null else point1.y - (dy / dx) * point1.x
+        }
+
         override fun minus(point: Point): Line {
             return Line(point1 - point, point2 - point)
         }
@@ -114,9 +125,15 @@ fun coincides(element1: Element, element2: Element): Boolean {
     }
 }
 
+private fun coincidesNullable(num1: Double?, num2: Double?): Boolean {
+    return num1 === null && num2 === null || (num1 !== null && num2 !== null && coincides(num1, num2))
+}
+
 private fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
-    // TODO ? optimize
-    return linesIntersect(line1, line2) === Intersection.Coincide
+    return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
+        line1.yIntercept,
+        line2.yIntercept
+    )
 }
 
 private fun circlesCoincide(circle1: Element.Circle, circle2: Element.Circle): Boolean {
@@ -127,7 +144,7 @@ fun coincides(point1: Point, point2: Point): Boolean {
     return coincides(point1.x, point2.x) && coincides(point1.y, point2.y)
 }
 
-private const val Epsilon = 0.0000000001
+const val Epsilon = 0.0000000001
 private const val EpsilonRough = Epsilon * 100000
 
 fun coincides(num1: Double, num2: Double): Boolean {
@@ -182,23 +199,23 @@ fun intersectTwoPointsOther(
 
 private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {
     // Help from: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
-    val p1 = line1.point1
-    val p2 = line1.point2
-    val p3 = line2.point1
-    val p4 = line2.point2
-    val d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
-    return if (coincides(d, 0.0)) {
-        // Check if p1 is on line2
-        if (coincides((p1.x - p4.x) * (p3.y - p4.y), (p1.y - p4.y) * (p3.x - p4.x)))
-            Intersection.Coincide
-        else
+    return if (linesCoincide(line1, line2))
+        Intersection.Coincide
+    else {
+        val p1 = line1.point1
+        val p2 = line1.point2
+        val p3 = line2.point1
+        val p4 = line2.point2
+        val d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
+        return if (coincides(d, 0.0))
             Intersection.Disjoint
-    } else {
-        val a = p1.x * p2.y - p1.y * p2.x
-        val b = p3.x * p4.y - p3.y * p4.x
-        val x = a * (p3.x - p4.x) - (p1.x - p2.x) * b
-        val y = a * (p3.y - p4.y) - (p1.y - p2.y) * b
-        Intersection.OnePoint(Point(x / d, y / d))
+        else {
+            val a = p1.x * p2.y - p1.y * p2.x
+            val b = p3.x * p4.y - p3.y * p4.x
+            val x = a * (p3.x - p4.x) - (p1.x - p2.x) * b
+            val y = a * (p3.y - p4.y) - (p1.y - p2.y) * b
+            Intersection.OnePoint(Point(x / d, y / d))
+        }
     }
 }
 

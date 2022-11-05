@@ -66,7 +66,7 @@ class SolvePuzzle15_8Test {
         // maxExtraElements = 2, maxDepth = 7, initialSameElements = 0 - nothing after ~4 mins
         // maxExtraElements = 4, maxDepth = 7, initialSameElements = 0 - nothing after 25h 31m 11s
         // maxExtraElements = 5, maxDepth = 7, initialSameElements = 0 - found 15hr 7m
-        val maxExtraElements = 5
+        val maxExtraElements = 1
         val initialSameElements = 0
         val solutionContext = solve(startingContext, 7, prune = { next ->
             val extraElements = next.elements.count { !sampleSolutionContext.hasElement(it) }
