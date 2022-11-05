@@ -102,7 +102,7 @@ class SolvePuzzle15_8Test {
             namer
         )
         val start = namer.set("start", EuclideaTools.circleTool(base1, center)!!)
-        val (adj1, adj2) = namer.set("shiftP", intersectTwoPoints(start, circle))
+        val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start, circle))
         val shift = namer.set("shift", EuclideaTools.circleTool(adj1, center)!!)
         val span = namer.set("span", EuclideaTools.circleTool(adj1, adj2)!!)
         val opp = namer.set("opp", intersectTwoPointsOther(shift, start, center))
