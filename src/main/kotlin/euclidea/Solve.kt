@@ -14,8 +14,8 @@ fun solve(
     prune: ((EuclideaContext) -> Boolean)? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
-    val pendingElements = mutableSetOf<Element>()
-    val passedElements = mutableSetOf<Element>()
+    val pendingElements = ElementSet()
+    val passedElements = ElementSet()
     fun sub(
         solveState: SolveState, depth: Int,
     ): EuclideaContext? {
@@ -45,13 +45,12 @@ fun solve(
                     visit(newPoint, newPoints[j])
             }
 
-            pendingElements.addAll(newElements)
+            pendingElements += newElements
 
             val removedElements = mutableSetOf<Element>()
             val newPassedElements = mutableSetOf<Element>()
             while (true) {
-                val newElement = pendingElements.firstOrNull() ?: break
-                pendingElements.remove(newElement)
+                val newElement = pendingElements.removeOne() ?: break
                 passedElements.add(newElement)
                 newPassedElements.add(newElement)
                 if (newElement !in newElements)
@@ -63,8 +62,8 @@ fun solve(
                 else if (nextDepth < maxDepth && (prune == null || !prune(nextContext)))
                     sub(next, nextDepth)?.let { return@sub it }
             }
-            pendingElements.addAll(removedElements)
-            passedElements.removeAll(newPassedElements)
+            pendingElements += removedElements
+            passedElements -= newPassedElements
         }
         return null
     }

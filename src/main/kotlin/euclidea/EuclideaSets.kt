@@ -5,7 +5,10 @@ import euclidea.Element.Line
 
 interface EuclideaSet<T> {
     operator fun contains(item: T): Boolean
+    fun removeOne(): T?
+
     fun add(item: T): Boolean
+    fun remove(item: T): Boolean
 
     operator fun plusAssign(item: T) {
         add(item)
@@ -13,6 +16,10 @@ interface EuclideaSet<T> {
 
     operator fun plusAssign(items: Collection<T>) {
         items.forEach { add(it) }
+    }
+
+    operator fun minusAssign(items: Collection<T>) {
+        items.forEach { remove(it) }
     }
 }
 
@@ -44,6 +51,20 @@ abstract class IndexedSet<T>(
             assert(added)
             added
         }
+    }
+
+    override fun remove(item: T): Boolean {
+        return if (!contains(item)) false else {
+            val removed = set.remove(item)
+            assert(removed)
+            removed
+        }
+    }
+
+    override fun removeOne(): T? {
+        val res = set.firstOrNull()
+        res?.let { set.remove(it) }
+        return res
     }
 }
 
@@ -111,6 +132,17 @@ class ElementSet : EuclideaSet<Element> {
             is Line -> lineSet.add(item)
             is Circle -> circleSet.add(item)
         }
+    }
+
+    override fun remove(item: Element): Boolean {
+        return when (item) {
+            is Line -> lineSet.remove(item)
+            is Circle -> circleSet.remove(item)
+        }
+    }
+
+    override fun removeOne(): Element? {
+        return lineSet.removeOne() ?: circleSet.removeOne()
     }
 }
 
