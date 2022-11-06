@@ -28,8 +28,10 @@ sealed class Element {
         init {
             val dx = point2.x - point1.x
             val dy = point2.y - point1.y
-            xIntercept = if (dy == 0.0) null else point1.x - (dx / dy) * point1.y
-            yIntercept = if (dx == 0.0) null else point1.y - (dy / dx) * point1.x
+            fun intercept(da: Double, db: Double, a: Double, b: Double) =
+                if (abs(db) < Epsilon) null else a - (da / db) * b
+            xIntercept = intercept(dx, dy, point1.x, point1.y)
+            yIntercept = intercept(dy, dx, point1.y, point1.x)
         }
 
         override fun minus(point: Point): Line {
