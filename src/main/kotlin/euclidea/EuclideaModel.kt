@@ -24,6 +24,8 @@ sealed class Element {
 
         val xIntercept: Double?
         val yIntercept: Double?
+        val xDir: Double
+        val yDir: Double
 
         init {
             val dx = point2.x - point1.x
@@ -32,6 +34,13 @@ sealed class Element {
                 if (abs(db) < Epsilon) null else a - (da / db) * b
             xIntercept = intercept(dx, dy, point1.x, point1.y)
             yIntercept = intercept(dy, dx, point1.y, point1.x)
+
+            val len = sqrt(sq(dx) + sq(dy))
+            val x = dx / len
+            val y = dy / len
+            val sign = if (abs(x) < Epsilon) sign(y) else sign(x)
+            xDir = x * sign
+            yDir = y * sign
         }
 
         override fun minus(point: Point): Line {
@@ -135,7 +144,7 @@ private fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
     return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
         line1.yIntercept,
         line2.yIntercept
-    )
+    ) && coincides(line1.xDir, line2.xDir) && coincides(line1.yDir, line2.yDir)
 }
 
 private fun circlesCoincide(circle1: Element.Circle, circle2: Element.Circle): Boolean {
