@@ -8,6 +8,14 @@ class Namer {
         return named
     }
 
+    // For constructions
+    fun <T : Any> setCons(name: String, nameds: Pair<T, List<T>>): Pair<T, List<T>> {
+        val (named, construction) = nameds
+        names[named] = name
+        construction.forEachIndexed { index: Int, t: T -> names[t] = "${name}#${index}" }
+        return nameds
+    }
+
     fun <T : Pair<Any, Any>> setAll(name1: String, name2: String, namedPair: T): T {
         names[namedPair.first] = name1
         names[namedPair.second] = name2

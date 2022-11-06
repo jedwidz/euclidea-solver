@@ -16,6 +16,24 @@ object EuclideaTools {
         return makeLine(point, point2)
     }
 
+    fun dropPerpendicular(
+        linePoint1: Point,
+        linePoint2: Point,
+        point: Point
+    ): Pair<Element.Line, List<Element.Circle>>? {
+        val circle1 = circleTool(linePoint1, point) ?: return null
+        val circle2 = circleTool(linePoint2, point) ?: return null
+        val other = intersectTwoPointsOther(circle1, circle2, point)
+        return lineTool(point, other)?.let { it to listOf(circle1, circle2) }
+    }
+
+    fun bisect(point1: Point, point2: Point): Pair<Element.Line, List<Element.Circle>>? {
+        val circle1 = circleTool(point1, point2) ?: return null
+        val circle2 = circleTool(point2, point1) ?: return null
+        val (cross1, cross2) = intersectTwoPoints(circle1, circle2)
+        return lineTool(cross1, cross2)?.let { it to listOf(circle1, circle2) }
+    }
+
     private fun makeLine(point1: Point, point2: Point): Element.Line? {
         return if (coincides(point1, point2)) null else Element.Line(point1, point2)
     }
