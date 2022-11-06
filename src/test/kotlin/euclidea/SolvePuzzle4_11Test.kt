@@ -1,95 +1,60 @@
 package euclidea
 
 import org.junit.jupiter.api.Test
-import kotlin.test.assertTrue
 
 class SolvePuzzle4_11Test {
     // Square by Two Vertices
     // (circles only)
 
     @Test
-    fun puzzle4_11_check_solution() {
+    fun checkSolution() {
         Solver().checkReferenceSolution()
     }
 
     @Test
-    fun puzzle4_11_improve_solution() {
-        Solver().improveSolution()
+    fun improveSolution() {
+        Solver().improveSolution(2, 7)
     }
 
-    class Solver {
+    data class Params(
+        val base1: Point,
+        val base2: Point
+    )
 
-        data class Params(
-            val base1: Point,
-            val base2: Point
-        )
+    object Setup
 
-        fun checkReferenceSolution() {
-            // Reproduce and check my best solution so far
-            val namer = Namer()
-            val params = Params(
+    class Solver : ImprovingSolver<Params, Setup>() {
+
+        override fun makeParams(namer: Namer): Params {
+            return Params(
                 base1 = namer.set("base1", Point(0.0, 0.0)),
                 base2 = namer.set("base2", Point(1.0, 0.0))
             )
-            val solutionContext =
-                referenceSolution(params, namer)
-
-            dumpSolution(solutionContext, namer)
-            assertTrue { isSolution(params).invoke(solutionContext) }
         }
 
-        fun improveSolution() {
-            val namer = Namer()
-            val params = Params(
+        override fun makeReplayParams(namer: Namer): Params {
+            return Params(
                 base1 = namer.set("base1", Point(0.0, 0.0)),
-                base2 = namer.set("base2", Point(1.0, 0.0))
-            )
-            val startingContext =
-                initialContext(params, namer)
-
-            val sampleSolutionContext =
-                referenceSolution(params, namer)
-
-            val isSolution = isSolution(params)
-
-            val replayNamer = Namer()
-            val replayParams = Params(
-                base1 = replayNamer.set("base1", Point(0.0, 0.0)),
                 base2 = namer.set("base2", Point(1.01983, 0.0011))
             )
-            val replayInitialContext = initialContext(
-                replayParams,
-                replayNamer
-            )
-
-            val isReplaySolution = isSolution(replayParams)
-
-            fun checkSolution(context: EuclideaContext): Boolean {
-                return try {
-                    val replaySolutionContext =
-                        replaySteps(context, replayInitialContext)
-                    isReplaySolution(replaySolutionContext)
-                } catch (e: IllegalStateException) {
-                    // Failed replay
-                    false
-                }
-            }
-
-            assertTrue(isSolution(sampleSolutionContext))
-
-            val maxExtraElements = 2
-            val solutionContext = solve(startingContext, 7, prune = { next ->
-                val extraElements = next.elements.count { !sampleSolutionContext.hasElement(it) }
-                extraElements > maxExtraElements
-            }) { context ->
-                isSolution(context) && checkSolution(context)
-            }
-            dumpSolution(solutionContext, namer)
-            println("Count: ${solutionContext?.elements?.size}")
         }
 
-        private fun isSolution(
-            params: Params
+        override fun initialContext(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            with(params) {
+                return Setup to EuclideaContext(
+                    config = EuclideaConfig(lineToolEnabled = false, maxSqDistance = sq(5.0)),
+                    points = listOf(base1, base2),
+                    elements = listOf()
+                )
+            }
+        }
+
+        override fun isSolution(
+            params: Params,
+            setup: Setup
         ): (EuclideaContext) -> Boolean {
             with(params) {
                 val diff = base2 - base1
@@ -102,14 +67,15 @@ class SolvePuzzle4_11Test {
             }
         }
 
-        private fun referenceSolution(
+        override fun referenceSolution(
             params: Params,
             namer: Namer
-        ): EuclideaContext {
-            val initialContext = initialContext(
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
                 params, namer
             )
             with(params) {
+                // Optimal 7E solution
                 val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base2)!!)
                 val start2 = namer.set("start2", EuclideaTools.circleTool(base2, base1)!!)
                 val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
@@ -124,26 +90,11 @@ class SolvePuzzle4_11Test {
 
                 // namer.setAll("solution1", "solution2", intersectTwoPoints(finalC, circle))
 
-                val solutionContext = initialContext.withElements(
+                return setup to initialContext.withElements(
                     listOf(
                         start1, start2, triangle, big, big1, focusC, finalC
                     )
                 )
-                return solutionContext
-            }
-        }
-
-        private fun initialContext(
-            params: Params,
-            namer: Namer
-        ): EuclideaContext {
-            with(params) {
-                val baseContext = EuclideaContext(
-                    config = EuclideaConfig(lineToolEnabled = false, maxSqDistance = sq(5.0)),
-                    points = listOf(base1, base2),
-                    elements = listOf()
-                )
-                return baseContext
             }
         }
     }
