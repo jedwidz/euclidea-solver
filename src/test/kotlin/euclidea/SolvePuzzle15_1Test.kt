@@ -26,18 +26,23 @@ class SolvePuzzle15_1Test {
 
     class Solver : ImprovingSolver<Params, Setup>() {
 
-        override fun makeParams(namer: Namer): Params {
+        override fun makeParams(): Params {
             return Params(
-                base1 = namer.set("base1", Point(0.0, 0.0)),
-                base2 = namer.set("base2", Point(1.0, 0.0))
+                base1 = Point(0.0, 0.0),
+                base2 = Point(1.0, 0.0)
             )
         }
 
-        override fun makeReplayParams(namer: Namer): Params {
+        override fun makeReplayParams(): Params {
             return Params(
-                base1 = namer.set("base1", Point(0.01, 0.0)),
-                base2 = namer.set("base2", Point(1.0, 0.1))
+                base1 = Point(0.01, 0.0),
+                base2 = Point(0.01, 0.0)
             )
+        }
+
+        override fun nameParams(params: Params, namer: Namer) {
+            namer.set("base1", params.base1)
+            namer.set("base2", params.base2)
         }
 
         override fun initialContext(

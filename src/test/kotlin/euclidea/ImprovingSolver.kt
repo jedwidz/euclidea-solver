@@ -6,7 +6,8 @@ abstract class ImprovingSolver<Params, Setup> {
 
     fun checkReferenceSolution() {
         val namer = Namer()
-        val params = makeParams(namer)
+        val params = makeParams()
+        nameParams(params, namer)
         val (setup, solutionContext) =
             referenceSolution(params, namer)
 
@@ -16,7 +17,8 @@ abstract class ImprovingSolver<Params, Setup> {
 
     fun improveSolution(maxExtraElements: Int, maxDepth: Int) {
         val namer = Namer()
-        val params = makeParams(namer)
+        val params = makeParams()
+        nameParams(params, namer)
         val (setup, startingContext) =
             initialContext(params, namer)
 
@@ -26,7 +28,8 @@ abstract class ImprovingSolver<Params, Setup> {
         val isSolution = isSolution(params, setup)
 
         val replayNamer = Namer()
-        val replayParams = makeReplayParams(replayNamer)
+        val replayParams = makeReplayParams()
+        nameParams(replayParams, replayNamer)
         val (replaySetup, replayInitialContext) = initialContext(
             replayParams,
             replayNamer
@@ -57,9 +60,11 @@ abstract class ImprovingSolver<Params, Setup> {
         println("Count: ${solutionContext?.elements?.size}")
     }
 
-    protected abstract fun makeReplayParams(namer: Namer): Params
+    protected abstract fun nameParams(params: Params, namer: Namer)
 
-    protected abstract fun makeParams(namer: Namer): Params
+    protected abstract fun makeParams(): Params
+
+    protected abstract fun makeReplayParams(): Params
 
     protected abstract fun isSolution(
         params: Params,

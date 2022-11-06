@@ -37,26 +37,34 @@ class SolvePuzzle15_7Test {
 
     class Solver : ImprovingSolver<Params, Setup>() {
 
-        override fun makeParams(namer: Namer): Params {
+        override fun makeParams(): Params {
             return Params(
-                base1 = namer.set("base1", Point(0.0, 0.0)),
-                base2 = namer.set("base2", Point(1.0, 0.0)),
-                center = namer.set("center", Point(0.0, 2.0)),
+                base1 = Point(0.0, 0.0),
+                base2 = Point(1.0, 0.0),
+                center = Point(0.0, 2.0),
                 radius = 1.0,
-                probePoint1 = namer.set("probe1", Point(-0.943215, 0.1)),
-                probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
+                probePoint1 = Point(-0.943215, 0.1),
+                probePoint2 = Point(-0.828934, 3.0)
             )
         }
 
-        override fun makeReplayParams(namer: Namer): Params {
+        override fun makeReplayParams(): Params {
             return Params(
-                base1 = namer.set("base1", Point(0.01, 0.0)),
-                base2 = namer.set("base2", Point(1.0, 0.1)),
-                center = namer.set("center", Point(0.02, 2.0)),
+                base1 = Point(0.01, 0.0),
+                base2 = Point(1.0, 0.1),
+                center = Point(0.02, 2.0),
                 radius = 1.0124,
-                probePoint1 = namer.set("probe1", Point(-0.943215, 0.0)),
-                probePoint2 = namer.set("probe2", Point(-0.828934, 3.0))
+                probePoint1 = Point(-0.943215, 0.0),
+                probePoint2 = Point(-0.828934, 3.0)
             )
+        }
+
+        override fun nameParams(params: Params, namer: Namer) {
+            namer.set("base1", params.base1)
+            namer.set("base2", params.base2)
+            namer.set("center", params.center)
+            namer.set("probe1", params.probePoint1)
+            namer.set("probe2", params.probePoint2)
         }
 
         override fun initialContext(
