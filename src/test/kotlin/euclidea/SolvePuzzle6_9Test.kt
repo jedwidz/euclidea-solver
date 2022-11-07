@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 
 class SolvePuzzle6_9Test {
     // Nine Point Circle
-    // (circles only)
 
     @Test
     fun checkSolution() {
