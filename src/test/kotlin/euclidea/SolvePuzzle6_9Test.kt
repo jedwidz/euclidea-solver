@@ -94,29 +94,28 @@ class SolvePuzzle6_9Test {
             )
             with(params) {
                 with(setup) {
-                    // Suboptimal 5L-13E solution
-                    val (perp1, perp1Cons) = namer.setCons(
-                        "perp1",
-                        EuclideaTools.dropPerpendicular(base2, base3, base1)!!
-                    )
-                    val (perp3, perp3Cons) = namer.setCons(
-                        "perp3",
-                        EuclideaTools.dropPerpendicular(base1, base2, base3)!!
-                    )
-                    val foot1 = namer.set("foot1", intersectOnePoint(perp1, triangle23))
-                    val foot2 = namer.set("foot2", intersectOnePoint(perp3, triangle12))
-                    val (cross, crossCons) = namer.setCons("cross", EuclideaTools.bisect(foot1, foot2)!!)
-                    val mid2 = namer.set("mid2", intersectOnePoint(cross, triangle31))
-                    val (pincer, pincerCons) = namer.setCons("pincer", EuclideaTools.bisect(mid2, foot1)!!)
-                    val center = namer.set("center", intersectOnePoint(pincer, cross))
-                    val solution = namer.set("solution", EuclideaTools.circleTool(center, mid2)!!)
+                    // Optimal 9E solution
+                    val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base2)!!)
+                    val start2 = namer.set("start2", EuclideaTools.circleTool(base2, base1)!!)
+                    val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
+                    val bisect = namer.set("bisect", EuclideaTools.lineTool(adj1, adj2)!!)
+                    val cross1 = namer.set("cross1", intersectTwoPointsOther(start1, triangle23, base2))
+                    val cross2 = namer.set("cross2", intersectTwoPointsOther(start2, triangle31, base1))
+                    val cross = namer.set("cross", EuclideaTools.lineTool(cross1, cross2)!!)
+                    val half = namer.set("half", intersectOnePoint(bisect, triangle12))
+                    val pupil = namer.set("pupil", EuclideaTools.circleTool(half, base1)!!)
+                    val narrow = namer.set("narrow", intersectTwoPointsOther(pupil, triangle23, base2))
+                    val back = namer.set("back", EuclideaTools.circleTool(narrow, half)!!)
+                    // Maybe needs to be the intersection inside the triangle?
+                    val inner = namer.set("inner", intersectAnyPoint(back, cross))
+                    val cut = namer.set("cut", EuclideaTools.lineTool(inner, half)!!)
+                    val (adjb1, adjb2) = namer.setAll("adj1b", "adjb2", intersectTwoPoints(pupil, back))
+                    val bisect2 = namer.set("bisect2", EuclideaTools.lineTool(adjb1, adjb2)!!)
+                    val center = namer.set("center", intersectOnePoint(bisect2, cut))
+                    val solution = namer.set("solution", EuclideaTools.circleTool(center, half)!!)
 
                     return setup to initialContext
-                        .withElements(perp1Cons).withElement(perp1)
-                        .withElements(perp3Cons).withElement(perp3)
-                        .withElements(crossCons).withElement(cross)
-                        .withElements(pincerCons).withElement(pincer)
-                        .withElement(solution)
+                        .withElements(listOf(start1, start2, bisect, cross, pupil, back, cut, bisect2, solution))
                 }
             }
         }
