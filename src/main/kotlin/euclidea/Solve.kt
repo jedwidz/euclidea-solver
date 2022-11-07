@@ -39,8 +39,10 @@ fun solve(
 
             val newElements = mutableListOf<Element>()
             fun tryAdd(e: Element?) {
-                if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e))
+                if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e)) {
+                    pendingElements += e
                     newElements.add(e)
+                }
             }
 
             fun visit(point1: Point, point2: Point) {
@@ -56,8 +58,6 @@ fun solve(
                 for (j in i + 1 until newPoints.size)
                     visit(newPoint, newPoints[j])
             }
-
-            pendingElements += newElements
 
             val pendingList = pendingElements.items().map { element ->
                 val priority = visitPriority?.let { it(element) } ?: 0
