@@ -13,7 +13,9 @@ class SolvePuzzle6_9Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(2, 7)
+        // Checks for center of circle, not the circle itself
+        // maxExtraElement = 2, maxDepth = 9 - 1 - success 1 hr 40 min
+        Solver().improveSolution(2, 9 - 1)
     }
 
     data class Params(
@@ -62,7 +64,7 @@ class SolvePuzzle6_9Test {
                 val triangle31 = namer.set("triangle31", EuclideaTools.lineTool(base3, base1)!!)
                 val setup = Setup(triangle12, triangle23, triangle31)
                 return setup to EuclideaContext(
-                    config = EuclideaConfig(maxSqDistance = sq(10.0)),
+                    config = EuclideaConfig(maxSqDistance = sq(8.0)),
                     points = listOf(base1, base2, base3),
                     elements = listOf(triangle12, triangle23, triangle31)
                 )
@@ -76,8 +78,10 @@ class SolvePuzzle6_9Test {
             val namer = Namer()
             val (_, referenceSolution) = referenceSolution(params, namer)
             val solutionCircle = referenceSolution.elements.last() as Element.Circle
+            val solutionCenter = solutionCircle.center
             return { context ->
-                context.hasElement(solutionCircle)
+                context.hasPoint(solutionCenter)
+                // context.hasElement(solutionCircle)
             }
         }
 
