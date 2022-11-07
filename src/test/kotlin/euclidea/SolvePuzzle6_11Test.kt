@@ -12,8 +12,8 @@ class SolvePuzzle6_11Test {
 
     @Test
     fun improveSolution() {
-        // maxExtraElements: 1, maxDepth: 10 - nothing
-        Solver().improveSolution(1, 10)
+        // maxExtraElements: 2, maxDepth: 10 - nothing
+        Solver().improveSolution(2, 12)
     }
 
     data class Params(
@@ -71,10 +71,26 @@ class SolvePuzzle6_11Test {
             }
         }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext, Element) -> Int {
+        override fun visitPriority(params: Params, setup: Setup): (Element) -> Int {
+            val namer = Namer()
+
+            val referenceElements = ElementSet()
+            referenceElements += referenceSolution(params, namer).second.elements
+
+            val solutionElements = ElementSet()
+            solutionElements += constructSolution(params)
+
+            return { element ->
+                val solutionScore = if (element in solutionElements) 2 else 0
+                val referenceScore = if (element in referenceElements) 1 else 0
+                solutionScore + referenceScore
+            }
+        }
+
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solutionElements = constructSolution(params)
-            return { context, element ->
-                solutionElements.count { !(coincides(it, element) || context.hasElement(it)) }
+            return { context ->
+                solutionElements.count { !context.hasElement(it) }
             }
         }
 

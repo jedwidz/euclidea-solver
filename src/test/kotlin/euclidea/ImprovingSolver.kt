@@ -26,6 +26,7 @@ abstract class ImprovingSolver<Params, Setup> {
             referenceSolution(params, namer)
 
         val isSolution = isSolution(params, setup)
+        val visitPriority = visitPriority(params, setup)
         val remainingStepsLowerBound = remainingStepsLowerBound(params, setup)
 
         val replayNamer = Namer()
@@ -58,6 +59,7 @@ abstract class ImprovingSolver<Params, Setup> {
                 val extraElements = next.elements.count { !sampleSolutionContext.hasElement(it) }
                 extraElements > maxExtraElements
             },
+            visitPriority = visitPriority,
             remainingStepsLowerBound = remainingStepsLowerBound
         ) { context ->
             isSolution(context) && checkSolution(context)
@@ -77,11 +79,18 @@ abstract class ImprovingSolver<Params, Setup> {
         setup: Setup
     ): (EuclideaContext) -> Boolean
 
+    protected open fun visitPriority(
+        params: Params,
+        setup: Setup
+    ): (Element) -> Int {
+        return { _ -> 0 }
+    }
+
     protected open fun remainingStepsLowerBound(
         params: Params,
         setup: Setup
-    ): (EuclideaContext, Element) -> Int {
-        return { _, _ -> 0 }
+    ): (EuclideaContext) -> Int {
+        return { _ -> 0 }
     }
 
     protected abstract fun referenceSolution(

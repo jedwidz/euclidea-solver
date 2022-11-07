@@ -10,11 +10,11 @@ private data class SolveState(
 
 private data class PendingNode(
     val element: Element,
-    val remainingStepsLowerBound: Int
+    val visitPriority: Int
 ) : Comparable<PendingNode> {
 
     override fun compareTo(other: PendingNode): Int {
-        return remainingStepsLowerBound.compareTo(other.remainingStepsLowerBound)
+        return other.visitPriority.compareTo(visitPriority)
     }
 }
 
@@ -22,7 +22,8 @@ fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
     prune: ((EuclideaContext) -> Boolean)? = null,
-    remainingStepsLowerBound: ((EuclideaContext, Element) -> Int)? = null,
+    visitPriority: ((Element) -> Int)? = null,
+    remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
     val pendingElements = ElementSet()
@@ -58,15 +59,14 @@ fun solve(
 
             pendingElements += newElements
 
-            val pendingList = pendingElements.items().mapNotNull { element ->
-                val lowerBound = remainingStepsLowerBound?.let { it(context, element) } ?: 0
-                if (nextDepth + lowerBound <= maxDepth)
-                    PendingNode(
-                        element = element,
-                        remainingStepsLowerBound = lowerBound
-                    )
-                else null
+            val pendingList = pendingElements.items().map { element ->
+                val priority = visitPriority?.let { it(element) } ?: 0
+                PendingNode(
+                    element = element,
+                    visitPriority = priority
+                )
             }.sorted()
+            // println("$depth - ${pendingList.size}")
 
             val removedElements = mutableSetOf<Element>()
             val newPassedElements = mutableSetOf<Element>()
@@ -82,7 +82,10 @@ fun solve(
                 val next = SolveState(nextContext, nextOldPoints)
                 if (check(nextContext))
                     return nextContext
-                else if (nextDepth < maxDepth && (prune == null || !prune(nextContext)))
+                else if (nextDepth < maxDepth &&
+                    (remainingStepsLowerBound == null || remainingStepsLowerBound(nextContext) + nextDepth <= maxDepth) &&
+                    (prune == null || !prune(nextContext))
+                )
                     sub(next, nextDepth)?.let { return@sub it }
             }
             pendingElements += removedElements
