@@ -12,7 +12,8 @@ class SolvePuzzle6_11Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(0, 10)
+        // maxExtraElements: 1, maxDepth: 10 - nothing
+        Solver().improveSolution(1, 10)
     }
 
     data class Params(
@@ -67,6 +68,13 @@ class SolvePuzzle6_11Test {
             val solutionElements = constructSolution(params)
             return { context ->
                 context.hasElements(solutionElements)
+            }
+        }
+
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext, Element) -> Int {
+            val solutionElements = constructSolution(params)
+            return { context, element ->
+                solutionElements.count { !(coincides(it, element) || context.hasElement(it)) }
             }
         }
 

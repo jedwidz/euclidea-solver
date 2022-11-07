@@ -10,6 +10,8 @@ interface EuclideaSet<T> {
     fun add(item: T): Boolean
     fun remove(item: T): Boolean
 
+    fun items(): List<T>
+
     operator fun plusAssign(item: T) {
         add(item)
     }
@@ -57,6 +59,10 @@ abstract class IndexedSet<T>(
         val res = set.firstOrNull()
         res?.let { set.remove(it) }
         return res
+    }
+
+    override fun items(): List<T> {
+        return set.toList()
     }
 }
 
@@ -141,6 +147,10 @@ class ElementSet : EuclideaSet<Element> {
 
     override fun removeOne(): Element? {
         return lineSet.removeOne() ?: circleSet.removeOne()
+    }
+
+    override fun items(): List<Element> {
+        return lineSet.items() + circleSet.items()
     }
 }
 

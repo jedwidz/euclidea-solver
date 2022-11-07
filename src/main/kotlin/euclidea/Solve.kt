@@ -8,10 +8,21 @@ private data class SolveState(
     val oldPoints: Set<Point>
 )
 
+private data class PendingNode(
+    val element: Element,
+    val remainingStepsLowerBound: Int
+) : Comparable<PendingNode> {
+
+    override fun compareTo(other: PendingNode): Int {
+        return remainingStepsLowerBound.compareTo(other.remainingStepsLowerBound)
+    }
+}
+
 fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
     prune: ((EuclideaContext) -> Boolean)? = null,
+    remainingStepsLowerBound: ((EuclideaContext, Element) -> Int)? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
     val pendingElements = ElementSet()
@@ -47,16 +58,28 @@ fun solve(
 
             pendingElements += newElements
 
+            val pendingList = pendingElements.items().mapNotNull { element ->
+                val lowerBound = remainingStepsLowerBound?.let { it(context, element) } ?: 0
+                if (nextDepth + lowerBound <= maxDepth)
+                    PendingNode(
+                        element = element,
+                        remainingStepsLowerBound = lowerBound
+                    )
+                else null
+            }.sorted()
+
             val removedElements = mutableSetOf<Element>()
             val newPassedElements = mutableSetOf<Element>()
-            while (true) {
-                val newElement = pendingElements.removeOne() ?: break
+            for (pendingNode in pendingList) {
+                val newElement = pendingNode.element
+                val removed = pendingElements.remove(newElement)
+                assert(removed)
                 passedElements.add(newElement)
                 newPassedElements.add(newElement)
                 if (newElement !in newElements)
                     removedElements.add(newElement)
-                val next = SolveState(withElement(newElement), nextOldPoints)
-                val nextContext = next.context
+                val nextContext = withElement(newElement)
+                val next = SolveState(nextContext, nextOldPoints)
                 if (check(nextContext))
                     return nextContext
                 else if (nextDepth < maxDepth && (prune == null || !prune(nextContext)))
