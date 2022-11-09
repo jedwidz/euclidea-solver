@@ -16,7 +16,7 @@ class SolvePuzzle6_11Test {
         // maxExtraElements: 4, maxDepth: 10 - nothing after 18 hr 15 min
         // maxExtraElements: 1, maxDepth: 14 - nothing after 25 min
         // maxExtraElements: 2, maxDepth: 12 - nothing after 2 hr 38 min
-        Solver().improveSolution(0, 15)
+        Solver().improveSolution(1, 10)
     }
 
     data class Params(
@@ -75,7 +75,7 @@ class SolvePuzzle6_11Test {
             }
         }
 
-        override fun visitPriority(params: Params, setup: Setup): (Element) -> Int {
+        override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
             val namer = Namer()
 
             val referenceElements = ElementSet()
@@ -86,7 +86,7 @@ class SolvePuzzle6_11Test {
 
             val interestPoints = pointsOfInterest(params)
 
-            return { element ->
+            return { _, element ->
                 val solutionScore = if (element in solutionElements) 1 else 0
                 val referenceScore = if (element in referenceElements) 1 else 0
                 val interestPointsScore = interestPoints.count { pointAndElementCoincide(it, element) }
@@ -106,6 +106,25 @@ class SolvePuzzle6_11Test {
                     base1.minus(d),
                     center.minus(d)
                 )
+            }
+        }
+
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 10E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> element !is Element.Line
+                    1 -> element !is Element.Circle
+                    2 -> element !is Element.Line
+                    3 -> element !is Element.Circle
+                    4 -> element !is Element.Circle
+                    5 -> element !is Element.Line
+                    6 -> element !is Element.Line
+                    7 -> element !is Element.Line
+                    8 -> element !is Element.Circle
+                    9 -> element !is Element.Line
+                    else -> false
+                }
             }
         }
 

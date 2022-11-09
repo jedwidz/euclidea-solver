@@ -3,8 +3,13 @@ package euclidea
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 
-private data class SolveState(
+data class SolveContext(
     val context: EuclideaContext,
+    val depth: Int
+)
+
+private data class SolveState(
+    val solveContext: SolveContext,
     val oldPoints: Set<Point>
 )
 
@@ -21,34 +26,19 @@ private data class PendingNode(
 fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
-    prune: ((EuclideaContext) -> Boolean)? = null,
-    visitPriority: ((Element) -> Int)? = null,
+    prune: ((SolveContext) -> Boolean)? = null,
+    visitPriority: ((SolveContext, Element) -> Int)? = null,
+    pass: ((SolveContext, Element) -> Boolean)? = null,
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
     val pendingElements = ElementSet()
     val passedElements = ElementSet()
 
-    fun maybePrioritize(items: List<Element>): List<Element> {
-        return when (visitPriority) {
-            null -> items
-            else -> {
-                // looks like sortedBy evaluates its selector more than once, so likely more efficient to 'precalc' it
-                items.map { element ->
-                    PendingNode(
-                        element = element,
-                        visitPriority = visitPriority(element)
-                    )
-                }.sorted().map { it.element }
-            }
-        }
-    }
-
-    fun sub(
-        solveState: SolveState, depth: Int,
-    ): EuclideaContext? {
+    fun sub(solveState: SolveState): EuclideaContext? {
+        val (solveContext, oldPoints) = solveState
+        val (context, depth) = solveContext
         val nextDepth = depth + 1
-        val (context, oldPoints) = solveState
         with(context) {
             val newPoints = points.filter { it !in oldPoints }
             val nextOldPoints = oldPoints + newPoints
@@ -75,7 +65,30 @@ fun solve(
                     visit(newPoint, newPoints[j])
             }
 
-            val pendingList = maybePrioritize(pendingElements.items())
+            fun maybePass(items: List<Element>): List<Element> {
+                return when (pass) {
+                    null -> items
+                    else -> items.filterNot { pass(solveContext, it) }
+                }
+            }
+
+            fun maybePrioritize(items: List<Element>): List<Element> {
+                return when (visitPriority) {
+                    null -> items
+                    else -> {
+                        // looks like sortedBy evaluates its selector more than once, so likely more efficient to 'precalc' it
+                        val prioritized = items.map { element ->
+                            PendingNode(
+                                element = element,
+                                visitPriority = visitPriority(solveContext, element)
+                            )
+                        }.sorted()
+                        prioritized.map { it.element }
+                    }
+                }
+            }
+
+            val pendingList = maybePrioritize(maybePass(pendingElements.items()))
             // println("$depth - ${pendingList.size}")
 
             val removedElements = mutableSetOf<Element>()
@@ -88,14 +101,16 @@ fun solve(
                 if (newElement !in newElements)
                     removedElements.add(newElement)
                 val nextContext = withElement(newElement)
-                val next = SolveState(nextContext, nextOldPoints)
+                val nextSolveContext = SolveContext(nextContext, nextDepth)
+                val next = SolveState(nextSolveContext, nextOldPoints)
                 if (check(nextContext))
                     return nextContext
                 else if (nextDepth < maxDepth &&
                     (remainingStepsLowerBound == null || remainingStepsLowerBound(nextContext) + nextDepth <= maxDepth) &&
-                    (prune == null || !prune(nextContext))
-                )
-                    sub(next, nextDepth)?.let { return@sub it }
+                    (prune == null || !prune(nextSolveContext))
+                ) {
+                    sub(next)?.let { return@sub it }
+                }
             }
             pendingElements += removedElements
             passedElements -= newPassedElements
@@ -104,6 +119,6 @@ fun solve(
     }
     if (check(initialContext))
         return initialContext
-    return sub(SolveState(initialContext, setOf()), 0)
+    return sub(SolveState(SolveContext(initialContext, 0), setOf()))
 }
 
