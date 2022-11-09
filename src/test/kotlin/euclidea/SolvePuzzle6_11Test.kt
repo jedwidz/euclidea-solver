@@ -1,6 +1,7 @@
 package euclidea
 
 import org.junit.jupiter.api.Test
+import kotlin.math.min
 
 class SolvePuzzle6_11Test {
     // Parallelogram by Three Midpoints
@@ -16,7 +17,7 @@ class SolvePuzzle6_11Test {
         // maxExtraElements: 4, maxDepth: 10 - nothing after 18 hr 15 min
         // maxExtraElements: 1, maxDepth: 14 - nothing after 25 min
         // maxExtraElements: 2, maxDepth: 12 - nothing after 2 hr 38 min
-        Solver().improveSolution(1, 10)
+        Solver().improveSolution(2, 3)
     }
 
     data class Params(
@@ -28,6 +29,8 @@ class SolvePuzzle6_11Test {
     object Setup
 
     class Solver : ImprovingSolver<Params, Setup>() {
+
+        private val partialSolutionSize = 1
 
         override fun makeParams(): Params {
             return Params(
@@ -71,7 +74,9 @@ class SolvePuzzle6_11Test {
         ): (EuclideaContext) -> Boolean {
             val solutionElements = constructSolution(params)
             return { context ->
-                context.hasElements(solutionElements)
+                // Partial solution
+                solutionElements.count { context.hasElement(it) } >= partialSolutionSize
+                // context.hasElements(solutionElements)
             }
         }
 
@@ -131,7 +136,9 @@ class SolvePuzzle6_11Test {
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solutionElements = constructSolution(params)
             return { context ->
-                solutionElements.count { !context.hasElement(it) }
+                // Partial solution
+                min(partialSolutionSize, solutionElements.count { !context.hasElement(it) })
+                // solutionElements.count { !context.hasElement(it) }
             }
         }
 
