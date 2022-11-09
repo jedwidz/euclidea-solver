@@ -28,6 +28,22 @@ fun solve(
 ): EuclideaContext? {
     val pendingElements = ElementSet()
     val passedElements = ElementSet()
+
+    fun maybePrioritize(items: List<Element>): List<Element> {
+        return when (visitPriority) {
+            null -> items
+            else -> {
+                // looks like sortedBy evaluates its selector more than once, so likely more efficient to 'precalc' it
+                items.map { element ->
+                    PendingNode(
+                        element = element,
+                        visitPriority = visitPriority(element)
+                    )
+                }.sorted().map { it.element }
+            }
+        }
+    }
+
     fun sub(
         solveState: SolveState, depth: Int,
     ): EuclideaContext? {
@@ -59,19 +75,12 @@ fun solve(
                     visit(newPoint, newPoints[j])
             }
 
-            val pendingList = pendingElements.items().map { element ->
-                val priority = visitPriority?.let { it(element) } ?: 0
-                PendingNode(
-                    element = element,
-                    visitPriority = priority
-                )
-            }.sorted()
+            val pendingList = maybePrioritize(pendingElements.items())
             // println("$depth - ${pendingList.size}")
 
             val removedElements = mutableSetOf<Element>()
             val newPassedElements = mutableSetOf<Element>()
-            for (pendingNode in pendingList) {
-                val newElement = pendingNode.element
+            for (newElement in pendingList) {
                 val removed = pendingElements.remove(newElement)
                 assert(removed)
                 passedElements.add(newElement)
