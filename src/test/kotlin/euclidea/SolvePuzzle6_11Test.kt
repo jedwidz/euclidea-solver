@@ -1,7 +1,7 @@
 package euclidea
 
 import org.junit.jupiter.api.Test
-import kotlin.math.min
+import kotlin.math.max
 
 class SolvePuzzle6_11Test {
     // Parallelogram by Three Midpoints
@@ -17,7 +17,12 @@ class SolvePuzzle6_11Test {
         // maxExtraElements: 4, maxDepth: 10 - nothing after 18 hr 15 min
         // maxExtraElements: 1, maxDepth: 14 - nothing after 25 min
         // maxExtraElements: 2, maxDepth: 12 - nothing after 2 hr 38 min
-        Solver().improveSolution(2, 3)
+        Solver().improveSolution(0, 7)
+    }
+
+    @Test
+    fun checkPrefixSolution() {
+        Solver().checkPrefixSolution()
     }
 
     data class Params(
@@ -30,7 +35,7 @@ class SolvePuzzle6_11Test {
 
     class Solver : ImprovingSolver<Params, Setup>() {
 
-        private val partialSolutionSize = 1
+        private val partialSolutionSize = 2
 
         override fun makeParams(): Params {
             return Params(
@@ -83,8 +88,13 @@ class SolvePuzzle6_11Test {
         override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
             val namer = Namer()
 
+            // TODO factor out with same set in ImprovingSolver
             val referenceElements = ElementSet()
             referenceElements += referenceSolution(params, namer).second.elements
+
+            val prefixNamer = Namer()
+            val prefixContext = solutionPrefix(params, prefixNamer)?.second
+            prefixContext?.let { referenceElements += it.elements }
 
             val solutionElements = ElementSet()
             solutionElements += constructSolution(params)
@@ -137,7 +147,8 @@ class SolvePuzzle6_11Test {
             val solutionElements = constructSolution(params)
             return { context ->
                 // Partial solution
-                min(partialSolutionSize, solutionElements.count { !context.hasElement(it) })
+                val res = max(0, partialSolutionSize - solutionElements.count { context.hasElement(it) })
+                res
                 // solutionElements.count { !context.hasElement(it) }
             }
         }
@@ -157,6 +168,32 @@ class SolvePuzzle6_11Test {
                     EuclideaTools.lineTool(p3, p4)!!,
                     EuclideaTools.lineTool(p4, p1)!!
                 )
+            }
+        }
+
+        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Partial solution
+                    val line1 = namer.set("line1", EuclideaTools.lineTool(base1, base3)!!)
+                    val circle1 = namer.set("circle1", EuclideaTools.circleTool(base3, base1)!!)
+                    val point1 = namer.set("point1", intersectTwoPointsOther(circle1, line1, base1))
+                    val solution1 = namer.set("solution1", EuclideaTools.lineTool(base2, point1)!!)
+                    // Gets a second solution line, but maybe not part of optimal solution:
+                    val start1 = namer.set("start1", EuclideaTools.circleTool(point1, base2)!!)
+                    val start2 = namer.set("start2", EuclideaTools.circleTool(base2, point1)!!)
+                    val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
+                    val bisect = namer.set("bisect", EuclideaTools.lineTool(adj1, adj2)!!)
+                    val point2 = namer.set("point2", intersectOnePoint(bisect, solution1))
+                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(base3, point2)!!)
+
+                    return setup to initialContext.withElements(
+                        listOf(line1, circle1, solution1, start1, start2, bisect, solution2)
+                    )
+                }
             }
         }
 

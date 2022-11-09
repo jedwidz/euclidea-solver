@@ -15,6 +15,17 @@ abstract class ImprovingSolver<Params, Setup> {
         assertTrue { isSolution(params, setup).invoke(solutionContext) }
     }
 
+    fun checkPrefixSolution() {
+        val namer = Namer()
+        val params = makeParams()
+        nameParams(params, namer)
+        val (setup, solutionContext) =
+            solutionPrefix(params, namer)!!
+
+        dumpSolution(solutionContext, namer)
+        assertTrue { isSolution(params, setup).invoke(solutionContext) }
+    }
+
     fun improveSolution(maxExtraElements: Int, maxDepth: Int) {
         val namer = Namer()
         val params = makeParams()
@@ -53,16 +64,39 @@ abstract class ImprovingSolver<Params, Setup> {
 
         assertTrue(isSolution(sampleSolutionContext))
 
+        val prefixNamer = Namer()
+        val prefixContext = solutionPrefix(params, prefixNamer)?.second
+
+        fun checkPrefix(index: Int, element: Element): Boolean {
+            if (prefixContext === null)
+                return true
+            return prefixContext.elements.getOrNull(index)?.let { prefixElement ->
+                coincides(element, prefixElement)
+            } ?: true
+        }
+
+        val targetElementSet = ElementSet()
+        targetElementSet += sampleSolutionContext.elements
+        prefixContext?.let { targetElementSet += it.elements }
+
+        val passWithPrefix: ((SolveContext, Element) -> Boolean) = { solveContext, element ->
+            !checkPrefix(solveContext.depth, element) || (pass !== null && pass(solveContext, element))
+        }
+
+        fun checkExtraElements(nextElements: List<Element>): Boolean {
+            val extraElements = nextElements.count { it !in targetElementSet }
+            return extraElements <= maxExtraElements
+        }
+
         val solutionContext = solve(
             startingContext,
             maxDepth,
             prune = { nextSolveContext ->
-                val next = nextSolveContext.context
-                val extraElements = next.elements.count { !sampleSolutionContext.hasElement(it) }
-                extraElements > maxExtraElements
+                val nextElements = nextSolveContext.context.elements
+                !checkExtraElements(nextElements)
             },
             visitPriority = visitPriority,
-            pass = pass,
+            pass = passWithPrefix,
             remainingStepsLowerBound = remainingStepsLowerBound
         ) { context ->
             isSolution(context) && checkSolution(context)
@@ -112,4 +146,11 @@ abstract class ImprovingSolver<Params, Setup> {
         params: Params,
         namer: Namer
     ): Pair<Setup, EuclideaContext>
+
+    protected open fun solutionPrefix(
+        params: Params,
+        namer: Namer
+    ): Pair<Setup, EuclideaContext>? {
+        return null
+    }
 }
