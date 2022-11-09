@@ -180,6 +180,13 @@ fun pointAndCircleCoincide(point: Point, circle: Element.Circle): Boolean {
     return coincides(d, sq(circle.radius))
 }
 
+fun pointAndElementCoincide(point: Point, element: Element): Boolean {
+    return when (element) {
+        is Element.Line -> pointAndLineCoincide(point, element)
+        is Element.Circle -> pointAndCircleCoincide(point, element)
+    }
+}
+
 fun intersectAnyPoint(element1: Element, element2: Element): Point =
     when (val i = intersect(element1, element2)) {
         is Intersection.OnePoint -> i.point

@@ -2,10 +2,9 @@ package euclidea
 
 import euclidea.Point.Companion.Origin
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
-import kotlin.test.assertTrue
+import kotlin.test.assertEquals
 
 class EuclideaModelTest {
 
@@ -126,15 +125,20 @@ class EuclideaModelTest {
         val base = EuclideaTools.lineTool(basePoint, basePoint2)!!
         val perpendicularLine = EuclideaTools.perpendicularTool(base, center)!!
 
-        assertFalse(pointAndLineCoincide(basePoint, perpendicularLine))
-        assertFalse(pointAndLineCoincide(basePoint2, perpendicularLine))
+        fun test(point: Point, line: Element.Line, coincides: Boolean) {
+            assertEquals(coincides, pointAndLineCoincide(point, line))
+            assertEquals(coincides, pointAndElementCoincide(point, line))
+        }
 
-        assertTrue(pointAndLineCoincide(basePoint, base))
-        assertTrue(pointAndLineCoincide(basePoint2, base))
-        assertTrue(pointAndLineCoincide(center, perpendicularLine))
+        test(basePoint, perpendicularLine, false)
+        test(basePoint2, perpendicularLine, false)
+
+        test(basePoint, base, true)
+        test(basePoint2, base, true)
+        test(center, perpendicularLine, true)
 
         val intersectionPoint = intersect(base, perpendicularLine).points().first()
-        assertTrue(pointAndLineCoincide(intersectionPoint, perpendicularLine))
+        test(intersectionPoint, perpendicularLine, true)
     }
 
     @Test
@@ -148,13 +152,18 @@ class EuclideaModelTest {
 
         val circle = EuclideaTools.circleTool(center, x1)!!
 
-        assertFalse(pointAndCircleCoincide(center, circle))
-        assertTrue(pointAndCircleCoincide(x1, circle))
-        assertTrue(pointAndCircleCoincide(x2, circle))
-        assertTrue(pointAndCircleCoincide(y1, circle))
-        assertTrue(pointAndCircleCoincide(y2, circle))
+        fun test(point: Point, circle: Element.Circle, coincides: Boolean) {
+            assertEquals(coincides, pointAndCircleCoincide(point, circle))
+            assertEquals(coincides, pointAndElementCoincide(point, circle))
+        }
 
-        assertFalse(pointAndCircleCoincide(x2.plus(Point(0.01, 0.0)), circle))
-        assertFalse(pointAndCircleCoincide(x2.plus(Point(0.0, 0.01)), circle))
+        test(center, circle, false)
+        test(x1, circle, true)
+        test(x2, circle, true)
+        test(y1, circle, true)
+        test(y2, circle, true)
+
+        test(x2.plus(Point(0.01, 0.0)), circle, false)
+        test(x2.plus(Point(0.0, 0.01)), circle, false)
     }
 }
