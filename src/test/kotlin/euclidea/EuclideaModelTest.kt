@@ -136,4 +136,25 @@ class EuclideaModelTest {
         val intersectionPoint = intersect(base, perpendicularLine).points().first()
         assertTrue(pointAndLineCoincide(intersectionPoint, perpendicularLine))
     }
+
+    @Test
+    fun circlePointCoincideTest() {
+        val center = Point(0.01, 2.000)
+        val radius = 1.0
+        val x1 = center.plus(Point(radius, 0.0))
+        val x2 = center.plus(Point(-radius, 0.0))
+        val y1 = center.plus(Point(0.0, radius))
+        val y2 = center.plus(Point(0.0, -radius))
+
+        val circle = EuclideaTools.circleTool(center, x1)!!
+
+        assertFalse(pointAndCircleCoincide(center, circle))
+        assertTrue(pointAndCircleCoincide(x1, circle))
+        assertTrue(pointAndCircleCoincide(x2, circle))
+        assertTrue(pointAndCircleCoincide(y1, circle))
+        assertTrue(pointAndCircleCoincide(y2, circle))
+
+        assertFalse(pointAndCircleCoincide(x2.plus(Point(0.01, 0.0)), circle))
+        assertFalse(pointAndCircleCoincide(x2.plus(Point(0.0, 0.01)), circle))
+    }
 }

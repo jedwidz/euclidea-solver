@@ -173,6 +173,13 @@ fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {
     return coincides(measure, 0.0)
 }
 
+fun pointAndCircleCoincide(point: Point, circle: Element.Circle): Boolean {
+    // check for coinciding square of distance
+    // TODO- maybe should use distance rather than its square?
+    val d = point.minus(circle.center).sqDistance
+    return coincides(d, sq(circle.radius))
+}
+
 fun intersectAnyPoint(element1: Element, element2: Element): Point =
     when (val i = intersect(element1, element2)) {
         is Intersection.OnePoint -> i.point
