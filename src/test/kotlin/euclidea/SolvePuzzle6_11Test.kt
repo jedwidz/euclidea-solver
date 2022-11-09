@@ -84,10 +84,28 @@ class SolvePuzzle6_11Test {
             val solutionElements = ElementSet()
             solutionElements += constructSolution(params)
 
+            val interestPoints = pointsOfInterest(params)
+
             return { element ->
-                val solutionScore = 0 //if (element in solutionElements) 2 else 0
+                val solutionScore = if (element in solutionElements) 1 else 0
                 val referenceScore = if (element in referenceElements) 1 else 0
-                solutionScore + referenceScore
+                val interestPointsScore = interestPoints.count { pointAndElementCoincide(it, element) }
+                solutionScore * 10 + referenceScore * 4 + interestPointsScore
+            }
+        }
+
+        private fun pointsOfInterest(params: Params): List<Point> {
+            return with(params) {
+                val center = midpoint(base1, base2)
+                val d = base3.minus(center)
+                listOf(
+                    center,
+                    base1.plus(d),
+                    base2.plus(d),
+                    base2.minus(d),
+                    base1.minus(d),
+                    center.minus(d)
+                )
             }
         }
 
