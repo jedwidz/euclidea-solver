@@ -17,7 +17,10 @@ class SolvePuzzle6_11Test {
         // maxExtraElements: 4, maxDepth: 10 - nothing after 18 hr 15 min
         // maxExtraElements: 1, maxDepth: 14 - nothing after 25 min
         // maxExtraElements: 2, maxDepth: 12 - nothing after 2 hr 38 min
-        Solver().improveSolution(0, 7)
+
+        // maxExtraElements: 1, maxDepth: 11 - nothing after ~2 min
+        // maxExtraElements: 2, maxDepth: 11 - nothing after 3 hr 34m
+        Solver().improveSolution(2, 11)
     }
 
     @Test
@@ -35,7 +38,7 @@ class SolvePuzzle6_11Test {
 
     class Solver : ImprovingSolver<Params, Setup>() {
 
-        private val partialSolutionSize = 2
+        private val partialSolutionSize = 4
 
         override fun makeParams(): Params {
             return Params(
@@ -66,7 +69,7 @@ class SolvePuzzle6_11Test {
         ): Pair<Setup, EuclideaContext> {
             with(params) {
                 return Setup to EuclideaContext(
-                    config = EuclideaConfig(maxSqDistance = sq(10.0)),
+                    config = EuclideaConfig(maxSqDistance = sq(8.0)),
                     points = listOf(base1, base2, base3),
                     elements = listOf()
                 )
@@ -124,24 +127,24 @@ class SolvePuzzle6_11Test {
             }
         }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-            // Euclidea 10E E-star moves hint
-            return { solveContext, element ->
-                when (solveContext.depth) {
-                    0 -> element !is Element.Line
-                    1 -> element !is Element.Circle
-                    2 -> element !is Element.Line
-                    3 -> element !is Element.Circle
-                    4 -> element !is Element.Circle
-                    5 -> element !is Element.Line
-                    6 -> element !is Element.Line
-                    7 -> element !is Element.Line
-                    8 -> element !is Element.Circle
-                    9 -> element !is Element.Line
-                    else -> false
-                }
-            }
-        }
+//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+//            // Euclidea 10E E-star moves hint
+//            return { solveContext, element ->
+//                when (solveContext.depth) {
+//                    0 -> element !is Element.Line
+//                    1 -> element !is Element.Circle
+//                    2 -> element !is Element.Line
+//                    3 -> element !is Element.Circle
+//                    4 -> element !is Element.Circle
+//                    5 -> element !is Element.Line
+//                    6 -> element !is Element.Line
+//                    7 -> element !is Element.Line
+//                    8 -> element !is Element.Circle
+//                    9 -> element !is Element.Line
+//                    else -> false
+//                }
+//            }
+//        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solutionElements = constructSolution(params)
