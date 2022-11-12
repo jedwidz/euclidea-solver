@@ -36,7 +36,7 @@ class SolvePuzzle15_1Test {
         override fun makeReplayParams(): Params {
             return Params(
                 base1 = Point(0.01, 0.0),
-                base2 = Point(0.01, 0.0)
+                base2 = Point(0.02, 0.0)
             )
         }
 
