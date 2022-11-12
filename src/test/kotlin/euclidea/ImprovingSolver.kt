@@ -5,25 +5,21 @@ import kotlin.test.assertTrue
 abstract class ImprovingSolver<Params, Setup> {
 
     fun checkReferenceSolution() {
-        val namer = Namer()
-        val params = makeParams()
-        nameParams(params, namer)
-        val (setup, solutionContext) =
-            referenceSolution(params, namer)
-
-        dumpSolution(solutionContext, namer)
-        assertTrue { isSolution(params, setup).invoke(solutionContext) }
+        checkImpl(this::referenceSolution)
     }
 
-    fun checkPrefixSolution() {
-        val namer = Namer()
-        val params = makeParams()
-        nameParams(params, namer)
-        val (setup, solutionContext) =
-            solutionPrefix(params, namer)!!
+    private fun checkImpl(solution: (Params, Namer) -> Pair<Setup, EuclideaContext>) {
+        fun check(params: Params, dump: Boolean) {
+            val namer = Namer()
+            nameParams(params, namer)
+            val (setup, solutionContext) =
+                solution(params, namer)
 
-        dumpSolution(solutionContext, namer)
-        assertTrue { isSolution(params, setup).invoke(solutionContext) }
+            if (dump) dumpSolution(solutionContext, namer)
+            assertTrue { isSolution(params, setup).invoke(solutionContext) }
+        }
+        check(makeParams(), true)
+        check(makeReplayParams(), false)
     }
 
     fun improveSolution(maxExtraElements: Int, maxDepth: Int) {

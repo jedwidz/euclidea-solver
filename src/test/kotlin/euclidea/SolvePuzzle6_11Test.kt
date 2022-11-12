@@ -16,11 +16,6 @@ class SolvePuzzle6_11Test {
         Solver().improveSolution(0, 10)
     }
 
-    @Test
-    fun checkPrefixSolution() {
-        Solver().checkPrefixSolution()
-    }
-
     data class Params(
         val base1: Point,
         val base2: Point,
@@ -42,11 +37,10 @@ class SolvePuzzle6_11Test {
         }
 
         override fun makeReplayParams(): Params {
-            // #$# temporarily the same, to work around false negatives
             return Params(
-                base1 = Point(0.0, 0.0),
-                base2 = Point(2.0011, 0.01),
-                base3 = Point(1.5012, 1.2012)
+                base1 = Point(0.043, 0.012),
+                base2 = Point(2.011, 0.0001),
+                base3 = Point(1.5091, 1.2031)
             )
         }
 
