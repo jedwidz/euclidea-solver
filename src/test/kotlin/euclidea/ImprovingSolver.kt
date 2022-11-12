@@ -9,7 +9,7 @@ abstract class ImprovingSolver<Params, Setup> {
     }
 
     private fun checkImpl(solution: (Params, Namer) -> Pair<Setup, EuclideaContext>) {
-        fun check(params: Params, dump: Boolean) {
+        fun check(params: Params, replayParams: Params, dump: Boolean) {
             val namer = Namer()
             nameParams(params, namer)
             val (setup, solutionContext) =
@@ -17,9 +17,16 @@ abstract class ImprovingSolver<Params, Setup> {
 
             if (dump) dumpSolution(solutionContext, namer)
             assertTrue { isSolution(params, setup).invoke(solutionContext) }
+
+            val replayNamer = Namer()
+            val (replaySetup, replayInitialContext) = initialContext(replayParams, replayNamer)
+            val replaySolutionContext =
+                replaySteps(solutionContext, replayInitialContext)
+
+            assertTrue { isSolution(replayParams, replaySetup).invoke(replaySolutionContext) }
         }
-        check(makeParams(), true)
-        check(makeReplayParams(), false)
+        check(makeParams(), makeReplayParams(), true)
+        check(makeReplayParams(), makeParams(), false)
     }
 
     fun improveSolution(maxExtraElements: Int, maxDepth: Int) {
