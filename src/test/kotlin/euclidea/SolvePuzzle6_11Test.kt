@@ -120,24 +120,24 @@ class SolvePuzzle6_11Test {
             }
         }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 10E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> element !is Element.Line
-//                    1 -> element !is Element.Circle
-//                    2 -> element !is Element.Line
-//                    3 -> element !is Element.Circle
-//                    4 -> element !is Element.Circle
-//                    5 -> element !is Element.Line
-//                    6 -> element !is Element.Line
-//                    7 -> element !is Element.Line
-//                    8 -> element !is Element.Circle
-//                    9 -> element !is Element.Line
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 10E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> element !is Element.Line
+                    1 -> element !is Element.Circle
+                    2 -> element !is Element.Line
+                    3 -> element !is Element.Circle
+                    4 -> element !is Element.Circle
+                    5 -> element !is Element.Line
+                    6 -> element !is Element.Line
+                    7 -> element !is Element.Line
+                    8 -> element !is Element.Circle
+                    9 -> element !is Element.Line
+                    else -> false
+                }
+            }
+        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solutionElements = constructSolution(params)
@@ -178,16 +178,9 @@ class SolvePuzzle6_11Test {
                     val circle1 = namer.set("circle1", EuclideaTools.circleTool(base3, base1)!!)
                     val point1 = namer.set("point1", intersectTwoPointsOther(circle1, line1, base1))
                     val solution1 = namer.set("solution1", EuclideaTools.lineTool(base2, point1)!!)
-                    // Gets a second solution line, but maybe not part of optimal solution:
-                    val start1 = namer.set("start1", EuclideaTools.circleTool(point1, base2)!!)
-                    val start2 = namer.set("start2", EuclideaTools.circleTool(base2, point1)!!)
-                    val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
-                    val bisect = namer.set("bisect", EuclideaTools.lineTool(adj1, adj2)!!)
-                    val point2 = namer.set("point2", intersectOnePoint(bisect, solution1))
-                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(base3, point2)!!)
 
                     return setup to initialContext.withElements(
-                        listOf(line1, circle1, solution1, start1, start2, bisect, solution2)
+                        listOf(line1, circle1, solution1)
                     )
                 }
             }
@@ -203,15 +196,15 @@ class SolvePuzzle6_11Test {
             with(params) {
                 with(setup) {
                     // Optimal 10E solution
-                    val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base3)!!)
-                    val start2 = namer.set("start2", EuclideaTools.circleTool(base3, base1)!!)
                     val base = namer.set("base", EuclideaTools.lineTool(base1, base3)!!)
+                    val start2 = namer.set("start2", EuclideaTools.circleTool(base3, base1)!!)
+                    val sol2P = namer.set("sol2P", intersectTwoPointsOther(base, start2, base1))
+                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(sol2P, base2)!!)
+                    val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base3)!!)
                     val sol3P1 = namer.set("sol3P1", intersectTwoPointsOther(base, start1, base3))
                     val spread = namer.set("spread", EuclideaTools.circleTool(base2, sol3P1)!!)
                     val sol1P = namer.set("sol1P", intersectTwoPointsOther(spread, start1, sol3P1))
                     val solution1 = namer.set("solution1", EuclideaTools.lineTool(sol1P, base3)!!)
-                    val sol2P = namer.set("sol2P", intersectTwoPointsOther(base, start2, base1))
-                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(sol2P, base2)!!)
                     val crossP = namer.set("crossP", intersectTwoPointsOther(solution2, start2, sol2P))
                     val cross = namer.set("cross", EuclideaTools.lineTool(crossP, base3)!!)
                     val sol4P = namer.set("sol4P", intersectTwoPointsOther(cross, start2, crossP))
@@ -222,12 +215,12 @@ class SolvePuzzle6_11Test {
 
                     return setup to initialContext.withElements(
                         listOf(
-                            start1,
-                            start2,
                             base,
+                            start2,
+                            solution2,
+                            start1,
                             spread,
                             solution1,
-                            solution2,
                             cross,
                             solution3,
                             spread2,
