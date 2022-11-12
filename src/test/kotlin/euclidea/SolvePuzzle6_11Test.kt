@@ -13,14 +13,7 @@ class SolvePuzzle6_11Test {
 
     @Test
     fun improveSolution() {
-        // maxExtraElements: 3, maxDepth: 10 - nothing after 28 min
-        // maxExtraElements: 4, maxDepth: 10 - nothing after 18 hr 15 min
-        // maxExtraElements: 1, maxDepth: 14 - nothing after 25 min
-        // maxExtraElements: 2, maxDepth: 12 - nothing after 2 hr 38 min
-
-        // maxExtraElements: 1, maxDepth: 11 - nothing after ~2 min
-        // maxExtraElements: 2, maxDepth: 11 - nothing after 3 hr 34m
-        Solver().improveSolution(2, 11)
+        Solver().improveSolution(0, 10)
     }
 
     @Test
@@ -209,48 +202,35 @@ class SolvePuzzle6_11Test {
             )
             with(params) {
                 with(setup) {
-                    // Suboptimal 15E solution
-                    val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base2)!!)
-                    val start2 = namer.set("start2", EuclideaTools.circleTool(base2, base1)!!)
-                    val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
-                    val bisect = namer.set("bisect", EuclideaTools.lineTool(adj1, adj2)!!)
-                    val base = namer.set("base", EuclideaTools.lineTool(base1, base2)!!)
-                    val center = namer.set("center", intersectOnePoint(base, bisect))
-                    val axis = namer.set("axis", EuclideaTools.lineTool(center, base3)!!)
-                    val centric = namer.set("centric", EuclideaTools.circleTool(center, base3)!!)
-                    val sideP = namer.set("sideP", intersectAnyPoint(centric, base))
-                    val sideP2 = namer.set("sideP2", intersectTwoPointsOther(centric, axis, base3))
-                    val sideC = namer.set("sideC", EuclideaTools.circleTool(sideP, sideP2)!!)
-                    val solP1 = namer.set("solP1", intersectTwoPointsOther(sideC, centric, sideP2))
-                    val solution1 = namer.set("solution1", EuclideaTools.lineTool(solP1, base3)!!)
-                    val small = namer.set("small", EuclideaTools.circleTool(center, base1)!!)
-                    val axialP = namer.set("axialP", intersectAnyPoint(small, axis))
-                    val axialC = namer.set("axialC", EuclideaTools.circleTool(axialP, base1)!!)
-                    val solP2 = namer.set("solP2", intersectTwoPointsOther(axialC, small, base1))
-                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(solP2, base2)!!)
-                    val corner = namer.set("corner", intersectOnePoint(solution1, solution2))
-                    val cross = namer.set("cross", EuclideaTools.lineTool(corner, center)!!)
-                    val big = namer.set("big", EuclideaTools.circleTool(center, corner)!!)
-                    val opp = namer.set("opp", intersectTwoPointsOther(big, cross, corner))
-                    val solution3 = namer.set("solution3", EuclideaTools.lineTool(opp, base1)!!)
-                    val solution4 = namer.set("solution4", EuclideaTools.lineTool(opp, sideP2)!!)
+                    // Optimal 10E solution
+                    val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base3)!!)
+                    val start2 = namer.set("start2", EuclideaTools.circleTool(base3, base1)!!)
+                    val base = namer.set("base", EuclideaTools.lineTool(base1, base3)!!)
+                    val sol3P1 = namer.set("sol3P1", intersectTwoPointsOther(base, start1, base3))
+                    val spread = namer.set("spread", EuclideaTools.circleTool(base2, sol3P1)!!)
+                    val sol1P = namer.set("sol1P", intersectTwoPointsOther(spread, start1, sol3P1))
+                    val solution1 = namer.set("solution1", EuclideaTools.lineTool(sol1P, base3)!!)
+                    val sol2P = namer.set("sol2P", intersectTwoPointsOther(base, start2, base1))
+                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(sol2P, base2)!!)
+                    val crossP = namer.set("crossP", intersectTwoPointsOther(solution2, start2, sol2P))
+                    val cross = namer.set("cross", EuclideaTools.lineTool(crossP, base3)!!)
+                    val sol4P = namer.set("sol4P", intersectTwoPointsOther(cross, start2, crossP))
+                    val solution4 = namer.set("solution4", EuclideaTools.lineTool(sol4P, base1)!!)
+                    val spread2 = namer.set("spread2", EuclideaTools.circleTool(base2, base3)!!)
+                    val sol3P2 = namer.set("sol3P2", intersectTwoPointsOther(spread2, start1, base3))
+                    val solution3 = namer.set("solution3", EuclideaTools.lineTool(sol3P2, sol3P1)!!)
 
                     return setup to initialContext.withElements(
                         listOf(
                             start1,
                             start2,
-                            bisect,
                             base,
-                            axis,
-                            centric,
-                            sideC,
+                            spread,
                             solution1,
-                            small,
-                            axialC,
                             solution2,
                             cross,
-                            big,
                             solution3,
+                            spread2,
                             solution4
                         )
                     )
