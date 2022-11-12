@@ -216,9 +216,9 @@ class SolvePuzzle6_11Test {
                             spread,
                             solution1,
                             cross,
-                            solution3,
+                            solution4,
                             spread2,
-                            solution4
+                            solution3
                         )
                     )
                 }
