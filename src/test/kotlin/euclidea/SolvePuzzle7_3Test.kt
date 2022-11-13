@@ -14,7 +14,7 @@ class SolvePuzzle7_3Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(0, 5)
+        Solver().improveSolution(1, 5)
     }
 
     data class Params(
