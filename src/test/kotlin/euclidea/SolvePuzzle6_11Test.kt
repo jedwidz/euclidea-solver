@@ -76,15 +76,9 @@ class SolvePuzzle6_11Test {
         }
 
         override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
-            val namer = Namer()
-
-            // TODO factor out with same set in ImprovingSolver
             val referenceElements = ElementSet()
-            referenceElements += referenceSolution(params, namer).second.elements
-
-            val prefixNamer = Namer()
-            val prefixContext = solutionPrefix(params, prefixNamer)?.second
-            prefixContext?.let { referenceElements += it.elements }
+            referenceElements += referenceSolution(params, Namer()).second.elements
+            referenceElements += solutionPrefix(params, Namer()).second.elements
 
             val solutionElements = ElementSet()
             solutionElements += constructSolution(params)
