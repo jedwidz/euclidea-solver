@@ -15,11 +15,13 @@ private data class SolveState(
 
 private data class PendingNode(
     val element: Element,
-    val visitPriority: Int
+    val visitPriority: Int,
+    val isNew: Boolean
 ) : Comparable<PendingNode> {
 
     override fun compareTo(other: PendingNode): Int {
-        return other.visitPriority.compareTo(visitPriority)
+        // Note reverse order
+        return compareValuesBy(other, this, { it.visitPriority }, { it.isNew })
     }
 }
 
@@ -43,7 +45,7 @@ fun solve(
             val newPoints = points.filter { it !in oldPoints }
             val nextOldPoints = oldPoints + newPoints
 
-            val newElements = mutableListOf<Element>()
+            val newElements = mutableSetOf<Element>()
             fun tryAdd(e: Element?) {
                 if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e)) {
                     pendingElements += e
@@ -80,7 +82,8 @@ fun solve(
                         val prioritized = items.map { element ->
                             PendingNode(
                                 element = element,
-                                visitPriority = visitPriority(solveContext, element)
+                                visitPriority = visitPriority(solveContext, element),
+                                isNew = element in newElements
                             )
                         }.sorted()
                         prioritized.map { it.element }
