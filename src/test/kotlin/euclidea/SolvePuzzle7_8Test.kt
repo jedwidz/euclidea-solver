@@ -14,7 +14,8 @@ class SolvePuzzle7_8Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(0, 8)
+        // maxExtraElements: 2, maxDepth: 6 - success in 7 min
+        Solver().improveSolution(2, 6)
     }
 
     data class Params(
