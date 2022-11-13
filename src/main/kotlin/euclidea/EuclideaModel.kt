@@ -115,6 +115,14 @@ fun midpoint(point1: Point, point2: Point): Point {
     return Point((point1.x + point2.x) * 0.5, (point1.y + point2.y) * 0.5)
 }
 
+fun rotatePoint(center: Point, point: Point, deg: Double): Point {
+    val d = point.minus(center)
+    val rad = deg * PI / 180.0
+    val x = d.x * cos(rad) - d.y * sin(rad)
+    val y = d.x * sin(rad) + d.y * cos(rad)
+    return Point(center.x + x, center.y + y)
+}
+
 // Angle aob in degrees, in range (0, 180)
 fun angle(a: Point, o: Point, b: Point): Double {
     val va = a.minus(o)
