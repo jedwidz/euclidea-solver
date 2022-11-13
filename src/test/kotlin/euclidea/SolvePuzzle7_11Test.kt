@@ -3,6 +3,7 @@ package euclidea
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
+import kotlin.math.max
 
 class SolvePuzzle7_11Test {
     // Excircle
@@ -14,7 +15,8 @@ class SolvePuzzle7_11Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(0, 10)
+        // maxExtraElement = 1, maxDepth = 8 - nothing in 2 min 47s
+        Solver().improveSolution(4, 8, 5)
     }
 
     data class Params(
@@ -92,10 +94,56 @@ class SolvePuzzle7_11Test {
             val solutionElements = ElementSet()
             solutionElements += constructSolution(params)
 
+            val interestPoints = pointsOfInterest(params, setup)
+
             return { _, element ->
                 val solutionScore = if (element in solutionElements) 1 else 0
                 val referenceScore = if (element in referenceElements) 1 else 0
-                solutionScore * 10 + referenceScore * 4
+                val interestPointsScore = interestPoints.count { pointAndElementCoincide(it, element) }
+                solutionScore * 10 + referenceScore * 4 + interestPointsScore
+            }
+        }
+
+        private fun pointsOfInterest(params: Params, setup: Setup): List<Point> {
+            return with(setup) {
+                val solutionElements = constructSolution(params)
+                val solution = solutionElements.last() as Element.Circle
+                val tangents = listOf(base12, base23, base31).map { intersectOnePoint(it, solution) }
+                val center = solution.center
+                listOf(center) + tangents
+            }
+        }
+
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean)? {
+            // Euclidea 8E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> element !is Element.Circle
+                    1 -> element !is Element.Circle
+                    2 -> element !is Element.Circle
+                    3 -> element !is Element.Circle
+                    4 -> element !is Element.Circle
+                    5 -> element !is Element.Line
+                    6 -> element !is Element.Line
+                    7 -> element !is Element.Circle
+                    else -> false
+                }
+            }
+        }
+
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+            val solutionElements = constructSolution(params)
+            val solution = solutionElements.last() as Element.Circle
+            val center = solution.center
+            return { context ->
+                // Assumes that solution is the last element (no extraneous elements)
+                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+                    0
+                else {
+                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
+                    // Need two elements to locate center, then the solution circle itself
+                    max(0, 2 - onCenter) + 1
+                }
             }
         }
 
