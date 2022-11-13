@@ -69,10 +69,20 @@ fun solve(
                     visit(newPoint, newPoints[j])
             }
 
-            fun maybePass(items: List<Element>): List<Element> {
+            fun maybePass(items: List<Element>): Pair<List<Element>, List<Element>> {
                 return when (pass) {
-                    null -> items
-                    else -> items.filterNot { pass(solveContext, it) }
+                    null -> items to listOf()
+                    else -> {
+                        val keep = mutableListOf<Element>()
+                        val skippedNewElements = mutableListOf<Element>()
+                        items.forEach { element ->
+                            if (pass(solveContext, element)) {
+                                if (element in newElements)
+                                    skippedNewElements += element
+                            } else keep += element
+                        }
+                        keep to skippedNewElements
+                    }
                 }
             }
 
@@ -122,6 +132,7 @@ fun solve(
                     }
                 }
             }
+            pendingElements -= skippedNewElements
             pendingElements += removedElements
             passedElements -= newPassedElements
         }
