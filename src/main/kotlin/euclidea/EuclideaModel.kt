@@ -265,12 +265,14 @@ private fun circlesIntersect(circle1: Element.Circle, circle2: Element.Circle): 
     } else {
         val l = (sq(circle1.radius) - sq(circle2.radius) + d2) / (2.0 * d)
         val h2 = sq(circle1.radius) - sq(l)
-        if (h2 < 0.0 || h2.isNaN())
+        if (h2.isNaN())
             Intersection.Disjoint
         else {
             val lod = l / d
             if (coincides(h2, 0.0))
                 Intersection.OnePoint(Point(lod * p.x, lod * p.y) + o)
+            else if (h2 < 0.0)
+                Intersection.Disjoint
             else {
                 val hod = sqrt(h2) / d
                 Intersection.TwoPoints(
@@ -291,13 +293,13 @@ private fun circleLineIntersect(circle: Element.Circle, line: Element.Line): Int
     val dr2 = sq(dx) + sq(dy)
     val det = lineO.point1.x * lineO.point2.y - lineO.point2.x * lineO.point1.y
     val disc = sq(circle.radius * sqrt(dr2)) - sq(det)
-    return if (disc
-        < 0.0 || disc.isNaN()
-    )
+    return if (disc.isNaN())
         Intersection.Disjoint
     else if (coincides(disc, 0.0)) {
         Intersection.OnePoint(Point(det * dy / dr2, -det * dx / dr2) + o)
-    } else {
+    } else if (disc < 0.0)
+        Intersection.Disjoint
+    else {
         val f = sqrt(disc)
         val xf = dx * f
         val yf = dy * f

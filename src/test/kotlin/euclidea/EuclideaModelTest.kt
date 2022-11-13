@@ -68,10 +68,15 @@ class EuclideaModelTest {
 
     @Test
     fun circleCircleIntersect_onePoint() {
-        val circle1 = Element.Circle(Point(-1.0, 1.0), 1.0)
-        val circle2 = Element.Circle(Point(1.0, 1.0), 1.0)
-        val intersection = intersect(circle1, circle2)
-        Assertions.assertEquals(Intersection.OnePoint(Point(0.0, 1.0)), intersection)
+        fun impl(err: Double) {
+            val circle1 = Element.Circle(Point(-1.0, 1.0), 1.0 + err)
+            val circle2 = Element.Circle(Point(1.0, 1.0), 1.0 + err)
+            val intersection = intersect(circle1, circle2)
+            Assertions.assertEquals(Intersection.OnePoint(Point(0.0, 1.0)), intersection)
+        }
+        impl(0.0)
+        impl(Epsilon * 0.1)
+        impl(-Epsilon * 0.1)
     }
 
     @Test
@@ -115,6 +120,30 @@ class EuclideaModelTest {
         val line2 = Element.Line(point2, point1)
         val intersection2 = intersect(line2, circle)
         Assertions.assertEquals(Intersection.TwoPoints(expectedPoint2, expectedPoint1), intersection2)
+    }
+
+    @Test
+    fun circleLineIntersect_onePoint() {
+        fun impl(err: Double) {
+            val circle = Element.Circle(Point(1.0, 2.0), 3.0 + err)
+            val point1 = Point(-2.0, -1.0)
+            val point2 = Point(-2.0, 1.0)
+
+            val expectedPoint = Point(-2.0, 2.0)
+
+            // Forwards
+            val line1 = Element.Line(point1, point2)
+            val intersection1 = intersect(line1, circle)
+            Assertions.assertEquals(Intersection.OnePoint(expectedPoint), intersection1)
+
+            // Backwards - intersection point should stay the same
+            val line2 = Element.Line(point2, point1)
+            val intersection2 = intersect(line2, circle)
+            Assertions.assertEquals(Intersection.OnePoint(expectedPoint), intersection2)
+        }
+        impl(0.0)
+        impl(Epsilon * 0.01)
+        impl(-Epsilon * 0.01)
     }
 
     @Test
