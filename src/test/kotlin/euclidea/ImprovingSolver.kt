@@ -29,7 +29,7 @@ abstract class ImprovingSolver<Params, Setup> {
         check(makeReplayParams(), makeParams(), false)
     }
 
-    fun improveSolution(maxExtraElements: Int, maxDepth: Int) {
+    fun improveSolution(maxExtraElements: Int, maxDepth: Int, nonNewElementLimit: Int? = null) {
         val namer = Namer()
         val params = makeParams()
         nameParams(params, namer)
@@ -93,7 +93,8 @@ abstract class ImprovingSolver<Params, Setup> {
 
         val solutionContext = solve(
             startingContext,
-            maxDepth,
+            maxDepth = maxDepth,
+            nonNewElementLimit = nonNewElementLimit,
             prune = { nextSolveContext ->
                 val nextElements = nextSolveContext.context.elements
                 !checkExtraElements(nextElements)

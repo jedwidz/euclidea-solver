@@ -14,7 +14,7 @@ class SolvePuzzle6_9Test {
     fun improveSolution() {
         // Checks for center of circle, not the circle itself
         // maxExtraElement = 2, maxDepth = 9 - 1 - success 1 hr 40 min
-        Solver().improveSolution(2, 9 - 1)
+        Solver().improveSolution(0, 9 - 1, 4)
     }
 
     data class Params(

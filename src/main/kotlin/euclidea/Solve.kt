@@ -10,7 +10,8 @@ data class SolveContext(
 
 private data class SolveState(
     val solveContext: SolveContext,
-    val oldPoints: Set<Point>
+    val oldPoints: Set<Point>,
+    val nonNewElementCount: Int
 )
 
 private data class PendingNode(
@@ -28,6 +29,7 @@ private data class PendingNode(
 fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
+    nonNewElementLimit: Int? = null,
     prune: ((SolveContext) -> Boolean)? = null,
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
@@ -101,18 +103,22 @@ fun solve(
                 assert(removed)
                 passedElements.add(newElement)
                 newPassedElements.add(newElement)
-                if (newElement !in newElements)
+                val isNonNewElement = newElement !in newElements
+                if (isNonNewElement)
                     removedElements.add(newElement)
-                val nextContext = withElement(newElement)
-                val nextSolveContext = SolveContext(nextContext, nextDepth)
-                val next = SolveState(nextSolveContext, nextOldPoints)
-                if (check(nextContext))
-                    return nextContext
-                else if (nextDepth < maxDepth &&
-                    (remainingStepsLowerBound == null || remainingStepsLowerBound(nextContext) + nextDepth <= maxDepth) &&
-                    (prune == null || !prune(nextSolveContext))
-                ) {
-                    sub(next)?.let { return@sub it }
+                val nextNonNewElementCount = solveState.nonNewElementCount + (if (isNonNewElement) 1 else 0)
+                if (nonNewElementLimit == null || nextNonNewElementCount < nonNewElementLimit) {
+                    val nextContext = withElement(newElement)
+                    val nextSolveContext = SolveContext(nextContext, nextDepth)
+                    val next = SolveState(nextSolveContext, nextOldPoints, nextNonNewElementCount)
+                    if (check(nextContext))
+                        return nextContext
+                    else if (nextDepth < maxDepth &&
+                        (remainingStepsLowerBound == null || remainingStepsLowerBound(nextContext) + nextDepth <= maxDepth) &&
+                        (prune == null || !prune(nextSolveContext))
+                    ) {
+                        sub(next)?.let { return@sub it }
+                    }
                 }
             }
             pendingElements += removedElements
@@ -122,6 +128,6 @@ fun solve(
     }
     if (check(initialContext))
         return initialContext
-    return sub(SolveState(SolveContext(initialContext, 0), setOf()))
+    return sub(SolveState(SolveContext(initialContext, 0), setOf(), 0))
 }
 
