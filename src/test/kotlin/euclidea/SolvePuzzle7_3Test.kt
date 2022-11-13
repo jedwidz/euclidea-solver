@@ -14,7 +14,7 @@ class SolvePuzzle7_3Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(1, 5)
+        Solver().improveSolution(0, 5)
     }
 
     data class Params(
@@ -127,21 +127,20 @@ class SolvePuzzle7_3Test {
             )
             with(params) {
                 with(setup) {
-                    // Suboptimal 6E solution
+                    // Optimal 5E solution
                     val start = namer.set("start", circleTool(probe, base1)!!)
                     val cut = namer.set("cut", intersectTwoPointsOther(start, base, base1))
                     val lens = namer.set("lens", circleTool(cut, probe)!!)
                     val (_, adj1) = namer.setAll("adj2", "adj1", intersectTwoPoints(lens, start))
                     val support = namer.set("support", circleTool(base1, adj1)!!)
-                    // Which side?
-                    val (_, bisectP) = namer.set("bisectP", intersectTwoPoints(support, base))
-                    val bisect1 = namer.set("bisect1", circleTool(adj1, bisectP)!!)
-                    val bisect2 = namer.set("bisect2", circleTool(bisectP, adj1)!!)
-                    val (sol1, sol2) = namer.setAll("sol1", "sol2", intersectTwoPoints(bisect1, bisect2))
-                    val solution = namer.set("solution", lineTool(sol1, sol2)!!)
+                    val aimP1 = namer.set("aimP1", intersectTwoPoints(support, base).second)
+                    val aimP2 = namer.set("aimP2", intersectTwoPointsOther(support, start, adj1))
+                    val aim = namer.set("aim", lineTool(aimP1, aimP2)!!)
+                    val solutionP = namer.set("solutionP", intersectTwoPointsOther(aim, start, aimP2))
+                    val solution = namer.set("solution", lineTool(solutionP, base1)!!)
 
                     return setup to initialContext.withElements(
-                        listOf(start, lens, support, bisect1, bisect2, solution)
+                        listOf(start, lens, support, aim, solution)
                     )
                 }
             }
