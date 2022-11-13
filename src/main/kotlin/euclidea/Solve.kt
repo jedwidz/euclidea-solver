@@ -111,10 +111,11 @@ fun solve(
                     val nextContext = withElement(newElement)
                     val nextSolveContext = SolveContext(nextContext, nextDepth)
                     val next = SolveState(nextSolveContext, nextOldPoints, nextNonNewElementCount)
-                    if (check(nextContext))
+                    val lowerBound = remainingStepsLowerBound?.let { it(nextContext) }
+                    if ((lowerBound == null || lowerBound <= 0) && check(nextContext))
                         return nextContext
                     else if (nextDepth < maxDepth &&
-                        (remainingStepsLowerBound == null || remainingStepsLowerBound(nextContext) + nextDepth <= maxDepth) &&
+                        (lowerBound == null || lowerBound + nextDepth <= maxDepth) &&
                         (prune == null || !prune(nextSolveContext))
                     ) {
                         sub(next)?.let { return@sub it }
