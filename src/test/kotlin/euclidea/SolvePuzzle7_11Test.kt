@@ -19,7 +19,7 @@ class SolvePuzzle7_11Test {
         // maxExtraElement = 4, maxDepth = 8, nonNewElementLimit = 5 - gave up after 3 days 22 hr 8-(
 
         // maxExtraElement = 4, maxDepth = 4, nonNewElementLimit = 5 - nothing in 41s
-        Solver().improveSolution(2, 5, 2)
+        Solver().improveSolution(2, 4, 2)
     }
 
     data class Params(
@@ -38,7 +38,7 @@ class SolvePuzzle7_11Test {
 
         override fun makeParams(): Params {
             return Params(
-                base1 = Point(0.0, 0.0),
+                base1 = Point(0.03, 0.04),
                 base2 = Point(0.3011, 0.61),
                 base3 = Point(0.6233, -0.12)
             )
@@ -47,8 +47,8 @@ class SolvePuzzle7_11Test {
         override fun makeReplayParams(): Params {
             return Params(
                 base1 = Point(0.0, 0.0),
-                base2 = Point(0.3021, 0.612),
-                base3 = Point(0.6223, -0.121)
+                base2 = Point(0.2031, 0.612),
+                base3 = Point(0.5123, -0.121)
             )
         }
 
@@ -79,16 +79,20 @@ class SolvePuzzle7_11Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             with(setup) {
-                // looking for perpendicular line through center
+                // looking for points on perpendicular line through center
                 val solution = constructSolution(params)
                 val center = solution.center
-                val perps = ElementSet()
-                perps += listOf(base12, base23, base31).map { perpendicularTool(it, center)!! }
+//                val perps = ElementSet()
+                val perpList = listOf(base12, base23, base31).map { perpendicularTool(it, center)!! }
+//                perps += perpList
                 return { context ->
-                    when (val last = context.elements.lastOrNull()) {
-                        is Element.Circle -> false
-                        is Element.Line -> last in perps
-                        null -> false
+                    perpList.any { perp ->
+                        context.points.any {
+                            if (pointAndLineCoincide(it, perp))
+                                true
+                            else
+                                false
+                        }
                     }
                 }
             }
@@ -184,11 +188,11 @@ class SolvePuzzle7_11Test {
                     // Suboptimal 10E solution
                     val startC1 = namer.set("startC1", circleTool(base1, base2)!!)
                     val startC2 = namer.set("startC2", circleTool(base2, base1)!!)
-                    val startP1 = namer.set("startP1", intersectTwoPoints(startC1, base31).first)
+                    val startP1 = namer.set("startP1", intersectTwoPoints(startC1, base31).second)
                     val bisectC1 = namer.set("bisectC1", circleTool(startP1, base1)!!)
                     val bisectP1 = namer.set("bisectP1", intersectTwoPointsOther(bisectC1, startC2, base1))
                     val bisectL1 = namer.set("bisectL1", lineTool(bisectP1, base1)!!)
-                    val startP2 = namer.set("startP2", intersectTwoPoints(startC2, base23).second)
+                    val startP2 = namer.set("startP2", intersectTwoPoints(startC2, base23).first)
                     val bisectC2 = namer.set("bisectC2", circleTool(startP2, base2)!!)
                     val bisectP2 = namer.set("bisectP2", intersectTwoPointsOther(bisectC2, startC1, base2))
                     val bisectL2 = namer.set("bisectL2", lineTool(bisectP2, base2)!!)
