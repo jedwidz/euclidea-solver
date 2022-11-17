@@ -107,8 +107,7 @@ class SolvePuzzle7_11Test {
 
         private fun pointsOfInterest(params: Params, setup: Setup): List<Point> {
             return with(setup) {
-                val solutionElements = constructSolution(params)
-                val solution = solutionElements.last() as Element.Circle
+                val solution = constructSolution(params)
                 val tangents = listOf(base12, base23, base31).map { intersectOnePoint(it, solution) }
                 val center = solution.center
                 listOf(center) + tangents
@@ -133,8 +132,7 @@ class SolvePuzzle7_11Test {
         }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutionElements = constructSolution(params)
-            val solution = solutionElements.last() as Element.Circle
+            val solution = constructSolution(params)
             val center = solution.center
             return { context ->
                 // Assumes that solution is the last element (no extraneous elements)
@@ -148,10 +146,9 @@ class SolvePuzzle7_11Test {
             }
         }
 
-        private fun constructSolution(params: Params): List<Element> {
+        private fun constructSolution(params: Params): Element.Circle {
             // cheekily use reference solution
-            val solution = referenceSolution(params, Namer()).second.elements.last()
-            return listOf(solution)
+            return referenceSolution(params, Namer()).second.elements.last() as Element.Circle
         }
 
         override fun referenceSolution(
