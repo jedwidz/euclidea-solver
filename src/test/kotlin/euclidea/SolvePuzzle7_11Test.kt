@@ -19,7 +19,8 @@ class SolvePuzzle7_11Test {
         // maxExtraElement = 4, maxDepth = 8, nonNewElementLimit = 5 - gave up after 3 days 22 hr 8-(
 
         // maxExtraElement = 4, maxDepth = 4, nonNewElementLimit = 5 - nothing in 41s
-        Solver().improveSolution(2, 4, 2)
+        // maxExtraElement = 3, maxDepth = 5, nonNewElementLimit = 2 - success in 43 min
+        Solver().improveSolution(3, 5, 2)
     }
 
     data class Params(
@@ -79,20 +80,16 @@ class SolvePuzzle7_11Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             with(setup) {
-                // looking for points on perpendicular line through center
+                // looking for perpendicular line through center
                 val solution = constructSolution(params)
                 val center = solution.center
-//                val perps = ElementSet()
-                val perpList = listOf(base12, base23, base31).map { perpendicularTool(it, center)!! }
-//                perps += perpList
+                val perps = ElementSet()
+                perps += listOf(base12, base23, base31).map { perpendicularTool(it, center)!! }
                 return { context ->
-                    perpList.any { perp ->
-                        context.points.any {
-                            if (pointAndLineCoincide(it, perp))
-                                true
-                            else
-                                false
-                        }
+                    when (val last = context.elements.lastOrNull()) {
+                        is Element.Circle -> false
+                        is Element.Line -> last in perps
+                        null -> false
                     }
                 }
             }
