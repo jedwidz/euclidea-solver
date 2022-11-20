@@ -65,7 +65,7 @@ abstract class ImprovingSolver<Params, Setup> {
             }
         }
 
-//        assertTrue(isSolution(sampleSolutionContext))
+        assertTrue(isSolution(sampleSolutionContext))
 
         val prefixNamer = Namer()
         val prefixContext = solutionPrefix(params, prefixNamer)?.second

@@ -2,8 +2,8 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
-import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import kotlin.math.max
 
 class SolvePuzzle7_11Test {
     // Excircle
@@ -20,7 +20,7 @@ class SolvePuzzle7_11Test {
 
         // maxExtraElement = 4, maxDepth = 4, nonNewElementLimit = 5 - nothing in 41s
         // maxExtraElement = 3, maxDepth = 5, nonNewElementLimit = 2 - success in 43 min
-        Solver().improveSolution(3, 5, 2)
+        Solver().improveSolution(0, 8, 0)
     }
 
     data class Params(
@@ -80,35 +80,16 @@ class SolvePuzzle7_11Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             with(setup) {
-                // looking for perpendicular line through center
-                val solution = constructSolution(params)
-                val center = solution.center
-                val perps = ElementSet()
-                perps += listOf(base12, base23, base31).map { perpendicularTool(it, center)!! }
                 return { context ->
                     when (val last = context.elements.lastOrNull()) {
-                        is Element.Circle -> false
-                        is Element.Line -> last in perps
-                        null -> false
+                        is Element.Circle -> listOf(base12, base23, base31).all { line ->
+                            intersect(line, last) is Intersection.OnePoint
+                        }
+                        else -> false
                     }
                 }
             }
         }
-//        override fun isSolution(
-//            params: Params,
-//            setup: Setup
-//        ): (EuclideaContext) -> Boolean {
-//            with(setup) {
-//                return { context ->
-//                    when (val last = context.elements.lastOrNull()) {
-//                        is Element.Circle -> listOf(base12, base23, base31).all { line ->
-//                            intersect(line, last) is Intersection.OnePoint
-//                        }
-//                        else -> false
-//                    }
-//                }
-//            }
-//        }
 
         override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
             val referenceElements = ElementSet()
@@ -153,20 +134,20 @@ class SolvePuzzle7_11Test {
 //            }
 //        }
 
-//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-//            val solution = constructSolution(params)
-//            val center = solution.center
-//            return { context ->
-//                // Assumes that solution is the last element (no extraneous elements)
-//                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
-//                    0
-//                else {
-//                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
-//                    // Need two elements to locate center, then the solution circle itself
-//                    max(0, 2 - onCenter) + 1
-//                }
-//            }
-//        }
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+            val solution = constructSolution(params)
+            val center = solution.center
+            return { context ->
+                // Assumes that solution is the last element (no extraneous elements)
+                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+                    0
+                else {
+                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
+                    // Need two elements to locate center, then the solution circle itself
+                    max(0, 2 - onCenter) + 1
+                }
+            }
+        }
 
         private fun constructSolution(params: Params): Element.Circle {
             // cheekily use reference solution
@@ -182,27 +163,25 @@ class SolvePuzzle7_11Test {
             )
             with(params) {
                 with(setup) {
-                    // Suboptimal 10E solution
+                    // Optimal 8E solution
                     val startC1 = namer.set("startC1", circleTool(base1, base2)!!)
-                    val startC2 = namer.set("startC2", circleTool(base2, base1)!!)
-                    val startP1 = namer.set("startP1", intersectTwoPoints(startC1, base31).second)
-                    val bisectC1 = namer.set("bisectC1", circleTool(startP1, base1)!!)
-                    val bisectP1 = namer.set("bisectP1", intersectTwoPointsOther(bisectC1, startC2, base1))
-                    val bisectL1 = namer.set("bisectL1", lineTool(bisectP1, base1)!!)
-                    val startP2 = namer.set("startP2", intersectTwoPoints(startC2, base23).first)
-                    val bisectC2 = namer.set("bisectC2", circleTool(startP2, base2)!!)
-                    val bisectP2 = namer.set("bisectP2", intersectTwoPointsOther(bisectC2, startC1, base2))
-                    val bisectL2 = namer.set("bisectL2", lineTool(bisectP2, base2)!!)
-                    val center = namer.set("center", intersectOnePoint(bisectL2, bisectL1))
-                    val perpC1 = namer.set("perpC1", circleTool(base1, center)!!)
-                    val perpC2 = namer.set("perpC2", circleTool(base2, center)!!)
+                    val outerP1 = namer.set("outerP1", intersectTwoPoints(startC1, base31).second)
+                    val outerC1 = namer.set("outerC1", circleTool(base3, outerP1)!!)
+                    val outerP2 = namer.set("outerP2", intersectTwoPoints(outerC1, base23).first)
+                    val perpC1 = namer.set("perpC1", circleTool(outerP2, base2)!!)
+                    val perpC2 = namer.set("perpC2", circleTool(base2, outerP2)!!)
                     val (perpP1, perpP2) = namer.setAll("perpP1", "perpP2", intersectTwoPoints(perpC2, perpC1))
                     val perp = namer.set("perp", lineTool(perpP1, perpP2)!!)
-                    val tangentP = namer.set("tangentP", intersectOnePoint(perp, base12))
+                    val sideP = namer.set("sideP", intersectTwoPoints(perpC2, base12).first)
+                    val bisectC = namer.set("bisectC", circleTool(sideP, base2)!!)
+                    val bisectP = namer.set("bisectP", intersectTwoPointsOther(bisectC, perpC1, base2))
+                    val bisectL = namer.set("bisectL", lineTool(bisectP, base2)!!)
+                    val center = namer.set("center", intersectOnePoint(bisectL, perp))
+                    val tangentP = namer.set("tangentP", intersectOnePoint(perp, base23))
                     val solution = namer.set("solution", circleTool(center, tangentP)!!)
 
                     return setup to initialContext.withElements(
-                        listOf(startC1, startC2, bisectC1, bisectL1, bisectC2, bisectL2, perpC1, perpC2, perp, solution)
+                        listOf(startC1, outerC1, perpC1, perpC2, perp, bisectC, bisectL, solution)
                     )
                 }
             }
