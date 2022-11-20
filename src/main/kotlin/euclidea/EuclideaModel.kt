@@ -2,7 +2,9 @@ package euclidea
 
 import kotlin.math.*
 
-data class Point(val x: Double, val y: Double) {
+interface Primitive
+
+data class Point(val x: Double, val y: Double) : Primitive {
     val sqDistance: Double = sq(x) + sq(y)
 
     operator fun minus(point: Point): Point {
@@ -18,7 +20,7 @@ data class Point(val x: Double, val y: Double) {
     }
 }
 
-sealed class Element {
+sealed class Element : Primitive {
 
     data class Line(val point1: Point, val point2: Point) : Element() {
 

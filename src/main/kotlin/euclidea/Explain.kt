@@ -1,28 +1,28 @@
 package euclidea
 
 class Namer {
-    private val names: MutableMap<Any, String> = mutableMapOf()
+    private val names: MutableMap<Primitive, String> = mutableMapOf()
 
-    fun <T : Any> set(name: String, named: T): T {
+    fun <T : Primitive> set(name: String, named: T): T {
         names[named] = name
         return named
     }
 
     // For constructions
-    fun <T : Any> setCons(name: String, nameds: Pair<T, List<T>>): Pair<T, List<T>> {
+    fun <T : Primitive> setCons(name: String, nameds: Pair<T, List<T>>): Pair<T, List<T>> {
         val (named, construction) = nameds
         names[named] = name
         construction.forEachIndexed { index: Int, t: T -> names[t] = "${name}#${index}" }
         return nameds
     }
 
-    fun <T : Pair<Any, Any>> setAll(name1: String, name2: String, namedPair: T): T {
+    fun <T : Pair<Primitive, Primitive>> setAll(name1: String, name2: String, namedPair: T): T {
         names[namedPair.first] = name1
         names[namedPair.second] = name2
         return namedPair
     }
 
-    fun get(named: Any): String? {
+    fun get(named: Primitive): String? {
         return names[named]
     }
 }
@@ -32,7 +32,7 @@ fun dumpSolution(solutionContext: EuclideaContext?, namer: Namer = Namer()) {
     solutionContext?.let { printSteps(it, namer) }
 }
 
-private class Labeler<T : Any>(val prefix: String, val namer: Namer) {
+private class Labeler<T : Primitive>(val prefix: String, val namer: Namer) {
     private val tags = mutableMapOf<T, Int>()
     private var nextTag = 1
 
