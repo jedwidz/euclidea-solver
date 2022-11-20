@@ -15,12 +15,7 @@ class SolvePuzzle7_11Test {
 
     @Test
     fun improveSolution() {
-        // maxExtraElement = 1, maxDepth = 8 - nothing in 2 min 47s
-        // maxExtraElement = 4, maxDepth = 8, nonNewElementLimit = 5 - gave up after 3 days 22 hr 8-(
-
-        // maxExtraElement = 4, maxDepth = 4, nonNewElementLimit = 5 - nothing in 41s
-        // maxExtraElement = 3, maxDepth = 5, nonNewElementLimit = 2 - success in 43 min
-        Solver().improveSolution(0, 8, 0)
+        Solver().improveSolution(0, 8, 4)
     }
 
     data class Params(
@@ -117,22 +112,22 @@ class SolvePuzzle7_11Test {
             }
         }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean)? {
-//            // Euclidea 8E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> element !is Element.Circle
-//                    1 -> element !is Element.Circle
-//                    2 -> element !is Element.Circle
-//                    3 -> element !is Element.Circle
-//                    4 -> element !is Element.Circle
-//                    5 -> element !is Element.Line
-//                    6 -> element !is Element.Line
-//                    7 -> element !is Element.Circle
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean)? {
+            // Euclidea 8E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> element !is Element.Circle
+                    1 -> element !is Element.Circle
+                    2 -> element !is Element.Circle
+                    3 -> element !is Element.Circle
+                    4 -> element !is Element.Circle
+                    5 -> element !is Element.Line
+                    6 -> element !is Element.Line
+                    7 -> element !is Element.Circle
+                    else -> false
+                }
+            }
+        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solution = constructSolution(params)
@@ -171,9 +166,9 @@ class SolvePuzzle7_11Test {
                     val perpC1 = namer.set("perpC1", circleTool(outerP2, base2)!!)
                     val perpC2 = namer.set("perpC2", circleTool(base2, outerP2)!!)
                     val (perpP1, perpP2) = namer.setAll("perpP1", "perpP2", intersectTwoPoints(perpC2, perpC1))
-                    val perp = namer.set("perp", lineTool(perpP1, perpP2)!!)
                     val sideP = namer.set("sideP", intersectTwoPoints(perpC2, base12).first)
                     val bisectC = namer.set("bisectC", circleTool(sideP, base2)!!)
+                    val perp = namer.set("perp", lineTool(perpP1, perpP2)!!)
                     val bisectP = namer.set("bisectP", intersectTwoPointsOther(bisectC, perpC1, base2))
                     val bisectL = namer.set("bisectL", lineTool(bisectP, base2)!!)
                     val center = namer.set("center", intersectOnePoint(bisectL, perp))
@@ -181,7 +176,7 @@ class SolvePuzzle7_11Test {
                     val solution = namer.set("solution", circleTool(center, tangentP)!!)
 
                     return setup to initialContext.withElements(
-                        listOf(startC1, outerC1, perpC1, perpC2, perp, bisectC, bisectL, solution)
+                        listOf(startC1, outerC1, perpC1, perpC2, bisectC, perp, bisectL, solution)
                     )
                 }
             }
