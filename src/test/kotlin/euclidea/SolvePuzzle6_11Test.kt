@@ -147,10 +147,10 @@ class SolvePuzzle6_11Test {
                 val p3 = base2.minus(d)
                 val p4 = base1.minus(d)
                 return listOf(
-                    EuclideaTools.lineTool(p1, p2)!!,
-                    EuclideaTools.lineTool(p2, p3)!!,
-                    EuclideaTools.lineTool(p3, p4)!!,
-                    EuclideaTools.lineTool(p4, p1)!!
+                    EuclideaTools.lineTool(p1, p2),
+                    EuclideaTools.lineTool(p2, p3),
+                    EuclideaTools.lineTool(p3, p4),
+                    EuclideaTools.lineTool(p4, p1)
                 )
             }
         }
@@ -162,10 +162,10 @@ class SolvePuzzle6_11Test {
             with(params) {
                 with(setup) {
                     // Partial solution
-                    val line1 = namer.set("line1", EuclideaTools.lineTool(base1, base3)!!)
-                    val circle1 = namer.set("circle1", EuclideaTools.circleTool(base3, base1)!!)
+                    val line1 = namer.set("line1", EuclideaTools.lineTool(base1, base3))
+                    val circle1 = namer.set("circle1", EuclideaTools.circleTool(base3, base1))
                     val point1 = namer.set("point1", intersectTwoPointsOther(circle1, line1, base1))
-                    val solution1 = namer.set("solution1", EuclideaTools.lineTool(base2, point1)!!)
+                    val solution1 = namer.set("solution1", EuclideaTools.lineTool(base2, point1))
 
                     return setup to initialContext.withElements(
                         listOf(line1, circle1, solution1)
@@ -184,22 +184,22 @@ class SolvePuzzle6_11Test {
             with(params) {
                 with(setup) {
                     // Optimal 10E solution
-                    val base = namer.set("base", EuclideaTools.lineTool(base1, base3)!!)
-                    val start2 = namer.set("start2", EuclideaTools.circleTool(base3, base1)!!)
+                    val base = namer.set("base", EuclideaTools.lineTool(base1, base3))
+                    val start2 = namer.set("start2", EuclideaTools.circleTool(base3, base1))
                     val sol2P = namer.set("sol2P", intersectTwoPointsOther(base, start2, base1))
-                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(sol2P, base2)!!)
-                    val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base3)!!)
+                    val solution2 = namer.set("solution2", EuclideaTools.lineTool(sol2P, base2))
+                    val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base3))
                     val sol3P1 = namer.set("sol3P1", intersectTwoPointsOther(base, start1, base3))
-                    val spread = namer.set("spread", EuclideaTools.circleTool(base2, sol3P1)!!)
+                    val spread = namer.set("spread", EuclideaTools.circleTool(base2, sol3P1))
                     val sol1P = namer.set("sol1P", intersectTwoPointsOther(spread, start1, sol3P1))
-                    val solution1 = namer.set("solution1", EuclideaTools.lineTool(sol1P, base3)!!)
+                    val solution1 = namer.set("solution1", EuclideaTools.lineTool(sol1P, base3))
                     val crossP = namer.set("crossP", intersectTwoPointsOther(solution2, start2, sol2P))
-                    val cross = namer.set("cross", EuclideaTools.lineTool(crossP, base3)!!)
+                    val cross = namer.set("cross", EuclideaTools.lineTool(crossP, base3))
                     val sol4P = namer.set("sol4P", intersectTwoPointsOther(cross, start2, crossP))
-                    val solution4 = namer.set("solution4", EuclideaTools.lineTool(sol4P, base1)!!)
-                    val spread2 = namer.set("spread2", EuclideaTools.circleTool(base2, base3)!!)
+                    val solution4 = namer.set("solution4", EuclideaTools.lineTool(sol4P, base1))
+                    val spread2 = namer.set("spread2", EuclideaTools.circleTool(base2, base3))
                     val sol3P2 = namer.set("sol3P2", intersectTwoPointsOther(spread2, start1, base3))
-                    val solution3 = namer.set("solution3", EuclideaTools.lineTool(sol3P2, sol3P1)!!)
+                    val solution3 = namer.set("solution3", EuclideaTools.lineTool(sol3P2, sol3P1))
 
                     return setup to initialContext.withElements(
                         listOf(

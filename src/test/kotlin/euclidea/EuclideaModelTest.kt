@@ -151,8 +151,8 @@ class EuclideaModelTest {
         val basePoint = Point(0.01, 0.0)
         val basePoint2 = Point(1.0, 0.1)
         val center = Point(0.01, 2.000)
-        val base = EuclideaTools.lineTool(basePoint, basePoint2)!!
-        val perpendicularLine = EuclideaTools.perpendicularTool(base, center)!!
+        val base = EuclideaTools.lineTool(basePoint, basePoint2)
+        val perpendicularLine = EuclideaTools.perpendicularTool(base, center)
 
         fun test(point: Point, line: Element.Line, coincides: Boolean) {
             assertEquals(coincides, pointAndLineCoincide(point, line))
@@ -179,7 +179,7 @@ class EuclideaModelTest {
         val y1 = center.plus(Point(0.0, radius))
         val y2 = center.plus(Point(0.0, -radius))
 
-        val circle = EuclideaTools.circleTool(center, x1)!!
+        val circle = EuclideaTools.circleTool(center, x1)
 
         fun test(point: Point, circle: Element.Circle, coincides: Boolean) {
             assertEquals(coincides, pointAndCircleCoincide(point, circle))

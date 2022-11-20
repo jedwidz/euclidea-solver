@@ -94,13 +94,13 @@ class SolvePuzzle15_3Test {
             with(params) {
                 with(setup) {
                     // Optimal 4E solution
-                    val start1 = namer.set("start1", circleTool(base1, center)!!)
-                    val start2 = namer.set("start2", circleTool(base2, center)!!)
+                    val start1 = namer.set("start1", circleTool(base1, center))
+                    val start2 = namer.set("start2", circleTool(base2, center))
                     val upper = namer.set("upper", intersectAnyPoint(start1, circle))
-                    val tweak = namer.set("tweak", circleTool(base2, upper)!!)
+                    val tweak = namer.set("tweak", circleTool(base2, upper))
                     val lower = namer.set("lower", intersectTwoPointsOther(start1, tweak, upper))
                     val up = namer.set("up", intersectTwoPointsOther(start1, start2, center))
-                    val dupe = namer.set("dupe", circleTool(up, lower)!!)
+                    val dupe = namer.set("dupe", circleTool(up, lower))
                     namer.setAll("solution1", "solution2", intersectTwoPoints(dupe, circle))
 
                     val solutionContext = initialContext.withElements(

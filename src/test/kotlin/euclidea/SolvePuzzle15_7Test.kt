@@ -91,8 +91,8 @@ class SolvePuzzle15_7Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             with(params) {
-                val base = lineTool(base1, base2)!!
-                val checkSolutionLine = perpendicularTool(base, center)!!
+                val base = lineTool(base1, base2)
+                val checkSolutionLine = perpendicularTool(base, center)
                 return { context ->
                     context.points.any { point ->
                         pointAndLineCoincide(point, checkSolutionLine) && !coincides(point, center) && !coincides(

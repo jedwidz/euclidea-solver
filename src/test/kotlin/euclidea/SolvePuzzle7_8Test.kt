@@ -59,10 +59,10 @@ class SolvePuzzle7_8Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                val base = namer.set("base", lineTool(base1, base2)!!)
-                val par1 = namer.set("par1", lineTool(base1, base3)!!)
+                val base = namer.set("base", lineTool(base1, base2))
+                val par1 = namer.set("par1", lineTool(base1, base3))
                 val base4 = namer.set("base4", base2.plus(base3.minus(base1)))
-                val par2 = namer.set("par2", lineTool(base2, base4)!!)
+                val par2 = namer.set("par2", lineTool(base2, base4))
                 return Setup(base4, base, par1, par2) to EuclideaContext(
                     config = EuclideaConfig(maxSqDistance = sq(8.0)),
                     points = listOf(base1, base2),
@@ -117,17 +117,17 @@ class SolvePuzzle7_8Test {
             with(params) {
                 with(setup) {
                     // Optimal 6E solution
-                    val startC1 = namer.set("startC1", circleTool(base1, base2)!!)
+                    val startC1 = namer.set("startC1", circleTool(base1, base2))
                     val startP1 = namer.set("startP1", intersectTwoPoints(startC1, par1).second)
-                    val startL1 = namer.set("startL1", lineTool(startP1, base2)!!)
+                    val startL1 = namer.set("startL1", lineTool(startP1, base2))
                     val expand = namer.set("expand", intersectTwoPointsOther(startC1, base, base2))
-                    val perpC1 = namer.set("perpC1", circleTool(expand, base2)!!)
-                    val perpC2 = namer.set("perpC2", circleTool(base2, startP1)!!)
+                    val perpC1 = namer.set("perpC1", circleTool(expand, base2))
+                    val perpC2 = namer.set("perpC2", circleTool(base2, startP1))
                     val (perpP1, perpP2) = namer.setAll("perpP1", "perpP2", intersectTwoPoints(perpC2, perpC1))
-                    val perp = namer.set("perp", lineTool(perpP1, perpP2)!!)
+                    val perp = namer.set("perp", lineTool(perpP1, perpP2))
                     val center = namer.set("center", intersectOnePoint(perp, startL1))
                     val tangentP = namer.set("tangentP", intersectOnePoint(perp, base))
-                    val solution = namer.set("solution", circleTool(center, tangentP)!!)
+                    val solution = namer.set("solution", circleTool(center, tangentP))
 
                     return setup to initialContext.withElements(
                         listOf(startC1, startL1, perpC1, perpC2, perp, solution)

@@ -13,10 +13,10 @@ class SolveAlphaTutorial1Test {
         val point2 = Point(1.0, 0.0)
         val line = Element.Line(point1, point2)
         val solutions = run {
-            val circle1 = circleTool(point1, point2)!!
-            val circle2 = circleTool(point2, point1)!!
+            val circle1 = circleTool(point1, point2)
+            val circle2 = circleTool(point2, point1)
             intersect(circle1, circle2).points().map { pointX ->
-                listOf(point1, point2).map { pointA -> lineTool(pointA, pointX)!! }
+                listOf(point1, point2).map { pointA -> lineTool(pointA, pointX) }
             }
         }
         val solutionContext =

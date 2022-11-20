@@ -79,15 +79,15 @@ class SolvePuzzle15_1Test {
             )
             with(params) {
                 // Optimal 6E solution
-                val start1 = namer.set("start1", circleTool(base1, base2)!!)
-                val start2 = namer.set("start2", circleTool(base2, base1)!!)
+                val start1 = namer.set("start1", circleTool(base1, base2))
+                val start2 = namer.set("start2", circleTool(base2, base1))
                 val (up, down) = namer.setAll("up", "down", intersectTwoPoints(start1, start2))
-                val top = namer.set("top", circleTool(up, down)!!)
+                val top = namer.set("top", circleTool(up, down))
                 val two = namer.set("two", intersectTwoPointsOther(start2, top, down))
-                val big = namer.set("big", circleTool(two, base1)!!)
+                val big = namer.set("big", circleTool(two, base1))
                 val (x1, x2) = namer.setAll("x1", "x2", intersectTwoPoints(big, start1))
-                val target1 = namer.set("target1", circleTool(x1, base1)!!)
-                val target2 = namer.set("target2", circleTool(x2, base1)!!)
+                val target1 = namer.set("target1", circleTool(x1, base1))
+                val target2 = namer.set("target2", circleTool(x2, base1))
                 namer.set("solution", intersectTwoPointsOther(target1, target2, base1))
 
                 return setup to initialContext.withElements(
