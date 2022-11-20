@@ -1,5 +1,10 @@
 package euclidea
 
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.starProjectedType
+
 class Namer {
     private val names: MutableMap<Primitive, String> = mutableMapOf()
 
@@ -24,6 +29,18 @@ class Namer {
 
     fun get(named: Primitive): String? {
         return names[named]
+    }
+
+    fun nameReflected(context: Any) {
+        context::class.declaredMemberProperties.forEach { property ->
+            if (property.parameters.size == 1 && property.returnType.isSubtypeOf(Primitive::class.starProjectedType)) {
+                @Suppress("UNCHECKED_CAST")
+                val typedProperty = property as KProperty1<Any, Primitive>
+                val primitive = typedProperty.get(context)
+                val name = property.name
+                names[primitive] = name
+            }
+        }
     }
 }
 

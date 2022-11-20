@@ -49,9 +49,7 @@ class SolvePuzzle7_11Test {
         }
 
         override fun nameParams(params: Params, namer: Namer) {
-            namer.set("base1", params.base1)
-            namer.set("base2", params.base2)
-            namer.set("base3", params.base3)
+            namer.nameReflected(params)
         }
 
         override fun initialContext(
@@ -59,14 +57,19 @@ class SolvePuzzle7_11Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                val base12 = namer.set("base12", lineTool(base1, base2))
-                val base23 = namer.set("base23", lineTool(base2, base3))
-                val base31 = namer.set("base31", lineTool(base3, base1))
-                return Setup(base12, base23, base31) to EuclideaContext(
-                    config = EuclideaConfig(maxSqDistance = sq(8.0)),
-                    points = listOf(base1, base2, base3),
-                    elements = listOf(base12, base23, base31)
-                )
+                val context = object {
+                    val base12 = lineTool(base1, base2)
+                    val base23 = lineTool(base2, base3)
+                    val base31 = lineTool(base3, base1)
+                }
+                namer.nameReflected(context)
+                with(context) {
+                    return Setup(base12, base23, base31) to EuclideaContext(
+                        config = EuclideaConfig(maxSqDistance = sq(8.0)),
+                        points = listOf(base1, base2, base3),
+                        elements = listOf(base12, base23, base31)
+                    )
+                }
             }
         }
 
@@ -159,25 +162,32 @@ class SolvePuzzle7_11Test {
             with(params) {
                 with(setup) {
                     // Optimal 8E solution
-                    val startC1 = namer.set("startC1", circleTool(base1, base2))
-                    val outerP1 = namer.set("outerP1", intersectTwoPoints(startC1, base31).second)
-                    val outerC1 = namer.set("outerC1", circleTool(base3, outerP1))
-                    val outerP2 = namer.set("outerP2", intersectTwoPoints(outerC1, base23).first)
-                    val perpC1 = namer.set("perpC1", circleTool(outerP2, base2))
-                    val perpC2 = namer.set("perpC2", circleTool(base2, outerP2))
-                    val (perpP1, perpP2) = namer.setAll("perpP1", "perpP2", intersectTwoPoints(perpC2, perpC1))
-                    val sideP = namer.set("sideP", intersectTwoPoints(perpC2, base12).first)
-                    val bisectC = namer.set("bisectC", circleTool(sideP, base2))
-                    val perp = namer.set("perp", lineTool(perpP1, perpP2))
-                    val bisectP = namer.set("bisectP", intersectTwoPointsOther(bisectC, perpC1, base2))
-                    val bisectL = namer.set("bisectL", lineTool(bisectP, base2))
-                    val center = namer.set("center", intersectOnePoint(bisectL, perp))
-                    val tangentP = namer.set("tangentP", intersectOnePoint(perp, base23))
-                    val solution = namer.set("solution", circleTool(center, tangentP))
+                    val context = object {
+                        val startC1 = circleTool(base1, base2)
+                        val outerP1 = intersectTwoPoints(startC1, base31).second
+                        val outerC1 = circleTool(base3, outerP1)
+                        val outerP2 = intersectTwoPoints(outerC1, base23).first
+                        val perpC1 = circleTool(outerP2, base2)
+                        val perpC2 = circleTool(base2, outerP2)
+                        val all = intersectTwoPoints(perpC2, perpC1)
+                        val perpP1 = all.first
+                        val perpP2 = all.second
+                        val sideP = intersectTwoPoints(perpC2, base12).first
+                        val bisectC = circleTool(sideP, base2)
+                        val perp = lineTool(perpP1, perpP2)
+                        val bisectP = intersectTwoPointsOther(bisectC, perpC1, base2)
+                        val bisectL = lineTool(bisectP, base2)
+                        val center = intersectOnePoint(bisectL, perp)
+                        val tangentP = intersectOnePoint(perp, base23)
+                        val solution = circleTool(center, tangentP)
+                    }
+                    namer.nameReflected(context)
 
-                    return setup to initialContext.withElements(
-                        listOf(startC1, outerC1, perpC1, perpC2, bisectC, perp, bisectL, solution)
-                    )
+                    with(context) {
+                        return setup to initialContext.withElements(
+                            listOf(startC1, outerC1, perpC1, perpC2, bisectC, perp, bisectL, solution)
+                        )
+                    }
                 }
             }
         }
