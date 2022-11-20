@@ -1,5 +1,6 @@
 package euclidea
 
+import euclidea.EuclideaTools.circleTool
 import org.junit.jupiter.api.Test
 
 class SolvePuzzle4_11Test {
@@ -81,17 +82,17 @@ class SolvePuzzle4_11Test {
             )
             with(params) {
                 // Optimal 7E solution
-                val start1 = namer.set("start1", EuclideaTools.circleTool(base1, base2))
-                val start2 = namer.set("start2", EuclideaTools.circleTool(base2, base1))
+                val start1 = namer.set("start1", circleTool(base1, base2))
+                val start2 = namer.set("start2", circleTool(base2, base1))
                 val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
-                val triangle = namer.set("triangle", EuclideaTools.circleTool(adj1, base1))
-                val big = namer.set("big", EuclideaTools.circleTool(adj2, adj1))
+                val triangle = namer.set("triangle", circleTool(adj1, base1))
+                val big = namer.set("big", circleTool(adj2, adj1))
                 val big1P = namer.set("big1P", intersectTwoPointsOther(triangle, start2, base1))
-                val big1 = namer.set("big1", EuclideaTools.circleTool(big1P, base1))
+                val big1 = namer.set("big1", circleTool(big1P, base1))
                 val focus = namer.set("focus", intersectAnyPoint(big, big1))
-                val focusC = namer.set("focusC", EuclideaTools.circleTool(base2, focus))
+                val focusC = namer.set("focusC", circleTool(base2, focus))
                 val finalP = namer.set("finalP", intersectAnyPoint(start1, focusC))
-                val finalC = namer.set("finalC", EuclideaTools.circleTool(adj2, finalP))
+                val finalC = namer.set("finalC", circleTool(adj2, finalP))
 
                 // namer.setAll("solution1", "solution2", intersectTwoPoints(finalC, circle))
 

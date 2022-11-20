@@ -1,5 +1,6 @@
 package euclidea
 
+import euclidea.EuclideaTools.circleTool
 import org.junit.jupiter.api.Test
 
 class SolvePuzzle15_8Test {
@@ -89,19 +90,19 @@ class SolvePuzzle15_8Test {
             with(params) {
                 with(setup) {
                     // Optimal 7E solution
-                    val start = namer.set("start", EuclideaTools.circleTool(base1, center))
+                    val start = namer.set("start", circleTool(base1, center))
                     val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start, circle))
-                    val shift = namer.set("shift", EuclideaTools.circleTool(adj1, center))
-                    val span = namer.set("span", EuclideaTools.circleTool(adj1, adj2))
+                    val shift = namer.set("shift", circleTool(adj1, center))
+                    val span = namer.set("span", circleTool(adj1, adj2))
                     val opp = namer.set("opp", intersectTwoPointsOther(shift, start, center))
-                    val eye = namer.set("eye", EuclideaTools.circleTool(center, opp))
+                    val eye = namer.set("eye", circleTool(center, opp))
                     val perpP = namer.set("perpP", intersectTwoPointsOther(eye, shift, opp))
-                    val perpC = namer.set("perpC", EuclideaTools.circleTool(perpP, adj1))
+                    val perpC = namer.set("perpC", circleTool(perpP, adj1))
                     val focus = namer.set("focus", intersectAnyPoint(shift, perpC))
                     val bigP = namer.set("bigP", intersectTwoPointsOther(eye, start, opp))
-                    val bigC = namer.set("bigC", EuclideaTools.circleTool(bigP, focus))
+                    val bigC = namer.set("bigC", circleTool(bigP, focus))
                     val finalP = namer.set("finalP", intersectAnyPoint(bigC, span))
-                    val finalC = namer.set("finalC", EuclideaTools.circleTool(perpP, finalP))
+                    val finalC = namer.set("finalC", circleTool(perpP, finalP))
 
                     namer.setAll("solution1", "solution2", intersectTwoPoints(finalC, circle))
 

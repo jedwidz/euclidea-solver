@@ -1,5 +1,6 @@
 package euclidea
 
+import euclidea.EuclideaTools.circleTool
 import euclidea.Point.Companion.Origin
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -179,7 +180,7 @@ class EuclideaModelTest {
         val y1 = center.plus(Point(0.0, radius))
         val y2 = center.plus(Point(0.0, -radius))
 
-        val circle = EuclideaTools.circleTool(center, x1)
+        val circle = circleTool(center, x1)
 
         fun test(point: Point, circle: Element.Circle, coincides: Boolean) {
             assertEquals(coincides, pointAndCircleCoincide(point, circle))
