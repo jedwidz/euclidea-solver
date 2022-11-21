@@ -44,7 +44,7 @@ fun <T> threeFrom(list: List<T>): Three<T> {
 }
 
 fun <T : Any> Any.reflectProperties(kClass: KClass<T>): Map<String, T> {
-    return this::class.declaredMemberProperties.mapNotNull { property ->
+    val unordered = this::class.declaredMemberProperties.mapNotNull { property ->
         if (property.parameters.size == 1 && property.returnType.isSubtypeOf(kClass.starProjectedType)) {
             @Suppress("UNCHECKED_CAST")
             val typedProperty = property as KProperty1<Any, T>
@@ -53,4 +53,8 @@ fun <T : Any> Any.reflectProperties(kClass: KClass<T>): Map<String, T> {
             name to primitive
         } else null
     }.toMap()
+    // Maybe not guaranteed to give the declaration order, but fingers crossed
+    // See: https://stackoverflow.com/a/5004929/2396171
+    val order = this::class.java.declaredFields.map { it.name }
+    return order.mapNotNull { name -> unordered[name]?.let { name to it } }.toMap()
 }

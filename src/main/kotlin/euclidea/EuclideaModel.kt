@@ -315,3 +315,7 @@ private fun circleLineIntersect(circle: Element.Circle, line: Element.Line): Int
 fun sq(v: Double): Double {
     return v * v
 }
+
+fun elementsReflected(obj: Any): List<Element> {
+    return obj.reflectProperties(Element::class).map { it.value }
+}

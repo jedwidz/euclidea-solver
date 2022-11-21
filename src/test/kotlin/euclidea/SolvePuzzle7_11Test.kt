@@ -162,7 +162,7 @@ class SolvePuzzle7_11Test {
             with(params) {
                 with(setup) {
                     // Optimal 8E solution
-                    val context = object {
+                    @Suppress("unused") val context = object {
                         val startC1 = circleTool(base1, base2)
                         val outerP1 = intersectTwoPoints(startC1, base31).second
                         val outerC1 = circleTool(base3, outerP1)
@@ -182,12 +182,7 @@ class SolvePuzzle7_11Test {
                         val solution = circleTool(center, tangentP)
                     }
                     namer.nameReflected(context)
-
-                    with(context) {
-                        return setup to initialContext.withElements(
-                            listOf(startC1, outerC1, perpC1, perpC2, bisectC, perp, bisectL, solution)
-                        )
-                    }
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }
