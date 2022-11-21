@@ -8,27 +8,33 @@ import kotlin.reflect.full.starProjectedType
 class Namer {
     private val names: MutableMap<Primitive, String> = mutableMapOf()
 
-    fun <T : Primitive> set(name: String, named: T): T {
+    private fun <T : Primitive> setImpl(named: T, name: String) {
         names[named] = name
+    }
+
+    private fun getImpl(named: Primitive) = names[named]
+
+    fun <T : Primitive> set(name: String, named: T): T {
+        setImpl(named, name)
         return named
     }
 
     // For constructions
     fun <T : Primitive> setCons(name: String, nameds: Pair<T, List<T>>): Pair<T, List<T>> {
         val (named, construction) = nameds
-        names[named] = name
-        construction.forEachIndexed { index: Int, t: T -> names[t] = "${name}#${index}" }
+        setImpl(named, name)
+        construction.forEachIndexed { index: Int, t: T -> setImpl(t, "${name}#${index}") }
         return nameds
     }
 
     fun <T : Pair<Primitive, Primitive>> setAll(name1: String, name2: String, namedPair: T): T {
-        names[namedPair.first] = name1
-        names[namedPair.second] = name2
+        setImpl(namedPair.first, name1)
+        setImpl(namedPair.second, name2)
         return namedPair
     }
 
     fun get(named: Primitive): String? {
-        return names[named]
+        return getImpl(named)
     }
 
     fun nameReflected(context: Any) {
@@ -38,7 +44,7 @@ class Namer {
                 val typedProperty = property as KProperty1<Any, Primitive>
                 val primitive = typedProperty.get(context)
                 val name = property.name
-                names[primitive] = name
+                setImpl(primitive, name)
             }
         }
     }
