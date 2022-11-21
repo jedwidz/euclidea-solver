@@ -165,8 +165,12 @@ class EuclideaSetsTest {
         differentItems.forEach { assertEquals(it, set.canonicalOrNull(it)) }
         differentItems.forEach { assertEquals(it, set.canonicalOrAdd(it)) }
 
-        set -= listOf(item)
-        allSameItems.forEach { assertFalse(it in set) }
-    }
+        set += sameItems
 
+        println("Removing ${set.items()}")
+        set -= listOf(item)
+        println("Removed ${set.items()}")
+        allSameItems.forEach { assertFalse(it in set) }
+        set.items().none { allSameItems.contains(it) }
+    }
 }

@@ -29,7 +29,7 @@ interface EuclideaSet<T> {
 }
 
 abstract class IndexedSet<T>(
-    // must compare on primaryDim first, and have equals consist with T::equals
+    // must compare on primaryDim first, and have equals consistent with T::equals
     comparator: Comparator<in T>
 ) : EuclideaSet<T> {
     protected abstract fun coincides(item1: T, item2: T): Boolean
@@ -43,6 +43,9 @@ abstract class IndexedSet<T>(
     }
 
     private fun <U : T> canonicalImpl(item: U): U? {
+        // Optimize for already canonical
+        if (item in set) return item
+
         val primary = primaryDim(item)
         val range = coincidingRange(primary)
         // Take some liberty here at the edge points of the range
@@ -58,11 +61,17 @@ abstract class IndexedSet<T>(
     }
 
     override fun add(item: T): Boolean {
-        return set.add(item)
+        return when (canonicalImpl(item)) {
+            null -> set.add(item)
+            else -> false
+        }
     }
 
     override fun remove(item: T): Boolean {
-        return set.remove(item)
+        return when (canonicalImpl(item)) {
+            null -> false
+            else -> set.remove(item)
+        }
     }
 
     override fun removeOne(): T? {
