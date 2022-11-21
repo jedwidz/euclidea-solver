@@ -2,24 +2,33 @@ package euclidea
 
 import euclidea.Element.Circle
 import euclidea.Element.Line
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class EuclideaSetsTest {
 
     private val d = Epsilon / 10
 
+    private val point = Point(0.0, 0.0)
+
+    private val samePoints = listOf(Point(0.0 - d, 0.0), Point(0.0 + d, 0.0), Point(0.0, 0.0 - d), Point(0.0, 0.0 + d))
+
+    private val differentPoints = listOf(Point(1.0, 0.0), Point(0.0, 1.0))
+
     @Test
     fun pointSet() {
         euclideaSetTest(
             set = PointSet(),
-            item = Point(0.0, 0.0),
-            sameItems = listOf(Point(0.0 - d, 0.0), Point(0.0 + d, 0.0), Point(0.0, 0.0 - d), Point(0.0, 0.0 + d)),
-            differentItems = listOf(Point(1.0, 0.0), Point(0.0, 1.0))
+            item = point,
+            sameItems = samePoints,
+            differentItems = differentPoints
         )
     }
 
-    private val line = Line(Point(0.0, 0.0), Point(1.0, 2.0))
+    private val line = Line(point, Point(1.0, 2.0))
 
     private val sameLines = listOf(
         Line(Point(0.0 - d, 0.0), Point(1.0, 2.0)),
@@ -46,7 +55,7 @@ class EuclideaSetsTest {
         )
     }
 
-    private val circle = Circle(Point(0.0, 0.0), 1.0)
+    private val circle = Circle(point, 1.0)
 
     private val sameCircles = listOf(
         Circle(Point(0.0 - d, 0.0), 1.0),
@@ -56,7 +65,7 @@ class EuclideaSetsTest {
     )
 
     private val differentCircles = listOf(
-        Circle(Point(0.0, 0.0), 2.0),
+        Circle(point, 2.0),
         Circle(Point(0.0, 1.0), 1.0),
         Circle(Point(1.0, 0.0), 1.0)
     )
@@ -77,7 +86,7 @@ class EuclideaSetsTest {
             set = ElementSet(),
             item = circle,
             sameItems = sameCircles,
-            differentItems = listOf(line) + sameLines + differentLines + differentCircles
+            differentItems = listOf(line) + differentLines + differentCircles
         )
     }
 
@@ -87,7 +96,46 @@ class EuclideaSetsTest {
             set = ElementSet(),
             item = line,
             sameItems = sameLines,
-            differentItems = listOf(circle) + sameCircles + differentLines + differentCircles
+            differentItems = listOf(circle) + differentLines + differentCircles
+        )
+    }
+
+    @Test
+    fun primitiveSet_point() {
+        euclideaSetTest(
+            set = PrimitiveSet(),
+            item = point,
+            sameItems = samePoints,
+            differentItems = listOf(
+                line,
+                circle
+            ) + differentPoints + differentLines + differentCircles
+        )
+    }
+
+    @Test
+    fun primitiveSet_circle() {
+        euclideaSetTest(
+            set = PrimitiveSet(),
+            item = circle,
+            sameItems = sameCircles,
+            differentItems = listOf(
+                point,
+                line
+            ) + differentPoints + differentLines + differentCircles
+        )
+    }
+
+    @Test
+    fun primitiveSet_line() {
+        euclideaSetTest(
+            set = PrimitiveSet(),
+            item = line,
+            sameItems = sameLines,
+            differentItems = listOf(
+                point,
+                circle
+            ) + differentPoints + differentLines + differentCircles
         )
     }
 
@@ -101,6 +149,7 @@ class EuclideaSetsTest {
         val items = allSameItems + differentItems
 
         items.forEach { assertTrue(it !in set) }
+        items.forEach { assertNull(set.canonicalOrNull(it)) }
 
         set += item
 
@@ -108,8 +157,16 @@ class EuclideaSetsTest {
         differentItems.forEach { assertTrue(it !in set) }
 
         set += differentItems
+        // TODO test using canonicalOrAdd to add
 
         items.forEach { assertTrue(it in set) }
+        sameItems.forEach { assertEquals(item, set.canonicalOrNull(it)) }
+        sameItems.forEach { assertEquals(item, set.canonicalOrAdd(it)) }
+        differentItems.forEach { assertEquals(it, set.canonicalOrNull(it)) }
+        differentItems.forEach { assertEquals(it, set.canonicalOrAdd(it)) }
+
+        set -= listOf(item)
+        allSameItems.forEach { assertFalse(it in set) }
     }
 
 }

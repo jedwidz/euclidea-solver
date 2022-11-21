@@ -7,12 +7,15 @@ import kotlin.reflect.full.starProjectedType
 
 class Namer {
     private val names: MutableMap<Primitive, String> = mutableMapOf()
+    private val alreadyNamed: PrimitiveSet = PrimitiveSet()
 
     private fun <T : Primitive> setImpl(named: T, name: String) {
-        names[named] = name
+        names[alreadyNamed.canonicalOrAdd(named)] = name
     }
 
-    private fun getImpl(named: Primitive) = names[named]
+    private fun getImpl(named: Primitive): String? {
+        return alreadyNamed.canonicalOrNull(named)?.let { names[it] }
+    }
 
     fun <T : Primitive> set(name: String, named: T): T {
         setImpl(named, name)

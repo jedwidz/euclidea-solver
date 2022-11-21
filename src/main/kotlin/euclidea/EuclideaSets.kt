@@ -12,6 +12,9 @@ interface EuclideaSet<T> {
 
     fun items(): List<T>
 
+    fun <U : T> canonicalOrNull(item: U): U?
+    fun <U : T> canonicalOrAdd(item: U): U
+
     operator fun plusAssign(item: T) {
         add(item)
     }
@@ -36,11 +39,18 @@ abstract class IndexedSet<T>(
     private val set = sortedSetOf(comparator)
 
     override operator fun contains(item: T): Boolean {
+        return canonicalImpl(item) !== null
+    }
+
+    private fun <U : T> canonicalImpl(item: U): U? {
         val primary = primaryDim(item)
         val range = coincidingRange(primary)
         // Take some liberty here at the edge points of the range
         val subSet = set.subSet(range.first, false, range.second, false)
-        return subSet.any { coincides(it, item) }
+
+        @Suppress("UNCHECKED_CAST", "UnnecessaryVariable")
+        val res = subSet.firstOrNull { coincides(it, item) } as U?
+        return res
     }
 
     private fun coincidingRange(primary: Double): Pair<T, T> {
@@ -63,6 +73,20 @@ abstract class IndexedSet<T>(
 
     override fun items(): List<T> {
         return set.toList()
+    }
+
+    override fun <U : T> canonicalOrNull(item: U): U? {
+        return canonicalImpl(item)
+    }
+
+    override fun <U : T> canonicalOrAdd(item: U): U {
+        return when (val existing = canonicalImpl(item)) {
+            null -> {
+                set.add(item)
+                item
+            }
+            else -> existing
+        }
     }
 }
 
@@ -121,8 +145,8 @@ class CircleSet : IndexedSet<Circle>(compareBy({ it.center.x }, { it.center.y },
 
 class ElementSet : EuclideaSet<Element> {
 
-    val lineSet = LineSet()
-    val circleSet = CircleSet()
+    private val lineSet = LineSet()
+    private val circleSet = CircleSet()
 
     override fun contains(item: Element): Boolean {
         return when (item) {
@@ -152,5 +176,82 @@ class ElementSet : EuclideaSet<Element> {
     override fun items(): List<Element> {
         return lineSet.items() + circleSet.items()
     }
+
+    override fun <U : Element> canonicalOrNull(item: U): U? {
+        return when (item) {
+            is Line -> lineSet.canonicalOrNull(item)
+            is Circle -> circleSet.canonicalOrNull(item)
+            else -> unreachable() // Kotlin compiler can't figure out this is unneeded
+        }
+    }
+
+    override fun <U : Element> canonicalOrAdd(item: U): U {
+        return when (item) {
+            is Line -> lineSet.canonicalOrAdd(item)
+            is Circle -> circleSet.canonicalOrAdd(item)
+            else -> unreachable() // Kotlin compiler can't figure out this is unneeded
+        }
+    }
+
+    private fun unreachable(): Nothing {
+        throw UnsupportedOperationException("Unreachable code reached")
+    }
 }
 
+class PrimitiveSet : EuclideaSet<Primitive> {
+
+    private val pointSet = PointSet()
+    private val elementSet = ElementSet()
+
+    override fun contains(item: Primitive): Boolean {
+        return when (item) {
+            is Point -> pointSet.contains(item)
+            is Element -> elementSet.contains(item)
+            else -> unsupported(item)
+        }
+    }
+
+    private fun unsupported(item: Primitive): Nothing {
+        throw IllegalArgumentException("Unsupported Primitive type: ${item::class}")
+    }
+
+    override fun add(item: Primitive): Boolean {
+        return when (item) {
+            is Point -> pointSet.add(item)
+            is Element -> elementSet.add(item)
+            else -> unsupported(item)
+        }
+    }
+
+    override fun remove(item: Primitive): Boolean {
+        return when (item) {
+            is Point -> pointSet.remove(item)
+            is Element -> elementSet.remove(item)
+            else -> unsupported(item)
+        }
+    }
+
+    override fun removeOne(): Primitive? {
+        return pointSet.removeOne() ?: elementSet.removeOne()
+    }
+
+    override fun items(): List<Primitive> {
+        return pointSet.items() + elementSet.items()
+    }
+
+    override fun <U : Primitive> canonicalOrNull(item: U): U? {
+        return when (item) {
+            is Point -> pointSet.canonicalOrNull(item)
+            is Element -> elementSet.canonicalOrNull(item)
+            else -> unsupported(item)
+        }
+    }
+
+    override fun <U : Primitive> canonicalOrAdd(item: U): U {
+        return when (item) {
+            is Point -> pointSet.canonicalOrAdd(item)
+            is Element -> elementSet.canonicalOrAdd(item)
+            else -> unsupported(item)
+        }
+    }
+}
