@@ -1,5 +1,11 @@
 package euclidea
 
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.starProjectedType
+
 fun <E> List<E>.forEachPair(action: (E, E) -> Unit) {
     val count = count()
     forEachIndexed { i, a ->
@@ -35,4 +41,16 @@ fun <E> List<E>.triples(): List<Three<E>> {
 fun <T> threeFrom(list: List<T>): Three<T> {
     require(list.size == 3)
     return Triple(list[0], list[1], list[2])
+}
+
+fun <T : Any> Any.reflectProperties(kClass: KClass<T>): Map<String, T> {
+    return this::class.declaredMemberProperties.mapNotNull { property ->
+        if (property.parameters.size == 1 && property.returnType.isSubtypeOf(kClass.starProjectedType)) {
+            @Suppress("UNCHECKED_CAST")
+            val typedProperty = property as KProperty1<Any, T>
+            val primitive = typedProperty.get(this)
+            val name = property.name
+            name to primitive
+        } else null
+    }.toMap()
 }

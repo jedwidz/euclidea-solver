@@ -30,4 +30,19 @@ class UtilsTest {
         assertEquals(expected, res.toList())
     }
 
+    @Test
+    fun reflectProperties() {
+        @Suppress("unused") val obj = object {
+            val intA = 1
+            val stringZ = "stringZ value"
+            val stringA = "stringA value"
+            val intZ = 100
+        }
+        assertEquals(
+            mapOf("stringZ" to "stringZ value", "stringA" to "stringA value"),
+            obj.reflectProperties(String::class)
+        )
+        assertEquals(mapOf("intA" to 1, "intZ" to 100), obj.reflectProperties(Int::class))
+        assertEquals(mapOf(), obj.reflectProperties(Double::class))
+    }
 }
