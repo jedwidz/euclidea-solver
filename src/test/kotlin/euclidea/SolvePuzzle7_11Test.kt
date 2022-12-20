@@ -111,7 +111,7 @@ class SolvePuzzle7_11Test {
             }
         }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean)? {
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
             // Euclidea 8E E-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
