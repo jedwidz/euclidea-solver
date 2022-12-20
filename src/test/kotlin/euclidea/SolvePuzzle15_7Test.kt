@@ -59,10 +59,6 @@ class SolvePuzzle15_7Test {
             )
         }
 
-        override fun nameParams(params: Params, namer: Namer) {
-            namer.nameReflected(params)
-        }
-
         override fun initialContext(
             params: Params,
             namer: Namer

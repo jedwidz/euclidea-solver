@@ -61,10 +61,7 @@ class SolvePuzzle11_5Test {
             )
         }
 
-        override fun nameParams(params: Params, namer: Namer) {
-            // TODO dir not really a point, shouldn't name it as one
-            namer.nameReflected(params)
-        }
+        // TODO dir not really a point, shouldn't name it as one
 
         override fun initialContext(
             params: Params,

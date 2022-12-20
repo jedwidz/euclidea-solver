@@ -2,7 +2,7 @@ package euclidea
 
 import kotlin.test.assertTrue
 
-abstract class ImprovingSolver<Params, Setup> {
+abstract class ImprovingSolver<Params : Any, Setup> {
 
     fun checkReferenceSolution() {
         checkImpl(this::referenceSolution)
@@ -109,7 +109,9 @@ abstract class ImprovingSolver<Params, Setup> {
         println("Count: ${solutionContext?.elements?.size}")
     }
 
-    protected abstract fun nameParams(params: Params, namer: Namer)
+    private fun nameParams(params: Params, namer: Namer) {
+        namer.nameReflected(params)
+    }
 
     protected abstract fun makeParams(): Params
 
