@@ -101,13 +101,12 @@ class SolvePuzzle11_1Test {
             )
             with(params) {
                 with(setup) {
-                    // Suboptimal 4E solution
+                    // Optimal 3E solution
                     @Suppress("unused") val context = object {
-                        val circle1 = circleTool(baseC, baseB)
-                        val circle2 = circleTool(baseA, baseB)
-                        val down = intersectTwoPointsOther(circle1, circle2, baseB)
-                        val cross = lineTool(down, baseA)
-                        val top = intersectTwoPointsOther(cross, circle2, down)
+                        val circle1 = circleTool(baseA, baseB)
+                        val left = intersectTwoPointsOther(circle1, line1, baseB)
+                        val circle2 = circleTool(baseC, left)
+                        val top = intersectTwoPointsOther(circle1, circle2, left)
                         val aim = lineTool(top, baseB)
                         val solution = intersectOnePoint(aim, line2)
                     }
