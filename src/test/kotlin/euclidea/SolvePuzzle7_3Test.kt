@@ -46,8 +46,7 @@ class SolvePuzzle7_3Test {
         }
 
         override fun nameParams(params: Params, namer: Namer) {
-            namer.set("base1", params.base1)
-            namer.set("base2", params.base2)
+            namer.nameReflected(params)
         }
 
         override fun initialContext(
@@ -55,12 +54,17 @@ class SolvePuzzle7_3Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                val base = namer.set("base", lineTool(base1, base2))
-                return Setup(base) to EuclideaContext(
-                    config = EuclideaConfig(maxSqDistance = sq(8.0)),
-                    points = listOf(base1, probe),
-                    elements = listOf(base)
-                )
+                val context = object {
+                    val base = lineTool(base1, base2)
+                }
+                namer.nameReflected(context)
+                with(context) {
+                    return Setup(base) to EuclideaContext(
+                        config = EuclideaConfig(maxSqDistance = sq(8.0)),
+                        points = listOf(base1, probe),
+                        elements = listOf(base)
+                    )
+                }
             }
         }
 
@@ -121,20 +125,20 @@ class SolvePuzzle7_3Test {
             with(params) {
                 with(setup) {
                     // Optimal 5E solution
-                    val start = namer.set("start", circleTool(probe, base1))
-                    val cut = namer.set("cut", intersectTwoPointsOther(start, base, base1))
-                    val lens = namer.set("lens", circleTool(cut, probe))
-                    val (_, adj1) = namer.setAll("adj2", "adj1", intersectTwoPoints(lens, start))
-                    val support = namer.set("support", circleTool(base1, adj1))
-                    val aimP1 = namer.set("aimP1", intersectTwoPoints(support, base).second)
-                    val aimP2 = namer.set("aimP2", intersectTwoPointsOther(support, start, adj1))
-                    val aim = namer.set("aim", lineTool(aimP1, aimP2))
-                    val solutionP = namer.set("solutionP", intersectTwoPointsOther(aim, start, aimP2))
-                    val solution = namer.set("solution", lineTool(solutionP, base1))
-
-                    return setup to initialContext.withElements(
-                        listOf(start, lens, support, aim, solution)
-                    )
+                    @Suppress("unused") val context = object {
+                        val start = circleTool(probe, base1)
+                        val cut = intersectTwoPointsOther(start, base, base1)
+                        val lens = circleTool(cut, probe)
+                        val adj1 = intersectTwoPoints(lens, start).second
+                        val support = circleTool(base1, adj1)
+                        val aimP1 = intersectTwoPoints(support, base).second
+                        val aimP2 = intersectTwoPointsOther(support, start, adj1)
+                        val aim = lineTool(aimP1, aimP2)
+                        val solutionP = intersectTwoPointsOther(aim, start, aimP2)
+                        val solution = lineTool(solutionP, base1)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }

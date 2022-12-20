@@ -62,13 +62,8 @@ class SolvePuzzle11_5Test {
         }
 
         override fun nameParams(params: Params, namer: Namer) {
-            namer.set("base1", params.base1)
-            namer.set("base2", params.base2)
-            namer.set("center", params.center)
-            // dir not really a point
-            namer.set("probeCenter", params.probeCenter)
-            namer.set("probe1", params.probePoint1)
-            namer.set("probe2", params.probePoint2)
+            // TODO dir not really a point, shouldn't name it as one
+            namer.nameReflected(params)
         }
 
         override fun initialContext(
@@ -76,18 +71,24 @@ class SolvePuzzle11_5Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                val line1 = namer.set("line1", Element.Line(base1, base1.plus(dir)))
-                val line2 = namer.set("line2", Element.Line(base2, base2.plus(dir)))
-                val baseContext = EuclideaContext(
-                    config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(25.0)),
-                    points = listOf(center),
-                    elements = listOf(line1, line2)
-                )
-                // 'probe' lines to cut across the given lines
-                val probeLine1 = namer.set("probe1", Element.Line(probeCenter, probePoint1))
-                val probeLine2 = namer.set("probe2", Element.Line(probeCenter, probePoint2))
-                val probeLineContext = baseContext.withElements(listOf(probeLine1, probeLine2))
-                return Pair(Setup(line1, line2, probeLine1, probeLine2), probeLineContext)
+                val context = object {
+                    val line1 = Element.Line(base1, base1.plus(dir))
+                    val line2 = Element.Line(base2, base2.plus(dir))
+
+                    // 'probe' lines to cut across the given lines
+                    val probeLine1 = Element.Line(probeCenter, probePoint1)
+                    val probeLine2 = Element.Line(probeCenter, probePoint2)
+                }
+                namer.nameReflected(context)
+                with(context) {
+                    val baseContext = EuclideaContext(
+                        config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(25.0)),
+                        points = listOf(center),
+                        elements = listOf(line1, line2)
+                    )
+                    val probeLineContext = baseContext.withElements(listOf(probeLine1, probeLine2))
+                    return Pair(Setup(line1, line2, probeLine1, probeLine2), probeLineContext)
+                }
             }
         }
 
@@ -117,22 +118,21 @@ class SolvePuzzle11_5Test {
             with(params) {
                 with(setup) {
                     // Optimal 7E solution
-                    val startP21 = namer.set("startP21", intersectOnePoint(line2, probeLine1))
-                    val startP22 = namer.set("startP22", intersectOnePoint(line2, probeLine2))
-                    val mid = namer.set("mid", Element.Line(center, probeCenter))
-                    val pivot = namer.set("pivot", intersectOnePoint(mid, line1))
-                    val x1 = namer.set("x1", Element.Line(pivot, startP22))
-                    val x2 = namer.set("x2", Element.Line(center, startP21))
-                    val crux = namer.set("crux", intersectOnePoint(x1, x2))
-                    val pivotOpp = namer.set("pivotOpp", intersectOnePoint(line1, probeLine1))
-                    val midOpp = namer.set("midOpp", Element.Line(pivotOpp, crux))
-                    val prop = namer.set("prop", intersectOnePoint(midOpp, probeLine2))
-                    val solution = namer.set("solution", Element.Line(center, prop))
-
-                    val solutionContext = initialContext.withElements(
-                        listOf(mid, x1, x2, mid, midOpp, solution)
-                    )
-                    return Pair(setup, solutionContext)
+                    @Suppress("unused") val context = object {
+                        val startP21 = intersectOnePoint(line2, probeLine1)
+                        val startP22 = intersectOnePoint(line2, probeLine2)
+                        val mid = Element.Line(center, probeCenter)
+                        val pivot = intersectOnePoint(mid, line1)
+                        val x1 = Element.Line(pivot, startP22)
+                        val x2 = Element.Line(center, startP21)
+                        val crux = intersectOnePoint(x1, x2)
+                        val pivotOpp = intersectOnePoint(line1, probeLine1)
+                        val midOpp = Element.Line(pivotOpp, crux)
+                        val prop = intersectOnePoint(midOpp, probeLine2)
+                        val solution = Element.Line(center, prop)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }

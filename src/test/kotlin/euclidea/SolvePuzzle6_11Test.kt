@@ -47,9 +47,7 @@ class SolvePuzzle6_11Test {
         }
 
         override fun nameParams(params: Params, namer: Namer) {
-            namer.set("base1", params.base1)
-            namer.set("base2", params.base2)
-            namer.set("base3", params.base3)
+            namer.nameReflected(params)
         }
 
         override fun initialContext(
@@ -164,14 +162,14 @@ class SolvePuzzle6_11Test {
             with(params) {
                 with(setup) {
                     // Partial solution
-                    val line1 = namer.set("line1", lineTool(base1, base3))
-                    val circle1 = namer.set("circle1", circleTool(base3, base1))
-                    val point1 = namer.set("point1", intersectTwoPointsOther(circle1, line1, base1))
-                    val solution1 = namer.set("solution1", lineTool(base2, point1))
-
-                    return setup to initialContext.withElements(
-                        listOf(line1, circle1, solution1)
-                    )
+                    @Suppress("unused") val context = object {
+                        val line1 = lineTool(base1, base3)
+                        val circle1 = circleTool(base3, base1)
+                        val point1 = intersectTwoPointsOther(circle1, line1, base1)
+                        val solution1 = lineTool(base2, point1)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }
@@ -186,37 +184,26 @@ class SolvePuzzle6_11Test {
             with(params) {
                 with(setup) {
                     // Optimal 10E solution
-                    val base = namer.set("base", lineTool(base1, base3))
-                    val start2 = namer.set("start2", circleTool(base3, base1))
-                    val sol2P = namer.set("sol2P", intersectTwoPointsOther(base, start2, base1))
-                    val solution2 = namer.set("solution2", lineTool(sol2P, base2))
-                    val start1 = namer.set("start1", circleTool(base1, base3))
-                    val sol3P1 = namer.set("sol3P1", intersectTwoPointsOther(base, start1, base3))
-                    val spread = namer.set("spread", circleTool(base2, sol3P1))
-                    val sol1P = namer.set("sol1P", intersectTwoPointsOther(spread, start1, sol3P1))
-                    val solution1 = namer.set("solution1", lineTool(sol1P, base3))
-                    val crossP = namer.set("crossP", intersectTwoPointsOther(solution2, start2, sol2P))
-                    val cross = namer.set("cross", lineTool(crossP, base3))
-                    val sol4P = namer.set("sol4P", intersectTwoPointsOther(cross, start2, crossP))
-                    val solution4 = namer.set("solution4", lineTool(sol4P, base1))
-                    val spread2 = namer.set("spread2", circleTool(base2, base3))
-                    val sol3P2 = namer.set("sol3P2", intersectTwoPointsOther(spread2, start1, base3))
-                    val solution3 = namer.set("solution3", lineTool(sol3P2, sol3P1))
-
-                    return setup to initialContext.withElements(
-                        listOf(
-                            base,
-                            start2,
-                            solution2,
-                            start1,
-                            spread,
-                            solution1,
-                            cross,
-                            solution4,
-                            spread2,
-                            solution3
-                        )
-                    )
+                    @Suppress("unused") val context = object {
+                        val base = lineTool(base1, base3)
+                        val start2 = circleTool(base3, base1)
+                        val sol2P = intersectTwoPointsOther(base, start2, base1)
+                        val solution2 = lineTool(sol2P, base2)
+                        val start1 = circleTool(base1, base3)
+                        val sol3P1 = intersectTwoPointsOther(base, start1, base3)
+                        val spread = circleTool(base2, sol3P1)
+                        val sol1P = intersectTwoPointsOther(spread, start1, sol3P1)
+                        val solution1 = lineTool(sol1P, base3)
+                        val crossP = intersectTwoPointsOther(solution2, start2, sol2P)
+                        val cross = lineTool(crossP, base3)
+                        val sol4P = intersectTwoPointsOther(cross, start2, crossP)
+                        val solution4 = lineTool(sol4P, base1)
+                        val spread2 = circleTool(base2, base3)
+                        val sol3P2 = intersectTwoPointsOther(spread2, start1, base3)
+                        val solution3 = lineTool(sol3P2, sol3P1)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }

@@ -41,8 +41,7 @@ class SolvePuzzle4_11Test {
         }
 
         override fun nameParams(params: Params, namer: Namer) {
-            namer.set("base1", params.base1)
-            namer.set("base2", params.base2)
+            namer.nameReflected(params)
         }
 
         override fun initialContext(
@@ -82,25 +81,24 @@ class SolvePuzzle4_11Test {
             )
             with(params) {
                 // Optimal 7E solution
-                val start1 = namer.set("start1", circleTool(base1, base2))
-                val start2 = namer.set("start2", circleTool(base2, base1))
-                val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
-                val triangle = namer.set("triangle", circleTool(adj1, base1))
-                val big = namer.set("big", circleTool(adj2, adj1))
-                val big1P = namer.set("big1P", intersectTwoPointsOther(triangle, start2, base1))
-                val big1 = namer.set("big1", circleTool(big1P, base1))
-                val focus = namer.set("focus", intersectAnyPoint(big, big1))
-                val focusC = namer.set("focusC", circleTool(base2, focus))
-                val finalP = namer.set("finalP", intersectAnyPoint(start1, focusC))
-                val finalC = namer.set("finalC", circleTool(adj2, finalP))
-
-                // namer.setAll("solution1", "solution2", intersectTwoPoints(finalC, circle))
-
-                return setup to initialContext.withElements(
-                    listOf(
-                        start1, start2, triangle, big, big1, focusC, finalC
-                    )
-                )
+                @Suppress("unused") val context = object {
+                    val start1 = circleTool(base1, base2)
+                    val start2 = circleTool(base2, base1)
+                    val adj = intersectTwoPoints(start1, start2)
+                    val adj1 = adj.first
+                    val adj2 = adj.second
+                    val triangle = circleTool(adj1, base1)
+                    val big = circleTool(adj2, adj1)
+                    val big1P = intersectTwoPointsOther(triangle, start2, base1)
+                    val big1 = circleTool(big1P, base1)
+                    val focus = intersectAnyPoint(big, big1)
+                    val focusC = circleTool(base2, focus)
+                    val finalP = intersectAnyPoint(start1, focusC)
+                    val finalC = circleTool(adj2, finalP)
+                    // val solution = intersectTwoPoints(finalC, circle)
+                }
+                namer.nameReflected(context)
+                return setup to initialContext.withElements(elementsReflected(context))
             }
         }
     }

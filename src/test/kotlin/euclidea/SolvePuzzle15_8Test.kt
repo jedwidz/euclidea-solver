@@ -46,8 +46,7 @@ class SolvePuzzle15_8Test {
         }
 
         override fun nameParams(params: Params, namer: Namer) {
-            namer.set("base1", params.base1)
-            namer.set("center", params.center)
+            namer.nameReflected(params)
         }
 
         override fun initialContext(
@@ -55,13 +54,18 @@ class SolvePuzzle15_8Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                val circle = namer.set("circle", Element.Circle(center, radius))
-                val baseContext = EuclideaContext(
-                    config = EuclideaConfig(lineToolEnabled = false, maxSqDistance = sq(4.0)),
-                    points = listOf(base1, center),
-                    elements = listOf(circle)
-                )
-                return Pair(Setup(circle), baseContext)
+                @Suppress("unused") val context = object {
+                    val circle = Element.Circle(center, radius)
+                }
+                namer.nameReflected(context)
+                with(context) {
+                    val baseContext = EuclideaContext(
+                        config = EuclideaConfig(lineToolEnabled = false, maxSqDistance = sq(4.0)),
+                        points = listOf(base1, center),
+                        elements = listOf(circle)
+                    )
+                    return Pair(Setup(circle), baseContext)
+                }
             }
         }
 
@@ -90,28 +94,28 @@ class SolvePuzzle15_8Test {
             with(params) {
                 with(setup) {
                     // Optimal 7E solution
-                    val start = namer.set("start", circleTool(base1, center))
-                    val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start, circle))
-                    val shift = namer.set("shift", circleTool(adj1, center))
-                    val span = namer.set("span", circleTool(adj1, adj2))
-                    val opp = namer.set("opp", intersectTwoPointsOther(shift, start, center))
-                    val eye = namer.set("eye", circleTool(center, opp))
-                    val perpP = namer.set("perpP", intersectTwoPointsOther(eye, shift, opp))
-                    val perpC = namer.set("perpC", circleTool(perpP, adj1))
-                    val focus = namer.set("focus", intersectAnyPoint(shift, perpC))
-                    val bigP = namer.set("bigP", intersectTwoPointsOther(eye, start, opp))
-                    val bigC = namer.set("bigC", circleTool(bigP, focus))
-                    val finalP = namer.set("finalP", intersectAnyPoint(bigC, span))
-                    val finalC = namer.set("finalC", circleTool(perpP, finalP))
-
-                    namer.setAll("solution1", "solution2", intersectTwoPoints(finalC, circle))
-
-                    val solutionContext = initialContext.withElements(
-                        listOf(
-                            start, shift, span, eye, perpC, bigC, finalC
-                        )
-                    )
-                    return Pair(setup, solutionContext)
+                    @Suppress("unused") val context = object {
+                        val start = circleTool(base1, center)
+                        val adj = intersectTwoPoints(start, circle)
+                        val adj1 = adj.first
+                        val adj2 = adj.second
+                        val shift = circleTool(adj1, center)
+                        val span = circleTool(adj1, adj2)
+                        val opp = intersectTwoPointsOther(shift, start, center)
+                        val eye = circleTool(center, opp)
+                        val perpP = intersectTwoPointsOther(eye, shift, opp)
+                        val perpC = circleTool(perpP, adj1)
+                        val focus = intersectAnyPoint(shift, perpC)
+                        val bigP = intersectTwoPointsOther(eye, start, opp)
+                        val bigC = circleTool(bigP, focus)
+                        val finalP = intersectAnyPoint(bigC, span)
+                        val finalC = circleTool(perpP, finalP)
+                        val solution = intersectTwoPoints(finalC, circle)
+                        val solution1 = solution.first
+                        val solution2 = solution.second
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }

@@ -50,9 +50,7 @@ class SolvePuzzle6_9Test {
         }
 
         override fun nameParams(params: Params, namer: Namer) {
-            namer.set("base1", params.base1)
-            namer.set("base2", params.base2)
-            namer.set("base3", params.base3)
+            namer.nameReflected(params)
         }
 
         override fun initialContext(
@@ -60,15 +58,20 @@ class SolvePuzzle6_9Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                val triangle12 = namer.set("triangle12", lineTool(base1, base2))
-                val triangle23 = namer.set("triangle23", lineTool(base2, base3))
-                val triangle31 = namer.set("triangle31", lineTool(base3, base1))
-                val setup = Setup(triangle12, triangle23, triangle31)
-                return setup to EuclideaContext(
-                    config = EuclideaConfig(maxSqDistance = sq(8.0)),
-                    points = listOf(base1, base2, base3),
-                    elements = listOf(triangle12, triangle23, triangle31)
-                )
+                val context = object {
+                    val triangle12 = lineTool(base1, base2)
+                    val triangle23 = lineTool(base2, base3)
+                    val triangle31 = lineTool(base3, base1)
+                }
+                namer.nameReflected(context)
+                with(context) {
+                    val setup = Setup(triangle12, triangle23, triangle31)
+                    return setup to EuclideaContext(
+                        config = EuclideaConfig(maxSqDistance = sq(8.0)),
+                        points = listOf(base1, base2, base3),
+                        elements = listOf(triangle12, triangle23, triangle31)
+                    )
+                }
             }
         }
 
@@ -96,27 +99,33 @@ class SolvePuzzle6_9Test {
             with(params) {
                 with(setup) {
                     // Optimal 9E solution
-                    val start1 = namer.set("start1", circleTool(base1, base2))
-                    val start2 = namer.set("start2", circleTool(base2, base1))
-                    val (adj1, adj2) = namer.setAll("adj1", "adj2", intersectTwoPoints(start1, start2))
-                    val bisect = namer.set("bisect", lineTool(adj1, adj2))
-                    val cross1 = namer.set("cross1", intersectTwoPointsOther(start1, triangle23, base2))
-                    val cross2 = namer.set("cross2", intersectTwoPointsOther(start2, triangle31, base1))
-                    val cross = namer.set("cross", lineTool(cross1, cross2))
-                    val half = namer.set("half", intersectOnePoint(bisect, triangle12))
-                    val pupil = namer.set("pupil", circleTool(half, base1))
-                    val narrow = namer.set("narrow", intersectTwoPointsOther(pupil, triangle23, base2))
-                    val back = namer.set("back", circleTool(narrow, half))
-                    // Maybe needs to be the intersection inside the triangle?
-                    val inner = namer.set("inner", intersectAnyPoint(back, cross))
-                    val cut = namer.set("cut", lineTool(inner, half))
-                    val (adjb1, adjb2) = namer.setAll("adj1b", "adjb2", intersectTwoPoints(pupil, back))
-                    val bisect2 = namer.set("bisect2", lineTool(adjb1, adjb2))
-                    val center = namer.set("center", intersectOnePoint(bisect2, cut))
-                    val solution = namer.set("solution", circleTool(center, half))
+                    @Suppress("unused") val context = object {
+                        val start1 = circleTool(base1, base2)
+                        val start2 = circleTool(base2, base1)
+                        val adj = intersectTwoPoints(start1, start2)
+                        val adj1 = adj.first
+                        val adj2 = adj.second
+                        val bisect = lineTool(adj1, adj2)
+                        val cross1 = intersectTwoPointsOther(start1, triangle23, base2)
+                        val cross2 = intersectTwoPointsOther(start2, triangle31, base1)
+                        val cross = lineTool(cross1, cross2)
+                        val half = intersectOnePoint(bisect, triangle12)
+                        val pupil = circleTool(half, base1)
+                        val narrow = intersectTwoPointsOther(pupil, triangle23, base2)
+                        val back = circleTool(narrow, half)
 
-                    return setup to initialContext
-                        .withElements(listOf(start1, start2, bisect, cross, pupil, back, cut, bisect2, solution))
+                        // Maybe needs to be the intersection inside the triangle?
+                        val inner = intersectAnyPoint(back, cross)
+                        val cut = lineTool(inner, half)
+                        val adjb = intersectTwoPoints(pupil, back)
+                        val adjb1 = adjb.first
+                        val adjb2 = adjb.second
+                        val bisect2 = lineTool(adjb1, adjb2)
+                        val center = intersectOnePoint(bisect2, cut)
+                        val solution = circleTool(center, half)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }
