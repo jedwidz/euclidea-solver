@@ -6,6 +6,7 @@ interface Primitive
 
 data class Point(val x: Double, val y: Double) : Primitive {
     val sqDistance: Double = sq(x) + sq(y)
+    val distance = sqrt(sqDistance)
 
     operator fun minus(point: Point): Point {
         return Point(x - point.x, y - point.y)
@@ -13,6 +14,10 @@ data class Point(val x: Double, val y: Double) : Primitive {
 
     operator fun plus(point: Point): Point {
         return Point(x + point.x, y + point.y)
+    }
+
+    operator fun times(scale: Double): Point {
+        return Point(x * scale, y * scale)
     }
 
     companion object {
