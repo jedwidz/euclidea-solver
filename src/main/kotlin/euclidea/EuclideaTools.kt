@@ -3,7 +3,7 @@ package euclidea
 object EuclideaTools {
 
     fun lineTool(point1: Point, point2: Point): Element.Line {
-        return makeLine(point1, point2)
+        return makeLine(point1, point2, null)
     }
 
     fun circleTool(center: Point, sample: Point): Element.Circle {
@@ -13,7 +13,14 @@ object EuclideaTools {
     fun perpendicularTool(line: Element.Line, point: Point): Element.Line {
         val direction = line.point2.minus(line.point1)
         val point2 = Point(point.x + direction.y, point.y - direction.x)
-        return makeLine(point, point2)
+        return makeLine(point, point2, LineSource.Perpendicular(line, point))
+    }
+
+    fun perpendicularBisectorTool(point1: Point, point2: Point): Element.Line {
+        val direction = point2.minus(point1)
+        val midpoint = midpoint(point1, point2)
+        val point3 = Point(midpoint.x + direction.y, midpoint.y - direction.x)
+        return makeLine(midpoint, point3, LineSource.PerpendicularBisect(point1, point2))
     }
 
     fun dropPerpendicular(
@@ -34,8 +41,8 @@ object EuclideaTools {
         return lineTool(cross1, cross2) to listOf(circle1, circle2)
     }
 
-    private fun makeLine(point1: Point, point2: Point): Element.Line {
-        return if (coincides(point1, point2)) invalid() else Element.Line(point1, point2)
+    private fun makeLine(point1: Point, point2: Point, source: LineSource?): Element.Line {
+        return if (coincides(point1, point2)) invalid() else Element.Line(point1, point2, source)
     }
 
     private fun makeCircle(center: Point, distance: Double, sample: Point): Element.Circle {

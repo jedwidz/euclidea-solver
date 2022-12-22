@@ -2,6 +2,8 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.perpendicularBisectorTool
+import euclidea.EuclideaTools.perpendicularTool
 
 data class SolveContext(
     val context: EuclideaContext,
@@ -11,7 +13,8 @@ data class SolveContext(
 private data class SolveState(
     val solveContext: SolveContext,
     val oldPoints: Set<Point>,
-    val nonNewElementCount: Int
+    val nonNewElementCount: Int,
+    val lastAddedElements: List<Element>
 )
 
 private data class PendingNode(
@@ -62,11 +65,33 @@ fun solve(
                     tryAdd(circleTool(point1, point2))
                     tryAdd(circleTool(point2, point1))
                 }
+                if (config.perpendicularBisectorToolEnabled)
+                    tryAdd(perpendicularBisectorTool(point1, point2))
             }
             newPoints.forEachIndexed { i, newPoint ->
                 oldPoints.forEach { visit(newPoint, it) }
                 for (j in i + 1 until newPoints.size)
                     visit(newPoint, newPoints[j])
+            }
+
+            if (config.anyLinePointToolEnabled) {
+                fun visit(line: Element.Line, point: Point) {
+                    if (config.perpendicularBisectorToolEnabled)
+                        tryAdd(perpendicularTool(line, point))
+                }
+
+                val newLines = solveState.lastAddedElements.filterIsInstance<Element.Line>().toSet()
+                val oldLines = elements.filterIsInstance<Element.Line>() - newLines
+                oldLines.forEach { oldLine ->
+                    newPoints.forEach { newPoint ->
+                        visit(oldLine, newPoint)
+                    }
+                }
+                newLines.forEach { newLine ->
+                    points.forEach { point ->
+                        visit(newLine, point)
+                    }
+                }
             }
 
             fun maybePass(items: List<Element>): Pair<List<Element>, List<Element>> {
@@ -120,7 +145,7 @@ fun solve(
                 if (nonNewElementLimit == null || nextNonNewElementCount < nonNewElementLimit) {
                     val nextContext = withElement(newElement)
                     val nextSolveContext = SolveContext(nextContext, nextDepth)
-                    val next = SolveState(nextSolveContext, nextOldPoints, nextNonNewElementCount)
+                    val next = SolveState(nextSolveContext, nextOldPoints, nextNonNewElementCount, listOf(newElement))
                     val lowerBound = remainingStepsLowerBound?.let { it(nextContext) }
                     if ((lowerBound == null || lowerBound <= 0) && check(nextContext))
                         return nextContext
@@ -140,6 +165,6 @@ fun solve(
     }
     if (check(initialContext))
         return initialContext
-    return sub(SolveState(SolveContext(initialContext, 0), setOf(), 0))
+    return sub(SolveState(SolveContext(initialContext, 0), setOf(), 0, initialContext.elements))
 }
 

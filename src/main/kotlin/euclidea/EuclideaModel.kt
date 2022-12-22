@@ -25,9 +25,14 @@ data class Point(val x: Double, val y: Double) : Primitive {
     }
 }
 
+sealed class LineSource {
+    data class PerpendicularBisect(val point1: Point, val point2: Point) : LineSource()
+    data class Perpendicular(val line: Element.Line, val point: Point) : LineSource()
+}
+
 sealed class Element : Primitive {
 
-    data class Line(val point1: Point, val point2: Point) : Element() {
+    data class Line(val point1: Point, val point2: Point, val source: LineSource? = null) : Element() {
 
         val xIntercept: Double?
         val yIntercept: Double?

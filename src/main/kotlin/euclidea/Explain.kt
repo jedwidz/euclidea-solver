@@ -117,10 +117,28 @@ private fun printSteps(context: EuclideaContext, namer: Namer) {
             }
 
             fun explainLine(line: Element.Line): String {
-                val point1Label = explainPoint(line.point1)
-                val point2Label = explainPoint(line.point2)
-                return lineLabeler.label(line) { lineLabel ->
-                    println("$lineLabel from $point1Label to $point2Label")
+                return when (val source = line.source) {
+                    is LineSource.Perpendicular -> {
+                        val sourceLineLabel = explainLine(source.line)
+                        val sourcePointLabel = explainPoint(source.point)
+                        lineLabeler.label(line) { lineLabel ->
+                            println("$lineLabel perpendicular to $sourceLineLabel through $sourcePointLabel")
+                        }
+                    }
+                    is LineSource.PerpendicularBisect -> {
+                        val point1Label = explainPoint(source.point1)
+                        val point2Label = explainPoint(source.point2)
+                        lineLabeler.label(line) { lineLabel ->
+                            println("$lineLabel bisecting points $point1Label and $point2Label")
+                        }
+                    }
+                    null -> {
+                        val point1Label = explainPoint(line.point1)
+                        val point2Label = explainPoint(line.point2)
+                        lineLabeler.label(line) { lineLabel ->
+                            println("$lineLabel from $point1Label to $point2Label")
+                        }
+                    }
                 }
             }
 

@@ -62,9 +62,8 @@ private fun EuclideaContext.distanceCoincidences(): List<Pair<Double, List<Segme
     val contextCircles = elements.filterIsInstance<Element.Circle>()
     fun matchesContextCircle(segment: Segment): Boolean {
         fun matches(pointA: Point, pointB: Point): Boolean {
-            return EuclideaTools.circleTool(pointA, pointB)?.let { circle ->
-                contextCircles.any { coincides(it, circle) }
-            } ?: false
+            val circle = EuclideaTools.circleTool(pointA, pointB)
+            return contextCircles.any { coincides(it, circle) }
         }
         return matches(segment.first, segment.second) || matches(segment.second, segment.first) || matches(
             midpoint(

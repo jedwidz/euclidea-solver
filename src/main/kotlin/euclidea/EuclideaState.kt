@@ -3,8 +3,13 @@ package euclidea
 data class EuclideaConfig(
     val lineToolEnabled: Boolean = true,
     val circleToolEnabled: Boolean = true,
+    // TODO be consistent about default enablement
+    val perpendicularToolEnabled: Boolean = false,
+    val perpendicularBisectorToolEnabled: Boolean = false,
     val maxSqDistance: Double = Double.MAX_VALUE
-)
+) {
+    val anyLinePointToolEnabled: Boolean = perpendicularToolEnabled
+}
 
 data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)
 

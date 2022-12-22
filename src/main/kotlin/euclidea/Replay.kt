@@ -61,6 +61,10 @@ fun replaySteps(referenceContext: EuclideaContext, replayInitialContext: Euclide
         }
     }
 
+    fun replayLineFor(referenceLine: Element.Line): Element.Line {
+        return replayElementFor(referenceLine) as Element.Line
+    }
+
     fun findReplayPoint(referencePoint: Point): Point {
         val canonicalReferencePoint = referenceContext.canonicalPoint(referencePoint)
             ?: replayFail("Failed to find replay point for $referencePoint: no canonical reference point")
@@ -87,17 +91,29 @@ fun replaySteps(referenceContext: EuclideaContext, replayInitialContext: Euclide
                 val replayCenter = findReplayPoint(referenceElement.center)
                 val replaySample = findReplayPoint(sample)
                 val replayCircle = EuclideaTools.circleTool(replayCenter, replaySample)
-                if (replayCircle === null)
-                    replayFail("Failed to generate replay circle for $referenceElement: replay has degenerate circle with center $replayCenter and sample point $replaySample")
                 replayCircle
             }
             is Element.Line -> {
-                val replayPoint1 = findReplayPoint(referenceElement.point1)
-                val replayPoint2 = findReplayPoint(referenceElement.point2)
-                val replayLine = EuclideaTools.lineTool(replayPoint1, replayPoint2)
-                if (replayLine === null)
-                    replayFail("Failed to generate replay line for $referenceElement: replay has degenerate line with points $replayPoint1 and $replayPoint2")
-                replayLine
+                when (val source = referenceElement.source) {
+                    is LineSource.Perpendicular -> {
+                        val replaySourceLine = replayLineFor(source.line)
+                        val replaySourcePoint = findReplayPoint(source.point)
+                        val replayLine = EuclideaTools.perpendicularTool(replaySourceLine, replaySourcePoint)
+                        replayLine
+                    }
+                    is LineSource.PerpendicularBisect -> {
+                        val replayPoint1 = findReplayPoint(source.point1)
+                        val replayPoint2 = findReplayPoint(source.point2)
+                        val replayLine = EuclideaTools.perpendicularBisectorTool(replayPoint1, replayPoint2)
+                        replayLine
+                    }
+                    null -> {
+                        val replayPoint1 = findReplayPoint(referenceElement.point1)
+                        val replayPoint2 = findReplayPoint(referenceElement.point2)
+                        val replayLine = EuclideaTools.lineTool(replayPoint1, replayPoint2)
+                        replayLine
+                    }
+                }
             }
         }
     }
