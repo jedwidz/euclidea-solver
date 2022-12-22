@@ -16,7 +16,7 @@ class SolvePuzzle11_3Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(0, 3)
+        Solver().improveSolution(3, 5)
     }
 
     data class Params(
@@ -60,8 +60,6 @@ class SolvePuzzle11_3Test {
                 with(context) {
                     return Setup(base) to EuclideaContext(
                         config = EuclideaConfig(
-                            perpendicularBisectorToolEnabled = true,
-                            perpendicularToolEnabled = true,
                             maxSqDistance = sq(50.0)
                         ),
                         points = listOf(baseO, baseA /*, probe*/),
