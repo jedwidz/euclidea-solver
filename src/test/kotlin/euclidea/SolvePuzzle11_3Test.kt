@@ -1,8 +1,7 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
-import euclidea.EuclideaTools.perpendicularBisectorTool
-import euclidea.EuclideaTools.perpendicularTool
+import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
@@ -16,7 +15,7 @@ class SolvePuzzle11_3Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(3, 5)
+        Solver().improveSolution(5, 5)
     }
 
     data class Params(
@@ -53,14 +52,13 @@ class SolvePuzzle11_3Test {
         ): Pair<Setup, EuclideaContext> {
             with(params) {
                 val context = object {
-                    // TODO should be a line segment
-                    val base = Element.Line(baseO, baseA)
+                    val base = Element.Line(baseO, baseA, limit1 = true, limit2 = true)
                 }
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(base) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(50.0)
+                            maxSqDistance = sq(20.0)
                         ),
                         points = listOf(baseO, baseA /*, probe*/),
                         elements = listOf(base)
@@ -91,18 +89,19 @@ class SolvePuzzle11_3Test {
             )
             with(params) {
                 with(setup) {
-                    // Glitchy 4L solution
+                    // Optimal 5E solution
                     @Suppress("unused") val context = object {
                         val circle = circleTool(baseO, baseA)
-
-                        // Shouldn't be allowed, point is outside line segment
-                        val left = intersectTwoPoints(circle, base).first
-                        val perpLeft = perpendicularBisectorTool(left, baseO)
-                        val center = intersectOnePoint(perpLeft, base)
-                        val perpO = perpendicularTool(base, baseO)
-                        val top = intersectTwoPoints(perpO, circle).second
-                        val circle2 = circleTool(center, top)
-                        val solution = intersectTwoPoints(circle2, base).second
+                        val circle2 = circleTool(baseA, baseO)
+                        val bisectP = intersectTwoPoints(circle, circle2)
+                        val bisectP1 = bisectP.first
+                        val bisectP2 = bisectP.second
+                        val bisectL = lineTool(bisectP1, bisectP2)
+                        val circle3 = circleTool(bisectP1, baseO)
+                        val left = intersectTwoPointsOther(circle3, circle, baseA)
+                        val down = intersectTwoPoints(circle3, bisectL).first
+                        val solutionC = circleTool(left, down)
+                        val solution = intersectOnePoint(solutionC, base)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
