@@ -32,7 +32,13 @@ sealed class LineSource {
 
 sealed class Element : Primitive {
 
-    data class Line(val point1: Point, val point2: Point, val source: LineSource? = null) : Element() {
+    data class Line(
+        val point1: Point,
+        val point2: Point,
+        val limit1: Boolean = false,
+        val limit2: Boolean = false,
+        val source: LineSource? = null
+    ) : Element() {
 
         val xIntercept: Double?
         val yIntercept: Double?
@@ -61,6 +67,30 @@ sealed class Element : Primitive {
 
         override fun plus(point: Point): Line {
             return Line(point1 + point, point2 + point)
+        }
+
+        fun filterLimits(intersection: Intersection): Intersection {
+            if (!limit1 && !limit2)
+                return intersection
+            val points = intersection.points()
+            val limitedPoints = points.filter { point -> withinLimits(point) }
+            return if (limitedPoints.size == points.size)
+                intersection
+            else Intersection.of(limitedPoints)
+        }
+
+        private fun withinLimits(point: Point): Boolean {
+            fun sameSide(x: Double, o: Double, a: Double): Boolean {
+                return a >= o - Epsilon && x >= o - Epsilon
+                        || a <= o + Epsilon && x <= o + Epsilon
+            }
+
+            fun sameSide(pointA: Point, pointB: Point): Boolean {
+                return sameSide(point.x, pointA.x, pointB.x)
+                        && sameSide(point.y, pointA.y, pointB.y)
+            }
+            return (!limit1 || sameSide(point1, point2))
+                    && (!limit2 || sameSide(point2, point1))
         }
     }
 
@@ -96,6 +126,17 @@ sealed class Intersection {
             Disjoint -> emptyList()
             is OnePoint -> listOf(point)
             is TwoPoints -> listOf(point1, point2)
+        }
+    }
+
+    companion object {
+        fun of(points: List<Point>): Intersection {
+            return when (points.size) {
+                0 -> Disjoint
+                1 -> OnePoint(points.first())
+                2 -> TwoPoints(points.first(), points.last())
+                else -> throw IllegalArgumentException("Too many points for intersection: $points")
+            }
         }
     }
 }
@@ -243,6 +284,10 @@ fun intersectTwoPointsOther(
 }
 
 private fun linesIntersect(line1: Element.Line, line2: Element.Line): Intersection {
+    return line1.filterLimits(line2.filterLimits(linesIntersectNoLimits(line1, line2)))
+}
+
+private fun linesIntersectNoLimits(line1: Element.Line, line2: Element.Line): Intersection {
     // Help from: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     return if (linesCoincide(line1, line2))
         Intersection.Coincide
@@ -297,6 +342,10 @@ private fun circlesIntersect(circle1: Element.Circle, circle2: Element.Circle): 
 }
 
 private fun circleLineIntersect(circle: Element.Circle, line: Element.Line): Intersection {
+    return line.filterLimits(circleLineIntersectNoLimits(circle, line))
+}
+
+private fun circleLineIntersectNoLimits(circle: Element.Circle, line: Element.Line): Intersection {
     // Help from: https://mathworld.wolfram.com/Circle-LineIntersection.html
     val o = circle.center
     val lineO = line - o

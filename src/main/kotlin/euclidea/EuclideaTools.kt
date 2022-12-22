@@ -42,7 +42,7 @@ object EuclideaTools {
     }
 
     private fun makeLine(point1: Point, point2: Point, source: LineSource?): Element.Line {
-        return if (coincides(point1, point2)) invalid() else Element.Line(point1, point2, source)
+        return if (coincides(point1, point2)) invalid() else Element.Line(point1, point2, source = source)
     }
 
     private fun makeCircle(center: Point, distance: Double, sample: Point): Element.Circle {

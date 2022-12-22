@@ -18,6 +18,21 @@ class EuclideaModelTest {
     }
 
     @Test
+    fun lineIntersect_onePointLimited() {
+        fun sub(limit11: Boolean, limit21: Boolean, limit12: Boolean, limit22: Boolean, expected: Boolean) {
+            val line1 = Element.Line(Point(6.0, 6.0), Point(10.0, 10.0), limit1 = limit11, limit2 = limit21)
+            val line2 = Element.Line(Point(2.0, 5.0), Point(3.0, 5.0), limit1 = limit12, limit2 = limit22)
+            val intersection = intersect(line1, line2)
+            val expectedIntersection = if (expected) Intersection.OnePoint(Point(5.0, 5.0)) else Intersection.Disjoint
+            Assertions.assertEquals(expectedIntersection, intersection)
+        }
+        sub(limit11 = false, limit21 = false, limit12 = false, limit22 = false, expected = true)
+        sub(limit11 = false, limit21 = true, limit12 = true, limit22 = false, expected = true)
+        sub(limit11 = true, limit21 = false, limit12 = false, limit22 = false, expected = false)
+        sub(limit11 = false, limit21 = false, limit12 = false, limit22 = true, expected = false)
+    }
+
+    @Test
     fun lineIntersect_onePoint_axes() {
         val xAxis = Element.Line(Point(-5.0, 0.0), Point(10.0, 0.0))
         val yAxis = Element.Line(Point(0.0, 1.0), Point(0.0, 2.0))
@@ -145,6 +160,22 @@ class EuclideaModelTest {
         impl(0.0)
         impl(Epsilon * 0.01)
         impl(-Epsilon * 0.01)
+    }
+
+    @Test
+    fun circleLineIntersect_onePointLimited() {
+        fun sub(limit1: Boolean, limit2: Boolean, expected: Boolean) {
+            val line = Element.Line(Point(-2.0, -1.0), Point(-2.0, 1.0), limit1 = limit1, limit2 = limit2)
+            val circle = Element.Circle(Point(1.0, 2.0), 3.0)
+
+            val intersection = intersect(line, circle)
+            val expectedIntersection = if (expected) Intersection.OnePoint(Point(-2.0, 2.0)) else Intersection.Disjoint
+            Assertions.assertEquals(expectedIntersection, intersection)
+        }
+        sub(limit1 = false, limit2 = false, expected = true)
+        sub(limit1 = true, limit2 = true, expected = false)
+        sub(limit1 = false, limit2 = true, expected = false)
+        sub(limit1 = true, limit2 = false, expected = true)
     }
 
     @Test
