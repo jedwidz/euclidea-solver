@@ -8,7 +8,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         checkImpl(this::referenceSolution)
     }
 
-    private fun checkImpl(solution: (Params, Namer) -> Pair<Setup, EuclideaContext>) {
+    private fun checkImpl(solution: (Params, Namer) -> Pair<Setup, EuclideaContext?>) {
         fun check(params: Params, replayParams: Params, dump: Boolean) {
             val namer = Namer()
             nameParams(params, namer)
@@ -16,14 +16,16 @@ abstract class ImprovingSolver<Params : Any, Setup> {
                 solution(params, namer)
 
             if (dump) dumpSolution(solutionContext, namer)
-            assertTrue { isSolution(params, setup).invoke(solutionContext) }
+            if (solutionContext != null) {
+                assertTrue { isSolution(params, setup).invoke(solutionContext) }
 
-            val replayNamer = Namer()
-            val (replaySetup, replayInitialContext) = initialContext(replayParams, replayNamer)
-            val replaySolutionContext =
-                replaySteps(solutionContext, replayInitialContext)
+                val replayNamer = Namer()
+                val (replaySetup, replayInitialContext) = initialContext(replayParams, replayNamer)
+                val replaySolutionContext =
+                    replaySteps(solutionContext, replayInitialContext)
 
-            assertTrue { isSolution(replayParams, replaySetup).invoke(replaySolutionContext) }
+                assertTrue { isSolution(replayParams, replaySetup).invoke(replaySolutionContext) }
+            }
         }
         check(makeParams(), makeReplayParams(), true)
         check(makeReplayParams(), makeParams(), false)
@@ -65,7 +67,9 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             }
         }
 
-        assertTrue(isSolution(sampleSolutionContext))
+        if (sampleSolutionContext !== null) {
+            assertTrue(isSolution(sampleSolutionContext))
+        }
 
         val prefixNamer = Namer()
         val prefixContext = solutionPrefix(params, prefixNamer)?.second
@@ -79,7 +83,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         }
 
         val targetElementSet = ElementSet()
-        targetElementSet += sampleSolutionContext.elements
+        sampleSolutionContext?.let { targetElementSet += it.elements }
         prefixContext?.let { targetElementSet += it.elements }
 
         val passWithPrefix: ((SolveContext, Element) -> Boolean) = { solveContext, element ->
@@ -143,10 +147,14 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         return null
     }
 
-    protected abstract fun referenceSolution(
+    protected open fun referenceSolution(
         params: Params,
         namer: Namer
-    ): Pair<Setup, EuclideaContext>
+    ): Pair<Setup, EuclideaContext?> {
+        // No solution
+        val (setup, _) = initialContext(params, namer)
+        return setup to null
+    }
 
     protected abstract fun initialContext(
         params: Params,
