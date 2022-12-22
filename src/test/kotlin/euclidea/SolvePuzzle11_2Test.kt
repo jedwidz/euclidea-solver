@@ -1,7 +1,8 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
-import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.perpendicularBisectorTool
+import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
@@ -15,7 +16,7 @@ class SolvePuzzle11_2Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(5, 5)
+        Solver().improveSolution(0, 3)
     }
 
     data class Params(
@@ -69,7 +70,11 @@ class SolvePuzzle11_2Test {
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(line1, line2) to EuclideaContext(
-                        config = EuclideaConfig(maxSqDistance = sq(50.0)),
+                        config = EuclideaConfig(
+                            perpendicularBisectorToolEnabled = true,
+                            perpendicularToolEnabled = true,
+                            maxSqDistance = sq(50.0)
+                        ),
                         // dir excluded
                         points = listOf(baseO, baseA, baseB /*, probe*/),
                         elements = listOf(line1, line2)
@@ -94,6 +99,18 @@ class SolvePuzzle11_2Test {
             }
         }
 
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 3L L-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> element !is Element.Line
+                    1 -> element !is Element.Line
+                    2 -> element !is Element.Circle
+                    else -> false
+                }
+            }
+        }
+
         override fun referenceSolution(
             params: Params,
             namer: Namer
@@ -103,19 +120,13 @@ class SolvePuzzle11_2Test {
             )
             with(params) {
                 with(setup) {
-                    // Optimal 5E solution
+                    // Optimal 3L solution
                     @Suppress("unused") val context = object {
-                        val circle1 = circleTool(baseA, baseO)
-                        val circle2 = circleTool(baseO, baseB)
-                        val left = intersectTwoPointsOther(circle2, line1, baseB)
-                        val circle3 = circleTool(left, baseO)
-                        val bisect = intersectTwoPoints(circle3, circle2)
-                        val bisect1 = bisect.first
-                        val bisect2 = bisect.second
-                        val bisectLine = lineTool(bisect1, bisect2)
-                        val top = intersectTwoPoints(circle1, bisectLine).first
-                        val circle4 = circleTool(baseO, top)
-                        val solution = intersectTwoPoints(circle4, line2).second
+                        val perp1 = perpendicularBisectorTool(baseA, baseB)
+                        val perp2 = perpendicularTool(line2, baseO)
+                        val center = intersectOnePoint(perp1, perp2)
+                        val circle = circleTool(center, baseA)
+                        val solution = intersectTwoPoints(circle, line2).second
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
