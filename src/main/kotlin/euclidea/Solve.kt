@@ -1,5 +1,6 @@
 package euclidea
 
+import euclidea.EuclideaTools.angleBisectorTool
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
@@ -58,20 +59,22 @@ fun solve(
                 }
             }
 
-            fun visit(point1: Point, point2: Point) {
-                if (config.lineToolEnabled)
-                    tryAdd(lineTool(point1, point2))
-                if (config.circleToolEnabled) {
-                    tryAdd(circleTool(point1, point2))
-                    tryAdd(circleTool(point2, point1))
+            if (config.anyTwoPointToolEnabled) {
+                fun visit(point1: Point, point2: Point) {
+                    if (config.lineToolEnabled)
+                        tryAdd(lineTool(point1, point2))
+                    if (config.circleToolEnabled) {
+                        tryAdd(circleTool(point1, point2))
+                        tryAdd(circleTool(point2, point1))
+                    }
+                    if (config.perpendicularBisectorToolEnabled)
+                        tryAdd(perpendicularBisectorTool(point1, point2))
                 }
-                if (config.perpendicularBisectorToolEnabled)
-                    tryAdd(perpendicularBisectorTool(point1, point2))
-            }
-            newPoints.forEachIndexed { i, newPoint ->
-                oldPoints.forEach { visit(newPoint, it) }
-                for (j in i + 1 until newPoints.size)
-                    visit(newPoint, newPoints[j])
+                newPoints.forEachIndexed { i, newPoint ->
+                    oldPoints.forEach { visit(newPoint, it) }
+                    for (j in i + 1 until newPoints.size)
+                        visit(newPoint, newPoints[j])
+                }
             }
 
             if (config.anyLinePointToolEnabled) {
@@ -91,6 +94,31 @@ fun solve(
                     points.forEach { point ->
                         visit(newLine, point)
                     }
+                }
+            }
+
+            if (config.anyThreePointToolEnabled) {
+                fun visit(point1: Point, point2: Point, point3: Point) {
+                    if (config.perpendicularBisectorToolEnabled) {
+                        tryAdd(angleBisectorTool(point1, point2, point3))
+                        tryAdd(angleBisectorTool(point2, point3, point1))
+                        tryAdd(angleBisectorTool(point3, point1, point2))
+                    }
+                }
+
+                val oldPointsList = oldPoints.toList()
+
+                // 3 new
+                newPoints.forEachTriple { n1, n2, n3 -> visit(n1, n2, n3) }
+
+                // 2 new + 1 old
+                newPoints.forEachPair { n1, n2 ->
+                    oldPointsList.forEach { o1 -> visit(n1, n2, o1) }
+                }
+
+                // 1 new + 2 old
+                newPoints.forEach { n1 ->
+                    oldPointsList.forEachPair { o1, o2 -> visit(n1, o1, o2) }
                 }
             }
 

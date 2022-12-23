@@ -1,5 +1,9 @@
 package euclidea
 
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+
 object EuclideaTools {
 
     fun lineTool(point1: Point, point2: Point): Element.Line {
@@ -21,6 +25,16 @@ object EuclideaTools {
         val midpoint = midpoint(point1, point2)
         val point3 = Point(midpoint.x + direction.y, midpoint.y - direction.x)
         return makeLine(midpoint, point3, LineSource.PerpendicularBisect(point1, point2))
+    }
+
+    fun angleBisectorTool(pointA: Point, pointO: Point, pointB: Point): Element.Line {
+        val dirA = pointA - pointO
+        val headingA = atan2(dirA.y, dirA.x)
+        val dirB = pointB - pointO
+        val headingB = atan2(dirB.y, dirB.x)
+        val heading = (headingA + headingB) * 0.5
+        val aim = Point(pointO.x + cos(heading), pointO.y + sin(heading))
+        return makeLine(pointO, aim, LineSource.AngleBisect(pointA, pointO, pointB))
     }
 
     fun dropPerpendicular(
