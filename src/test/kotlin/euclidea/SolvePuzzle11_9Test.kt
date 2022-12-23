@@ -14,7 +14,8 @@ class SolvePuzzle11_9Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(0, 2)
+        // found solution ~18 sec
+        Solver().improveSolution(4, 4)
     }
 
     data class Params(
@@ -39,8 +40,8 @@ class SolvePuzzle11_9Test {
                 baseO = Point(0.0, 0.0),
                 baseA = Point(0.3, 0.0),
                 baseB = Point(0.5, 0.4),
-                center = Point(0.4, 0.25),
-                radius = 0.1,
+                center = Point(1.0, 0.35),
+                radius = 0.15,
                 probe = Point(0.6, 0.3)
             )
         }
@@ -50,8 +51,8 @@ class SolvePuzzle11_9Test {
                 baseO = Point(0.0, 0.0),
                 baseA = Point(0.7143, 0.0134),
                 baseB = Point(0.5012, 0.4443),
-                center = Point(0.4111, 0.25011),
-                radius = 0.102,
+                center = Point(1.00111, 0.35434),
+                radius = 0.1511,
                 probe = Point(0.6001, 0.3022)
             )
         }
