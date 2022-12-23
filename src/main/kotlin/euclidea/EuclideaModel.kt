@@ -430,3 +430,7 @@ val Element.isCircleFromNonCollapsingCompass: Boolean
     get() {
         return this is Element.Circle && source is CircleSource.NonCollapsingCompass
     }
+
+fun meetAtOnePoint(element1: Element, element2: Element): Boolean {
+    return intersect(element1, element2) is Intersection.OnePoint
+}
