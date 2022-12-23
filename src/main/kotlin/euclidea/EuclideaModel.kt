@@ -29,6 +29,7 @@ sealed class LineSource {
     data class Perpendicular(val line: Element.Line, val point: Point) : LineSource()
     data class PerpendicularBisect(val point1: Point, val point2: Point) : LineSource()
     data class AngleBisect(val pointA: Point, val pointO: Point, val pointB: Point) : LineSource()
+    data class Parallel(val line: Element.Line, val point: Point) : LineSource()
 }
 
 sealed class Element : Primitive {

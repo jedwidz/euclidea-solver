@@ -140,6 +140,13 @@ private fun printSteps(context: EuclideaContext, namer: Namer) {
                             println("$lineLabel bisecting angle from $pointALabel through $pointOLabel to $pointBLabel")
                         }
                     }
+                    is LineSource.Parallel -> {
+                        val sourceLineLabel = explainLine(source.line)
+                        val sourcePointLabel = explainPoint(source.point)
+                        lineLabeler.label(line) { lineLabel ->
+                            println("$lineLabel parallel to $sourceLineLabel through $sourcePointLabel")
+                        }
+                    }
                     null -> {
                         val point1Label = explainPoint(line.point1)
                         val point2Label = explainPoint(line.point2)

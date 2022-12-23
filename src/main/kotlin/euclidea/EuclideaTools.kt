@@ -37,6 +37,12 @@ object EuclideaTools {
         return makeLine(pointO, aim, LineSource.AngleBisect(pointA, pointO, pointB))
     }
 
+    fun parallelTool(line: Element.Line, point: Point): Element.Line {
+        val direction = line.point2.minus(line.point1)
+        val point2 = Point(point.x + direction.x, point.y + direction.y)
+        return makeLine(point, point2, LineSource.Parallel(line, point))
+    }
+
     fun dropPerpendicular(
         linePoint1: Point,
         linePoint2: Point,

@@ -7,10 +7,11 @@ data class EuclideaConfig(
     val perpendicularToolEnabled: Boolean = false,
     val perpendicularBisectorToolEnabled: Boolean = false,
     val angleBisectorToolEnabled: Boolean = false,
+    val parallelToolEnabled: Boolean = false,
     val maxSqDistance: Double = Double.MAX_VALUE
 ) {
     val anyTwoPointToolEnabled: Boolean = lineToolEnabled || circleToolEnabled || perpendicularBisectorToolEnabled
-    val anyLinePointToolEnabled: Boolean = perpendicularToolEnabled
+    val anyLinePointToolEnabled: Boolean = perpendicularToolEnabled || parallelToolEnabled
     val anyThreePointToolEnabled: Boolean = angleBisectorToolEnabled
 }
 

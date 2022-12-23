@@ -3,6 +3,7 @@ package euclidea
 import euclidea.EuclideaTools.angleBisectorTool
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 
@@ -79,8 +80,10 @@ fun solve(
 
             if (config.anyLinePointToolEnabled) {
                 fun visit(line: Element.Line, point: Point) {
-                    if (config.perpendicularBisectorToolEnabled)
+                    if (config.perpendicularToolEnabled)
                         tryAdd(perpendicularTool(line, point))
+                    if (config.parallelToolEnabled)
+                        tryAdd(parallelTool(line, point))
                 }
 
                 val newLines = solveState.lastAddedElements.filterIsInstance<Element.Line>().toSet()

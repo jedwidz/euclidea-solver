@@ -114,6 +114,12 @@ fun replaySteps(referenceContext: EuclideaContext, replayInitialContext: Euclide
                         val replayLine = EuclideaTools.angleBisectorTool(replayPointA, replayPointO, replayPointB)
                         replayLine
                     }
+                    is LineSource.Parallel -> {
+                        val replaySourceLine = replayLineFor(source.line)
+                        val replaySourcePoint = findReplayPoint(source.point)
+                        val replayLine = EuclideaTools.parallelTool(replaySourceLine, replaySourcePoint)
+                        replayLine
+                    }
                     null -> {
                         val replayPoint1 = findReplayPoint(referenceElement.point1)
                         val replayPoint2 = findReplayPoint(referenceElement.point2)
