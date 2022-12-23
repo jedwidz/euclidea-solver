@@ -12,7 +12,6 @@ class SolvePuzzle11_10Test {
 
     @Test
     fun improveSolution() {
-        // Line segment in puzzle, but assume first step is to fill in the line
         // Solution found <1 sec
         Solver().improveSolution(4, 4)
     }
@@ -56,14 +55,15 @@ class SolvePuzzle11_10Test {
         ): Pair<Setup, EuclideaContext> {
             with(params) {
                 val context = object {
-                    // Line segment in puzzle, but assume first step is to fill in the line
-                    // val base = Element.Line(baseO, baseA, limit1 = true, limit2 = true)
-                    val base = Element.Line(baseO, baseA)
+                    val base = Element.Line(baseO, baseA, limit1 = true, limit2 = true)
                 }
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(base) to EuclideaContext(
                         config = EuclideaConfig(
+                            perpendicularBisectorToolEnabled = true,
+                            angleBisectorToolEnabled = true,
+                            nonCollapsingCompassToolEnabled = true,
                             maxSqDistance = sq(20.0)
                         ),
                         points = listOf(baseO, baseA/*, probe1, probe2*/),
@@ -81,6 +81,19 @@ class SolvePuzzle11_10Test {
                 val checkSolutionPoint = baseO + (baseA - baseO) * (1.0 / 6.0)
                 return { context ->
                     context.hasPoint(checkSolutionPoint)
+                }
+            }
+        }
+
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea L-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isLineFromPerpendicularBisector
+                    1 -> !element.isCircleFromNonCollapsingCompass
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isLineFromAngleBisector
+                    else -> false
                 }
             }
         }
