@@ -8,11 +8,12 @@ data class EuclideaConfig(
     val perpendicularBisectorToolEnabled: Boolean = false,
     val angleBisectorToolEnabled: Boolean = false,
     val parallelToolEnabled: Boolean = false,
+    val nonCollapsingCompassToolEnabled: Boolean = false,
     val maxSqDistance: Double = Double.MAX_VALUE
 ) {
     val anyTwoPointToolEnabled: Boolean = lineToolEnabled || circleToolEnabled || perpendicularBisectorToolEnabled
     val anyLinePointToolEnabled: Boolean = perpendicularToolEnabled || parallelToolEnabled
-    val anyThreePointToolEnabled: Boolean = angleBisectorToolEnabled
+    val anyThreePointToolEnabled: Boolean = angleBisectorToolEnabled || nonCollapsingCompassToolEnabled
 }
 
 data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)

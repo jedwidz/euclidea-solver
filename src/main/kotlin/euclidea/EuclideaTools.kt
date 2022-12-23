@@ -11,7 +11,7 @@ object EuclideaTools {
     }
 
     fun circleTool(center: Point, sample: Point): Element.Circle {
-        return makeCircle(center, distance(center, sample), sample)
+        return makeCircle(center, distance(center, sample), sample, source = null)
     }
 
     fun perpendicularTool(line: Element.Line, point: Point): Element.Line {
@@ -43,6 +43,14 @@ object EuclideaTools {
         return makeLine(point, point2, LineSource.Parallel(line, point))
     }
 
+    fun nonCollapsingCompassTool(pointA: Point, pointB: Point, center: Point): Element.Circle {
+        return makeCircle(
+            center, distance(pointA, pointB),
+            sample = null,
+            source = CircleSource.NonCollapsingCompass(pointA, pointB)
+        )
+    }
+
     fun dropPerpendicular(
         linePoint1: Point,
         linePoint2: Point,
@@ -65,8 +73,8 @@ object EuclideaTools {
         return if (coincides(point1, point2)) invalid() else Element.Line(point1, point2, source = source)
     }
 
-    private fun makeCircle(center: Point, distance: Double, sample: Point): Element.Circle {
-        return if (distance <= 0.0) invalid() else Element.Circle(center, distance, sample)
+    private fun makeCircle(center: Point, distance: Double, sample: Point?, source: CircleSource?): Element.Circle {
+        return if (distance <= 0.0) invalid() else Element.Circle(center, distance, sample, source = source)
     }
 
 }

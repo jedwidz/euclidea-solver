@@ -105,12 +105,23 @@ private fun printSteps(context: EuclideaContext, namer: Namer) {
 
             fun explainCircle(circle: Element.Circle): String {
                 val centerLabel = explainPoint(circle.center)
-                return circleLabeler.label(circle) { circleLabel ->
-                    when (val sample = circle.sample) {
-                        null -> println("$circleLabel with center $centerLabel and radius ${circle.radius}")
+                return when (val source = circle.source) {
+                    is CircleSource.NonCollapsingCompass -> {
+                        val pointALabel = explainPoint(source.pointA)
+                        val pointBLabel = explainPoint(source.pointB)
+                        circleLabeler.label(circle) { circleLabel ->
+                            println("$circleLabel with center $centerLabel from distance between $pointALabel and $pointBLabel (radius ${circle.radius})")
+                        }
+                    }
+                    null -> when (val sample = circle.sample) {
+                        null -> circleLabeler.label(circle) { circleLabel ->
+                            println("$circleLabel with center $centerLabel and radius ${circle.radius}")
+                        }
                         else -> {
                             val sampleLabel = explainPoint(sample)
-                            println("$circleLabel with center $centerLabel extending to $sampleLabel")
+                            circleLabeler.label(circle) { circleLabel ->
+                                println("$circleLabel with center $centerLabel extending to $sampleLabel (radius ${circle.radius})")
+                            }
                         }
                     }
                 }

@@ -32,6 +32,10 @@ sealed class LineSource {
     data class Parallel(val line: Element.Line, val point: Point) : LineSource()
 }
 
+sealed class CircleSource {
+    data class NonCollapsingCompass(val pointA: Point, val pointB: Point) : CircleSource()
+}
+
 sealed class Element : Primitive {
 
     data class Line(
@@ -99,7 +103,8 @@ sealed class Element : Primitive {
     data class Circle(
         val center: Point,
         val radius: Double,
-        val sample: Point? = null
+        val sample: Point? = null,
+        val source: CircleSource? = null
     ) : Element() {
         override fun minus(point: Point): Circle {
             return Circle(center - point, radius, sample?.let { it - point })
@@ -380,3 +385,48 @@ fun sq(v: Double): Double {
 fun elementsReflected(obj: Any): List<Element> {
     return obj.reflectProperties(Element::class).map { it.value }
 }
+
+val Element.isLine: Boolean
+    get() {
+        return this is Element.Line
+    }
+
+val Element.isLineFromLine: Boolean
+    get() {
+        return this is Element.Line && source === null
+    }
+
+val Element.isLineFromPerpendicularBisector: Boolean
+    get() {
+        return this is Element.Line && source is LineSource.PerpendicularBisect
+    }
+
+val Element.isLineFromPerpendicular: Boolean
+    get() {
+        return this is Element.Line && source is LineSource.Perpendicular
+    }
+
+val Element.isLineFromParallel: Boolean
+    get() {
+        return this is Element.Line && source is LineSource.Parallel
+    }
+
+val Element.isLineFromAngleBisector: Boolean
+    get() {
+        return this is Element.Line && source is LineSource.AngleBisect
+    }
+
+val Element.isCircle: Boolean
+    get() {
+        return this is Element.Circle
+    }
+
+val Element.isCircleFromCircle: Boolean
+    get() {
+        return this is Element.Circle && source === null
+    }
+
+val Element.isCircleFromNonCollapsingCompass: Boolean
+    get() {
+        return this is Element.Circle && source is CircleSource.NonCollapsingCompass
+    }

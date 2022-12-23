@@ -85,13 +85,24 @@ fun replaySteps(referenceContext: EuclideaContext, replayInitialContext: Euclide
     fun generateReplayElement(referenceElement: Element): Element {
         return when (referenceElement) {
             is Element.Circle -> {
-                val sample = referenceElement.sample
-                if (sample === null)
-                    replayFail("Failed to generate replay element for $referenceElement: no sample point on circle")
                 val replayCenter = findReplayPoint(referenceElement.center)
-                val replaySample = findReplayPoint(sample)
-                val replayCircle = EuclideaTools.circleTool(replayCenter, replaySample)
-                replayCircle
+                when (val source = referenceElement.source) {
+                    is CircleSource.NonCollapsingCompass -> {
+                        val replayPointA = findReplayPoint(source.pointA)
+                        val replayPointB = findReplayPoint(source.pointB)
+                        val replayCircle =
+                            EuclideaTools.nonCollapsingCompassTool(replayPointA, replayPointB, replayCenter)
+                        replayCircle
+                    }
+                    null -> {
+                        val sample = referenceElement.sample
+                        if (sample === null)
+                            replayFail("Failed to generate replay element for $referenceElement: no sample point on circle")
+                        val replaySample = findReplayPoint(sample)
+                        val replayCircle = EuclideaTools.circleTool(replayCenter, replaySample)
+                        replayCircle
+                    }
+                }
             }
             is Element.Line -> {
                 when (val source = referenceElement.source) {

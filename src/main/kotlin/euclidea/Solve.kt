@@ -3,6 +3,7 @@ package euclidea
 import euclidea.EuclideaTools.angleBisectorTool
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
@@ -106,6 +107,11 @@ fun solve(
                         tryAdd(angleBisectorTool(point1, point2, point3))
                         tryAdd(angleBisectorTool(point2, point3, point1))
                         tryAdd(angleBisectorTool(point3, point1, point2))
+                    }
+                    if (config.nonCollapsingCompassToolEnabled) {
+                        tryAdd(nonCollapsingCompassTool(point1, point2, point3))
+                        tryAdd(nonCollapsingCompassTool(point2, point3, point1))
+                        tryAdd(nonCollapsingCompassTool(point3, point1, point2))
                     }
                 }
 
