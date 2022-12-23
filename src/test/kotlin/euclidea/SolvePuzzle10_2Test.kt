@@ -1,5 +1,8 @@
 package euclidea
 
+import euclidea.EuclideaTools.circleTool
+import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 
 class SolvePuzzle10_2Test {
@@ -12,7 +15,6 @@ class SolvePuzzle10_2Test {
 
     @Test
     fun improveSolution() {
-        // No solution - ~22 min
         Solver().improveSolution(6, 6)
     }
 
@@ -107,6 +109,35 @@ class SolvePuzzle10_2Test {
                     4 -> !element.isCircleFromCircle
                     5 -> !element.isLineFromLine
                     else -> false
+                }
+            }
+        }
+
+        override fun referenceSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Suboptimal 7E solution
+                    @Suppress("unused") val context = object {
+                        val base = lineTool(centerA, centerB)
+                        val perpA = perpendicularTool(base, centerA)
+                        val perpB = perpendicularTool(base, centerB)
+                        val refA = intersectTwoPoints(perpA, circleA).second
+                        val refB = intersectTwoPoints(perpB, circleB).second
+                        val ref = lineTool(refA, refB)
+                        val focus = intersectOnePoint(ref, base)
+                        val roof = perpendicularTool(perpB, refB)
+                        val circle = circleTool(focus, centerB)
+                        val target = intersectTwoPoints(circle, roof).second
+                        val solution = lineTool(focus, target)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }
