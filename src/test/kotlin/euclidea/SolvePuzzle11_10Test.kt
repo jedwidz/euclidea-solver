@@ -13,6 +13,7 @@ class SolvePuzzle11_10Test {
     @Test
     fun improveSolution() {
         // Line segment in puzzle, but assume first step is to fill in the line
+        // Solution found <1 sec
         Solver().improveSolution(4, 4)
     }
 
