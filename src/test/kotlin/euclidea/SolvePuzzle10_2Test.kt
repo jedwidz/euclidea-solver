@@ -1,5 +1,6 @@
 package euclidea
 
+import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
 
 class SolvePuzzle10_2Test {
@@ -12,7 +13,7 @@ class SolvePuzzle10_2Test {
 
     @Test
     fun improveSolution() {
-        // No solution
+        // No solution ~17 min
         Solver().improveSolution(6, 6)
     }
 
@@ -22,10 +23,8 @@ class SolvePuzzle10_2Test {
         val centerB: Point,
         val radiusB: Double,
         val probe1: Point,
-        val probeScale: Double
-    ) {
-        val probe2 = centerA + (centerB - centerA) * probeScale
-    }
+        val probe2: Point
+    )
 
     data class Setup(
         val circleA: Element.Circle,
@@ -40,8 +39,8 @@ class SolvePuzzle10_2Test {
                 radiusA = 0.2,
                 centerB = Point(1.0, 0.0),
                 radiusB = 0.35,
-                probe1 = Point(0.6, 0.3),
-                probeScale = 0.5623
+                probe1 = Point(0.0, 0.12),
+                probe2 = Point(1.0, 0.16)
             )
         }
 
@@ -51,8 +50,8 @@ class SolvePuzzle10_2Test {
                 radiusA = 0.201234,
                 centerB = Point(1.0011, 0.0133),
                 radiusB = 0.3534,
-                probe1 = Point(0.6001, 0.3022),
-                probeScale = 0.5623111
+                probe1 = Point(0.0, 0.12001),
+                probe2 = Point(1.0011, 0.1601)
             )
         }
 
@@ -67,13 +66,16 @@ class SolvePuzzle10_2Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
+                    val probeLine = lineTool(probe1, probe2)
+                    val probeA = intersectTwoPoints(probeLine, circleA).first
+                    val probeB = intersectTwoPoints(probeLine, circleB).first
                     return Setup(circleA, circleB) to EuclideaContext(
                         config = EuclideaConfig(
                             // limited by 6L hint
                             perpendicularBisectorToolEnabled = true,
                             maxSqDistance = sq(20.0)
                         ),
-                        points = listOf(centerA, centerB/*, probe1, probe2*/),
+                        points = listOf(centerA, centerB, probeA, probeB/*probe1, probe2*/),
                         elements = listOf(circleA, circleB)
                     )
                 }
