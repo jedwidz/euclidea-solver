@@ -41,7 +41,7 @@ class SolvePuzzle10_2Test {
                 centerA = Point(0.0, 0.0),
                 radiusA = 0.2,
                 centerB = Point(1.0, 0.0),
-                radiusB = 0.35,
+                radiusB = 0.351,
                 probe1 = Point(0.6, 0.2),
                 probeScale = -0.5623
             )
@@ -53,8 +53,8 @@ class SolvePuzzle10_2Test {
                 radiusA = 0.201234,
                 centerB = Point(1.0011, 0.0133),
                 radiusB = 0.3534,
-                probe1 = Point(0.6001, 0.2022),
-                probeScale = -0.5623111
+                probe1 = Point(0.6101, 0.2022),
+                probeScale = -0.564111
             )
         }
 
@@ -73,7 +73,7 @@ class SolvePuzzle10_2Test {
                         config = EuclideaConfig(
                             // limited by 6L hint
                             perpendicularBisectorToolEnabled = true,
-                            maxSqDistance = sq(20.0)
+                            maxSqDistance = sq(50.0)
                         ),
                         points = listOf(centerA, centerB, probe1, probe2),
                         elements = listOf(circleA, circleB)
