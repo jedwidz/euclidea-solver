@@ -212,7 +212,11 @@ private fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
     return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
         line1.yIntercept,
         line2.yIntercept
-    ) && coincides(line1.xDir, line2.xDir) && coincides(line1.yDir, line2.yDir)
+    ) && linesParallel(line1, line2)
+}
+
+fun linesParallel(line1: Element.Line, line2: Element.Line): Boolean {
+    return coincides(line1.xDir, line2.xDir) && coincides(line1.yDir, line2.yDir)
 }
 
 private fun circlesCoincide(circle1: Element.Circle, circle2: Element.Circle): Boolean {
