@@ -103,7 +103,7 @@ fun solve(
 
             if (config.anyThreePointToolEnabled) {
                 fun visit(point1: Point, point2: Point, point3: Point) {
-                    if (config.perpendicularBisectorToolEnabled) {
+                    if (config.angleBisectorToolEnabled) {
                         tryAdd(angleBisectorTool(point1, point2, point3))
                         tryAdd(angleBisectorTool(point2, point3, point1))
                         tryAdd(angleBisectorTool(point3, point1, point2))
