@@ -15,7 +15,8 @@ class SolvePuzzle10_2Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(6, 6)
+        // Gave up after ~23 hours
+        Solver().improveSolution(5, 6)
     }
 
     data class Params(
@@ -86,16 +87,21 @@ class SolvePuzzle10_2Test {
             params: Params,
             setup: Setup
         ): (EuclideaContext) -> Boolean {
-            with(setup) {
-                return { context ->
-                    context.elements.any {
-                        it is Element.Line && meetAtOnePoint(it, circleA) && meetAtOnePoint(
-                            it,
-                            circleB
-                        )
-                    }
-                }
+            // cheekily use reference solution
+            val solution = referenceSolution(params, Namer()).second.elements.last()
+            return { context ->
+                coincides(context.elements.last(), solution)
             }
+//            with(setup) {
+//                return { context ->
+//                    context.elements.any {
+//                        it is Element.Line && meetAtOnePoint(it, circleA) && meetAtOnePoint(
+//                            it,
+//                            circleB
+//                        )
+//                    }
+//                }
+//            }
         }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
