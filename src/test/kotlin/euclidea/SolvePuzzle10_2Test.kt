@@ -15,8 +15,8 @@ class SolvePuzzle10_2Test {
 
     @Test
     fun improveSolution() {
-        // Gave up after ~23 hours
-        Solver().improveSolution(5, 6)
+        // found solution ~1hr 11min
+        Solver().improveSolution(4, 6)
     }
 
     data class Params(
@@ -72,11 +72,10 @@ class SolvePuzzle10_2Test {
                 with(context) {
                     return Setup(circleA, circleB) to EuclideaContext(
                         config = EuclideaConfig(
-                            // limited by 6L hint
                             perpendicularBisectorToolEnabled = true,
-                            maxSqDistance = sq(50.0)
+                            maxSqDistance = sq(5.0)
                         ),
-                        points = listOf(centerA, centerB, probe1, probe2),
+                        points = listOf(centerA, centerB/*, probe1, probe2*/),
                         elements = listOf(circleA, circleB)
                     )
                 }
@@ -88,9 +87,11 @@ class SolvePuzzle10_2Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             // cheekily use reference solution
-            val solution = referenceSolution(params, Namer()).second.elements.last()
+            val solution = constructSolution(params)
             return { context ->
                 coincides(context.elements.last(), solution)
+//                val last = context.elements.last()
+//                last is Element.Line && linesParallel(last, solution)
             }
 //            with(setup) {
 //                return { context ->
@@ -108,6 +109,7 @@ class SolvePuzzle10_2Test {
             // Euclidea L-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
+//                    0 -> !(element.isLineFromLine && coincides(element, lineTool(params.centerA, params.centerB)))
                     0 -> !element.isLineFromLine
                     1 -> !element.isLineFromPerpendicularBisector
                     2 -> !element.isLineFromPerpendicularBisector
@@ -117,6 +119,26 @@ class SolvePuzzle10_2Test {
                     else -> false
                 }
             }
+        }
+
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solution = constructSolution(params)
+//            return { context ->
+//                // Assumes that solution is the last element (no extraneous elements)
+//                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+//                    0
+//                else {
+//                    val onSolution = context.points.count { pointAndElementCoincide(it, solution) }
+//                    // Assume that points on line are constructed separately (could be both are determined at once)
+//                    max(0, 2 - onSolution) + 1
+////                    max(0, (2 - onSolution)/2) + 1
+//                }
+//            }
+//        }
+
+        private fun constructSolution(params: Params): Element.Line {
+            // cheekily use reference solution
+            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
         }
 
         override fun referenceSolution(
