@@ -17,8 +17,7 @@ class SolvePuzzle10_8Test {
 
     @Test
     fun improveSolution() {
-        // found solution ~6 sec
-        Solver().improveSolution(3, 4)
+        Solver().improveSolution(1, 3)
     }
 
     data class Params(
@@ -78,8 +77,12 @@ class SolvePuzzle10_8Test {
                     with(prep) {
                         return Setup(circleA, circleB, chordB) to EuclideaContext(
                             config = EuclideaConfig(
-//                            perpendicularBisectorToolEnabled = true,
-                                maxSqDistance = sq(20.0)
+                                maxSqDistance = sq(20.0),
+                                perpendicularBisectorToolEnabled = true,
+                                perpendicularToolEnabled = true,
+                                parallelToolEnabled = true,
+                                angleBisectorToolEnabled = true,
+                                nonCollapsingCompassToolEnabled = true
                             ),
                             points = listOf(center, chordB, probeA),
                             elements = listOf(circleA, circleB)
