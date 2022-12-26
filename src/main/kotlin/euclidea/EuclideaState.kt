@@ -62,6 +62,10 @@ data class EuclideaContext(
         return points.any { p -> coincides(p, point) }
     }
 
+    fun hasPoints(otherPoints: List<Point>): Boolean {
+        return otherPoints.all { hasPoint(it) }
+    }
+
     fun canonicalPoint(point: Point): Point? {
         // Linear lookup, maybe should be more efficient
         return points.firstOrNull() { coincides(it, point) }
