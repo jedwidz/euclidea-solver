@@ -1,6 +1,10 @@
 package euclidea
 
+import euclidea.EuclideaTools.angleBisectorTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.nonCollapsingCompassTool
+import euclidea.EuclideaTools.perpendicularBisectorTool
+import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 
 class SolvePuzzle10_8Test {
@@ -13,7 +17,8 @@ class SolvePuzzle10_8Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(4, 4)
+        // found solution ~6 sec
+        Solver().improveSolution(3, 4)
     }
 
     data class Params(
@@ -64,17 +69,22 @@ class SolvePuzzle10_8Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    val probe = lineTool(probe1, probe2)
-                    val probeA = intersectTwoPoints(probe, circleA).first
-                    val chordB = intersectTwoPoints(probe, circleB).first
-                    return Setup(circleA, circleB, chordB) to EuclideaContext(
-                        config = EuclideaConfig(
+                    val prep = object {
+                        val probe = lineTool(probe1, probe2)
+                        val probeA = intersectTwoPoints(probe, circleA).first
+                        val chordB = intersectTwoPoints(probe, circleB).first
+                    }
+                    namer.nameReflected(prep)
+                    with(prep) {
+                        return Setup(circleA, circleB, chordB) to EuclideaContext(
+                            config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
-                            maxSqDistance = sq(20.0)
-                        ),
-                        points = listOf(center, chordB, probeA),
-                        elements = listOf(circleA, circleB)
-                    )
+                                maxSqDistance = sq(20.0)
+                            ),
+                            points = listOf(center, chordB, probeA),
+                            elements = listOf(circleA, circleB)
+                        )
+                    }
                 }
             }
         }
@@ -119,33 +129,32 @@ class SolvePuzzle10_8Test {
 //            }
 //        }
 
-//        override fun referenceSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    // Suboptimal 7E solution
-//                    @Suppress("unused") val context = object {
-//                        val base = lineTool(center, centerB)
-//                        val perpA = perpendicularTool(base, center)
-//                        val perpB = perpendicularTool(base, centerB)
-//                        val refA = intersectTwoPoints(perpA, circleA).second
-//                        val refB = intersectTwoPoints(perpB, circleB).second
-//                        val ref = lineTool(refA, refB)
-//                        val focus = intersectOnePoint(ref, base)
-//                        val roof = perpendicularTool(perpB, refB)
-//                        val circle = circleTool(focus, centerB)
-//                        val target = intersectTwoPoints(circle, roof).second
-//                        val solution = lineTool(focus, target)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun referenceSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Suboptimal 7E solution
+                    @Suppress("unused") val context = object {
+                        val base = lineTool(center, chordB)
+                        val pointA = intersectTwoPoints(base, circleA).first
+                        val perpA = perpendicularTool(base, pointA)
+                        val pointB = intersectTwoPoints(perpA, circleB).first
+                        val slant = angleBisectorTool(pointB, pointA, chordB)
+                        val parallel = perpendicularBisectorTool(pointB, pointA)
+                        val slantP = intersectOnePoint(parallel, slant)
+                        val circle = nonCollapsingCompassTool(pointB, slantP, chordB)
+                        val aim = intersectTwoPoints(circle, circleA).first
+                        val solution = lineTool(chordB, aim)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
