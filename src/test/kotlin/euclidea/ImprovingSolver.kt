@@ -83,6 +83,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         }
 
         val targetElementSet = ElementSet()
+        targetElementSet += startingContext.elements
         sampleSolutionContext?.let { targetElementSet += it.elements }
         prefixContext?.let { targetElementSet += it.elements }
 
