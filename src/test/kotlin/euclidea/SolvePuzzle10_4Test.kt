@@ -15,7 +15,9 @@ class SolvePuzzle10_4Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(5, 6)
+        // 'first move' removes limits
+        // solution found in ~19 sec
+        Solver().improveSolution(3, 5)
     }
 
     data class Params(
@@ -46,7 +48,7 @@ class SolvePuzzle10_4Test {
             return Params(
                 center = Point(0.0, 0.0),
                 point1A = Point(-0.4142, -0.2234),
-                point1B = Point(-0.2343, 0.12124)
+                point1B = Point(-0.2143, 0.12124)
             )
         }
 
@@ -57,7 +59,9 @@ class SolvePuzzle10_4Test {
             with(params) {
                 fun rotate(point: Point) = rotatePoint(center, point, 90.0)
                 val context = object {
-                    val line1 = Element.Line(point1A, point1B, limit1 = true, limit2 = true)
+                    // 'first move' removes limits
+//                    val line1 = Element.Line(point1A, point1B, limit1 = true, limit2 = true)
+                    val line1 = Element.Line(point1A, point1B)
                     val point2A = rotate(point1A)
                     val point2B = rotate(point1B)
                     val line2 = Element.Line(point2A, point2B, limit1 = true, limit2 = true)
@@ -66,7 +70,7 @@ class SolvePuzzle10_4Test {
                 with(context) {
                     return Setup(point2A, point2B, line1, line2) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(5.0),
+                            maxSqDistance = sq(2.0),
                             perpendicularBisectorToolEnabled = true
                         ),
                         points = listOf(center, point1A, point1B),
@@ -91,13 +95,13 @@ class SolvePuzzle10_4Test {
             // Euclidea L-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
-//                    0 -> !(element.isLineFromLine && coincides(element, lineTool(params.centerA, params.centerB)))
-                    0 -> !element.isLineFromLine
+                    // 'first move' removes limits
+                    // 0 -> !element.isLineFromLine
+                    0 -> !element.isCircleFromCircle
                     1 -> !element.isCircleFromCircle
-                    2 -> !element.isCircleFromCircle
-                    3 -> !element.isLineFromLine
-                    4 -> !element.isCircleFromCircle
-                    5 -> !element.isLineFromPerpendicularBisector
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isCircleFromCircle
+                    4 -> !element.isLineFromPerpendicularBisector
                     else -> false
                 }
             }
