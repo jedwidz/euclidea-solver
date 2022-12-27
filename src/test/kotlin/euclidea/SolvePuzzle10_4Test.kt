@@ -15,7 +15,8 @@ class SolvePuzzle10_4Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(5, 6)
+        // found solution ~2sec - but only works with tweaked initial points
+        Solver().improveSolution(2, 6)
     }
 
     data class Params(
@@ -37,16 +38,16 @@ class SolvePuzzle10_4Test {
         override fun makeParams(): Params {
             return Params(
                 center = Point(0.0, 0.0),
-                point1A = Point(-0.4, -0.22),
-                point1B = Point(-0.2, 0.12)
+                point1A = Point(-0.2, -0.18),
+                point1B = Point(0.15, 0.22)
             )
         }
 
         override fun makeReplayParams(): Params {
             return Params(
                 center = Point(0.0, 0.0),
-                point1A = Point(-0.4142, -0.2234),
-                point1B = Point(-0.2343, 0.12124)
+                point1A = Point(-0.214, -0.1834),
+                point1B = Point(0.1555, 0.2211)
             )
         }
 
@@ -66,7 +67,7 @@ class SolvePuzzle10_4Test {
                 with(context) {
                     return Setup(point2A, point2B, line1, line2) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(5.0),
+                            maxSqDistance = sq(20.0),
                             perpendicularBisectorToolEnabled = true
                         ),
                         points = listOf(center, point1A, point1B),
@@ -116,6 +117,7 @@ class SolvePuzzle10_4Test {
                     @Suppress("unused") val context = object {
                         val circleB = circleTool(center, point1B)
                         val lineB = lineTool(center, point1B)
+
                         val perpB = perpendicularTool(lineB, center)
                         val solutionPointB = intersectTwoPoints(perpB, circleB).first
                         val solution = perpendicularTool(line1, solutionPointB)
