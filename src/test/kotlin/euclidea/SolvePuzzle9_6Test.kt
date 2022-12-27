@@ -14,7 +14,9 @@ class SolvePuzzle9_6Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(4, 4)
+        // solution found ~8 sec
+        // using one move to extend line2
+        Solver().improveSolution(3, 4)
     }
 
     data class Params(
@@ -65,7 +67,7 @@ class SolvePuzzle9_6Test {
         ): Pair<Setup, EuclideaContext> {
             with(params) {
                 val context = object {
-                    val line1 = Element.Line(baseA1, baseA2/*, limit1 = true, limit2 = true*/)
+                    val line1 = Element.Line(baseA1, baseA2, limit1 = true, limit2 = true)
                     val line2 = Element.Line(baseB1, baseB2/*, limit1 = true, limit2 = true*/)
                     val side1 = Element.Line(baseA1, baseB1/*, limit1 = true, limit2 = true*/)
                     val side2 = Element.Line(baseA2, baseB2/*, limit1 = true, limit2 = true*/)
@@ -79,7 +81,7 @@ class SolvePuzzle9_6Test {
                         config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,
-                            maxSqDistance = sq(5.0)
+                            maxSqDistance = sq(10.0)
                         ),
                         // dir excluded
                         points = listOf(baseA1, baseA2, baseB1, baseB2, center /*, probe*/),
