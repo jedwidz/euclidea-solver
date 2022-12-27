@@ -14,8 +14,7 @@ class SolvePuzzle9_6Test {
 
     @Test
     fun improveSolution() {
-        // No solution found ~7 min
-        Solver().improveSolution(3, 5)
+        Solver().improveSolution(4, 4)
     }
 
     data class Params(
@@ -66,12 +65,12 @@ class SolvePuzzle9_6Test {
         ): Pair<Setup, EuclideaContext> {
             with(params) {
                 val context = object {
-                    val line1 = Element.Line(baseA1, baseA2, limit1 = true, limit2 = true)
-                    val line2 = Element.Line(baseB1, baseB2, limit1 = true, limit2 = true)
-                    val side1 = Element.Line(baseA1, baseB1, limit1 = true, limit2 = true)
-                    val side2 = Element.Line(baseA2, baseB2, limit1 = true, limit2 = true)
-                    val diag1 = Element.Line(baseA1, baseB2, limit1 = true, limit2 = true)
-                    val diag2 = Element.Line(baseA2, baseB1, limit1 = true, limit2 = true)
+                    val line1 = Element.Line(baseA1, baseA2/*, limit1 = true, limit2 = true*/)
+                    val line2 = Element.Line(baseB1, baseB2/*, limit1 = true, limit2 = true*/)
+                    val side1 = Element.Line(baseA1, baseB1/*, limit1 = true, limit2 = true*/)
+                    val side2 = Element.Line(baseA2, baseB2/*, limit1 = true, limit2 = true*/)
+                    val diag1 = Element.Line(baseA1, baseB2/*, limit1 = true, limit2 = true*/)
+                    val diag2 = Element.Line(baseA2, baseB1/*, limit1 = true, limit2 = true*/)
                     val center = intersectOnePoint(diag1, diag2)
                 }
                 namer.nameReflected(context)
@@ -80,7 +79,7 @@ class SolvePuzzle9_6Test {
                         config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,
-                            maxSqDistance = sq(20.0)
+                            maxSqDistance = sq(5.0)
                         ),
                         // dir excluded
                         points = listOf(baseA1, baseA2, baseB1, baseB2, center /*, probe*/),
@@ -118,17 +117,19 @@ class SolvePuzzle9_6Test {
             return referenceSolution(params, Namer()).second.elements.last() as Element.Line
         }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 3L L-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> element !is Element.Line
-//                    1 -> element !is Element.Line
-//                    2 -> element !is Element.Circle
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 5L L-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+//                    0 -> !element.isLineFromLine
+                    0 -> !element.isCircleFromCircle
+                    1 -> !element.isLineFromLine
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isLineFromLine
+                    else -> false
+                }
+            }
+        }
 
         override fun referenceSolution(
             params: Params,
