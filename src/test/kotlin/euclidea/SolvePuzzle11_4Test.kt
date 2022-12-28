@@ -13,8 +13,8 @@ class SolvePuzzle11_4Test {
 
     @Test
     fun improveSolution() {
-        // solution found ~13 sec
-        Solver().improveSolution(6, 6)
+        // 5L solution found ~8 sec
+        Solver().improveSolution(4, 5)
     }
 
     data class Params(
@@ -57,7 +57,10 @@ class SolvePuzzle11_4Test {
                 with(context) {
                     return Setup(base) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(20.0)
+                            maxSqDistance = sq(20.0),
+                            perpendicularBisectorToolEnabled = true,
+                            angleBisectorToolEnabled = true,
+                            nonCollapsingCompassToolEnabled = true
                         ),
                         points = listOf(baseO, baseA /*, probe*/),
                         elements = listOf(base)
@@ -76,6 +79,20 @@ class SolvePuzzle11_4Test {
                 val solution = lineTool(baseO, solP)
                 return { context ->
                     context.hasElement(solution)
+                }
+            }
+        }
+
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 5L moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isLineFromPerpendicularBisector
+                    1 -> !element.isCircleFromNonCollapsingCompass
+                    2 -> !element.isCircleFromNonCollapsingCompass
+                    3 -> !element.isCircleFromNonCollapsingCompass
+                    4 -> !element.isLineFromAngleBisector
+                    else -> false
                 }
             }
         }
