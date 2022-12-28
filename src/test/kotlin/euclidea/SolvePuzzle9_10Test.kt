@@ -122,9 +122,9 @@ class SolvePuzzle9_10Test {
                 with(setup) {
                     // Optimal 2L solution
                     @Suppress("unused") val context = object {
-                        val midL = perpendicularBisectorTool(baseB, baseC)
-                        val midP = intersectOnePoint(midL, line3)
-                        val solution = parallelTool(line1, midP)
+                        val midL = perpendicularBisectorTool(baseA, baseB)
+                        val midP = intersectOnePoint(midL, line1)
+                        val solution = parallelTool(line3, midP)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
