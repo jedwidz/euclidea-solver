@@ -23,7 +23,7 @@ class SolvePuzzle9_10Test {
         val baseC: Point,
         val probeScale: Double
     ) {
-        val probe = baseA + (baseB - baseA) * probeScale
+        val probe = baseB + (baseA - baseB) * probeScale
     }
 
     data class Setup(
