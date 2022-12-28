@@ -1,7 +1,5 @@
 package euclidea
 
-import euclidea.EuclideaTools.circleTool
-import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import org.junit.jupiter.api.Test
@@ -16,7 +14,7 @@ class SolvePuzzle9_10Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(0, 5)
+        Solver().improveSolution(4, 5)
     }
 
     data class Params(
@@ -133,20 +131,11 @@ class SolvePuzzle9_10Test {
             )
             with(params) {
                 with(setup) {
-                    // Optimal 5E solution - looked up here 8-(:
-                    // https://www.youtube.com/watch?v=cGHHMRz9eRc&ab_channel=DidaTaufiq
+                    // Optimal 2L solution
                     @Suppress("unused") val context = object {
-                        val half = circleTool(probe1, baseC)
-                        val fullP = intersectTwoPointsOther(half, line3, baseC)
-                        val full = circleTool(fullP, baseC)
-                        val target = intersectTwoPoints(full, line1)
-                        val target1 = target.first
-                        val target2 = target.second
-                        val aim1 = lineTool(baseC, target1)
-                        val aim2 = lineTool(baseC, target2)
-                        val solution1 = intersectTwoPoints(aim1, half).second
-                        val solution2 = intersectTwoPoints(aim2, half).second
-                        val solution = lineTool(solution1, solution2)
+                        val midL = perpendicularBisectorTool(baseB, baseC)
+                        val midP = intersectOnePoint(midL, line3)
+                        val solution = parallelTool(line1, midP)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
