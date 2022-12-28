@@ -114,7 +114,7 @@ class PointSet : IndexedSet<Point>(compareBy({ it.x }, { it.y })) {
     }
 }
 
-private fun linePrimaryDim(line: Line) = line.xIntercept ?: line.yIntercept ?: 0.0
+private fun linePrimaryDim(line: Line) = line.intercept ?: 0.0
 
 class LineSet : IndexedSet<Line>(
     compareBy({ linePrimaryDim(it) },

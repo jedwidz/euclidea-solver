@@ -48,6 +48,7 @@ sealed class Element : Primitive {
 
         val xIntercept: Double?
         val yIntercept: Double?
+        val intercept: Double?
         val xDir: Double
         val yDir: Double
 
@@ -58,6 +59,7 @@ sealed class Element : Primitive {
                 if (abs(db) < Epsilon) null else a - (da / db) * b
             xIntercept = intercept(dx, dy, point1.x, point1.y)
             yIntercept = intercept(dy, dx, point1.y, point1.x)
+            intercept = minNullable(xIntercept, yIntercept)
 
             val len = sqrt(sq(dx) + sq(dy))
             val x = dx / len

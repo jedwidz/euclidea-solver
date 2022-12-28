@@ -1,5 +1,6 @@
 package euclidea
 
+import kotlin.math.min
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
@@ -57,4 +58,8 @@ fun <T : Any> Any.reflectProperties(kClass: KClass<T>): Map<String, T> {
     // See: https://stackoverflow.com/a/5004929/2396171
     val order = this::class.java.declaredFields.map { it.name }
     return order.mapNotNull { name -> unordered[name]?.let { name to it } }.toMap()
+}
+
+fun minNullable(a: Double?, b: Double?): Double? {
+    return if (a == null) b else if (b == null) a else min(a, b)
 }
