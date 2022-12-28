@@ -41,7 +41,7 @@ class SolvePuzzle9_10Test {
                 baseA = Point(0.0, 0.0),
                 baseB = Point(1.0, 0.0),
                 baseC = Point(0.4, 0.8),
-                probe1Scale = 0.13,
+                probe1Scale = 0.25,
                 probe2Scale = 0.135
             )
         }
@@ -51,7 +51,7 @@ class SolvePuzzle9_10Test {
                 baseA = Point(0.0, 0.0),
                 baseB = Point(1.0143, 0.0134),
                 baseC = Point(0.4043, 0.8123),
-                probe1Scale = 0.13013,
+                probe1Scale = 0.25013,
                 probe2Scale = 0.13513
             )
         }
@@ -122,9 +122,9 @@ class SolvePuzzle9_10Test {
                 with(setup) {
                     // Optimal 2L solution
                     @Suppress("unused") val context = object {
-                        val midL = perpendicularBisectorTool(baseA, baseB)
-                        val midP = intersectOnePoint(midL, line1)
-                        val solution = parallelTool(line3, midP)
+                        val midL = perpendicularBisectorTool(baseB, baseC)
+                        val midP = intersectOnePoint(midL, line3)
+                        val solution = parallelTool(line1, midP)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
