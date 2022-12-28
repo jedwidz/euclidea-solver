@@ -16,7 +16,7 @@ class SolvePuzzle9_10Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(4, 5)
+        Solver().improveSolution(0, 5)
     }
 
     data class Params(
@@ -43,7 +43,7 @@ class SolvePuzzle9_10Test {
                 baseA = Point(0.0, 0.0),
                 baseB = Point(1.0, 0.0),
                 baseC = Point(0.4, 0.8),
-                probe1Scale = 0.25,
+                probe1Scale = 0.24,
                 probe2Scale = 0.135
             )
         }
@@ -51,10 +51,10 @@ class SolvePuzzle9_10Test {
         override fun makeReplayParams(): Params {
             return Params(
                 baseA = Point(0.0, 0.0),
-                baseB = Point(1.0143, 0.0134),
-                baseC = Point(0.4043, 0.8123),
-                probe1Scale = 0.25013,
-                probe2Scale = 0.13513
+                baseB = Point(1.01, 0.0),
+                baseC = Point(0.401, 0.8005),
+                probe1Scale = 0.2398,
+                probe2Scale = 0.135
             )
         }
 
