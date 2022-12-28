@@ -40,7 +40,7 @@ class SolvePuzzle9_10Test {
             return Params(
                 baseA = Point(0.0, 0.0),
                 baseB = Point(0.7, 0.0),
-                baseC = Point(0.3, 1.0),
+                baseC = Point(0.4, 0.8),
                 probe1Scale = 0.13,
                 probe2Scale = 0.135
             )
@@ -50,7 +50,7 @@ class SolvePuzzle9_10Test {
             return Params(
                 baseA = Point(0.0, 0.0),
                 baseB = Point(0.7143, 0.0134),
-                baseC = Point(0.3043, 1.0123),
+                baseC = Point(0.4043, 0.8123),
                 probe1Scale = 0.13013,
                 probe2Scale = 0.13513
             )
@@ -72,9 +72,9 @@ class SolvePuzzle9_10Test {
                         config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,
-                            maxSqDistance = sq(20.0)
+                            maxSqDistance = sq(50.0)
                         ),
-                        points = listOf(baseA, baseB, baseC, probe1, probe2),
+                        points = listOf(baseA, baseB, baseC/*, probe1, probe2*/),
                         elements = listOf(line1, line2, line3)
                     )
                 }
