@@ -21,9 +21,11 @@ class SolvePuzzle9_10Test {
         val baseA: Point,
         val baseB: Point,
         val baseC: Point,
-        val probeScale: Double
+        val probe1Scale: Double,
+        val probe2Scale: Double
     ) {
-        val probe = baseC + (baseB - baseC) * probeScale
+        val probe1 = baseC + (baseA - baseC) * probe1Scale
+        val probe2 = baseC + (baseB - baseC) * probe1Scale
     }
 
     data class Setup(
@@ -39,7 +41,8 @@ class SolvePuzzle9_10Test {
                 baseA = Point(0.0, 0.0),
                 baseB = Point(0.7, 0.0),
                 baseC = Point(0.3, 1.0),
-                probeScale = 0.13
+                probe1Scale = 0.13,
+                probe2Scale = 0.135
             )
         }
 
@@ -48,7 +51,8 @@ class SolvePuzzle9_10Test {
                 baseA = Point(0.0, 0.0),
                 baseB = Point(0.7143, 0.0134),
                 baseC = Point(0.3043, 1.0123),
-                probeScale = 0.13013
+                probe1Scale = 0.13013,
+                probe2Scale = 0.13513
             )
         }
 
@@ -70,7 +74,7 @@ class SolvePuzzle9_10Test {
 //                            perpendicularToolEnabled = true,
                             maxSqDistance = sq(20.0)
                         ),
-                        points = listOf(baseA, baseB, baseC, probe),
+                        points = listOf(baseA, baseB, baseC, probe1, probe2),
                         elements = listOf(line1, line2, line3)
                     )
                 }
