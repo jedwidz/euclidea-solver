@@ -24,7 +24,7 @@ class SolvePuzzle9_10Test {
         val probe1Scale: Double,
         val probe2Scale: Double
     ) {
-        val probe1 = baseA + (baseB - baseA) * probe1Scale
+        val probe1 = baseC + (baseB - baseC) * probe1Scale
         val probe2 = baseB + (baseC - baseB) * probe2Scale
     }
 
@@ -39,7 +39,7 @@ class SolvePuzzle9_10Test {
         override fun makeParams(): Params {
             return Params(
                 baseA = Point(0.0, 0.0),
-                baseB = Point(4.0, 0.0),
+                baseB = Point(1.0, 0.0),
                 baseC = Point(0.4, 0.8),
                 probe1Scale = 0.13,
                 probe2Scale = 0.135
@@ -49,7 +49,7 @@ class SolvePuzzle9_10Test {
         override fun makeReplayParams(): Params {
             return Params(
                 baseA = Point(0.0, 0.0),
-                baseB = Point(4.0143, 0.0134),
+                baseB = Point(1.0143, 0.0134),
                 baseC = Point(0.4043, 0.8123),
                 probe1Scale = 0.13013,
                 probe2Scale = 0.13513
@@ -74,7 +74,7 @@ class SolvePuzzle9_10Test {
 //                            perpendicularToolEnabled = true,
                             maxSqDistance = sq(50.0)
                         ),
-                        points = listOf(baseA, baseB, baseC/*, probe1, probe2*/),
+                        points = listOf(baseA, baseB, baseC, probe1/*, probe2*/),
                         elements = listOf(line1, line2, line3)
                     )
                 }
