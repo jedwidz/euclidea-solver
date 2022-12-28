@@ -63,7 +63,7 @@ sealed class Element : Primitive {
                 if (abs(db) < Epsilon) null else a - (da / db) * b
             xIntercept = intercept(dx, dy, point1.x, point1.y)
             yIntercept = intercept(dy, dx, point1.y, point1.x)
-            intercept = minNullable(xIntercept, yIntercept)
+            intercept = smallerNullable(xIntercept, yIntercept)
 
             val len = sqrt(sq(dx) + sq(dy))
             val x = dx / len

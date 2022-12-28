@@ -208,11 +208,22 @@ class EuclideaSetsTest {
 
     @Test
     fun lineSet_largeInterceptBugFix() {
-        val set = LineSet()
-        val line = Line(
-            point1 = Point(x = 0.2740876489451589, y = -0.612271149651619),
-            point2 = Point(x = 0.9449083964302225, y = -0.6122709910755564)
+        lineSet_largeInterceptBugFix_impl(
+            Line(
+                point1 = Point(x = 0.2740876489451589, y = -0.612271149651619),
+                point2 = Point(x = 0.9449083964302225, y = -0.6122709910755564)
+            )
         )
+        lineSet_largeInterceptBugFix_impl(
+            Line(
+                point1 = Point(x = -0.2740876489451589, y = -0.612271149651619),
+                point2 = Point(x = -0.9449083964302225, y = -0.6122709910755564)
+            )
+        )
+    }
+
+    private fun lineSet_largeInterceptBugFix_impl(line: Line) {
+        val set = LineSet()
         set.add(line)
         assertEquals(1, set.items().size)
         val removed = set.remove(line)
