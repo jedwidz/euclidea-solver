@@ -1,5 +1,7 @@
 package euclidea
 
+import euclidea.EuclideaTools.circleTool
+import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import org.junit.jupiter.api.Test
@@ -93,8 +95,19 @@ class SolvePuzzle9_10Test {
         }
 
         private fun constructSolution(params: Params): Element.Line {
-            // cheekily use reference solution
-            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
+            val namer = Namer()
+            val (setup, _) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Optimal 2L solution
+                    val midL = perpendicularBisectorTool(baseB, baseC)
+                    val midP = intersectOnePoint(midL, line3)
+                    val solution = parallelTool(line1, midP)
+                    return solution
+                }
+            }
         }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
@@ -120,11 +133,20 @@ class SolvePuzzle9_10Test {
             )
             with(params) {
                 with(setup) {
-                    // Optimal 2L solution
+                    // Optimal 5E solution - looked up here 8-(:
+                    // https://www.youtube.com/watch?v=cGHHMRz9eRc&ab_channel=DidaTaufiq
                     @Suppress("unused") val context = object {
-                        val midL = perpendicularBisectorTool(baseB, baseC)
-                        val midP = intersectOnePoint(midL, line3)
-                        val solution = parallelTool(line1, midP)
+                        val half = circleTool(probe1, baseC)
+                        val fullP = intersectTwoPointsOther(half, line3, baseC)
+                        val full = circleTool(fullP, baseC)
+                        val target = intersectTwoPoints(full, line1)
+                        val target1 = target.first
+                        val target2 = target.second
+                        val aim1 = lineTool(baseC, target1)
+                        val aim2 = lineTool(baseC, target2)
+                        val solution1 = intersectTwoPoints(aim1, half).second
+                        val solution2 = intersectTwoPoints(aim2, half).second
+                        val solution = lineTool(solution1, solution2)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
