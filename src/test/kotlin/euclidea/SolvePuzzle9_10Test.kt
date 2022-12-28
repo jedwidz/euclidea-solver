@@ -57,8 +57,8 @@ class SolvePuzzle9_10Test {
             with(params) {
                 val context = object {
                     val line1 = Element.Line(baseA, baseB, limit1 = true, limit2 = true)
-                    val line2 = Element.Line(baseA, baseC/*, limit1 = true, limit2 = true*/)
-                    val line3 = Element.Line(baseB, baseC/*, limit1 = true, limit2 = true*/)
+                    val line2 = Element.Line(baseA, baseC, limit1 = true, limit2 = true)
+                    val line3 = Element.Line(baseB, baseC, limit1 = true, limit2 = true)
                 }
                 namer.nameReflected(context)
                 with(context) {
@@ -66,10 +66,10 @@ class SolvePuzzle9_10Test {
                         config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,
-                            maxSqDistance = sq(50.0)
+                            maxSqDistance = sq(20.0)
                         ),
                         // dir excluded
-                        points = listOf(baseA, baseB, baseC /*, probe*/),
+                        points = listOf(baseA, baseB, baseC, probe),
                         elements = listOf(line1, line2, line3)
                     )
                 }
