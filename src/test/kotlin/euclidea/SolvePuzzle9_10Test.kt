@@ -36,7 +36,7 @@ class SolvePuzzle9_10Test {
             return Params(
                 baseA = Point(0.0, 0.0),
                 baseB = Point(0.7, 0.0),
-                baseC = Point(0.2, 0.6),
+                baseC = Point(0.3, 1.0),
                 probe = Point(0.6, 0.3)
             )
         }
@@ -45,7 +45,7 @@ class SolvePuzzle9_10Test {
             return Params(
                 baseA = Point(0.0, 0.0),
                 baseB = Point(0.7143, 0.0134),
-                baseC = Point(0.2043, 0.614),
+                baseC = Point(0.3043, 1.0123),
                 probe = Point(0.6001, 0.3022)
             )
         }
@@ -57,8 +57,8 @@ class SolvePuzzle9_10Test {
             with(params) {
                 val context = object {
                     val line1 = Element.Line(baseA, baseB, limit1 = true, limit2 = true)
-                    val line2 = Element.Line(baseA, baseC, limit1 = true, limit2 = true)
-                    val line3 = Element.Line(baseB, baseC, limit1 = true, limit2 = true)
+                    val line2 = Element.Line(baseA, baseC/*, limit1 = true, limit2 = true*/)
+                    val line3 = Element.Line(baseB, baseC/*, limit1 = true, limit2 = true*/)
                 }
                 namer.nameReflected(context)
                 with(context) {
@@ -66,7 +66,7 @@ class SolvePuzzle9_10Test {
                         config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,
-                            maxSqDistance = sq(20.0)
+                            maxSqDistance = sq(50.0)
                         ),
                         // dir excluded
                         points = listOf(baseA, baseB, baseC /*, probe*/),
@@ -90,6 +90,20 @@ class SolvePuzzle9_10Test {
         private fun constructSolution(params: Params): Element.Line {
             // cheekily use reference solution
             return referenceSolution(params, Namer()).second.elements.last() as Element.Line
+        }
+
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 5E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isCircleFromCircle
+                    1 -> !element.isCircleFromCircle
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isLineFromLine
+                    4 -> !element.isLineFromLine
+                    else -> false
+                }
+            }
         }
 
         override fun referenceSolution(
