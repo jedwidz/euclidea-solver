@@ -39,8 +39,8 @@ class SolvePuzzle9_10Test {
         override fun makeParams(): Params {
             return Params(
                 baseA = Point(0.0, 0.0),
-                baseB = Point(1.0, 0.0),
-                baseC = Point(0.4, 3.8),
+                baseB = Point(4.0, 0.0),
+                baseC = Point(0.4, 0.8),
                 probe1Scale = 0.13,
                 probe2Scale = 0.135
             )
@@ -49,8 +49,8 @@ class SolvePuzzle9_10Test {
         override fun makeReplayParams(): Params {
             return Params(
                 baseA = Point(0.0, 0.0),
-                baseB = Point(1.0143, 0.0134),
-                baseC = Point(0.4043, 3.8123),
+                baseB = Point(4.0143, 0.0134),
+                baseC = Point(0.4043, 0.8123),
                 probe1Scale = 0.13013,
                 probe2Scale = 0.13513
             )
