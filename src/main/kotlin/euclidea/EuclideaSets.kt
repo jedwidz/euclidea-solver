@@ -121,7 +121,9 @@ class LineSet : IndexedSet<Line>(
         { it.xDir },
         { it.yDir },
         { it.yIntercept },
-        { it.xIntercept })
+        { it.xIntercept },
+        { it.limit1 },
+        { it.limit2 })
 ) {
 
     override fun primaryDim(item: Line): Double {

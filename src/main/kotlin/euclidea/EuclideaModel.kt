@@ -76,7 +76,7 @@ sealed class Element : Primitive {
         }
 
         fun filterLimits(intersection: Intersection): Intersection {
-            if (!limit1 && !limit2)
+            if (!hasLimit())
                 return intersection
             val points = intersection.points()
             val limitedPoints = points.filter { point -> withinLimits(point) }
@@ -85,7 +85,9 @@ sealed class Element : Primitive {
             else Intersection.of(limitedPoints)
         }
 
-        private fun withinLimits(point: Point): Boolean {
+        fun hasLimit() = limit1 || limit2
+
+        fun withinLimits(point: Point): Boolean {
             fun sameSide(x: Double, o: Double, a: Double): Boolean {
                 return a >= o - Epsilon && x >= o - Epsilon
                         || a <= o + Epsilon && x <= o + Epsilon
@@ -209,6 +211,14 @@ private fun coincidesNullable(num1: Double?, num2: Double?): Boolean {
 }
 
 private fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
+    return linesCoincideNoLimits(line1, line2)
+            && (!line2.hasLimit() || line2.withinLimits(line1.point1)
+            && line2.withinLimits(line1.point2))
+            && (!line1.hasLimit() || line1.withinLimits(line2.point1)
+            && line1.withinLimits(line2.point2))
+}
+
+private fun linesCoincideNoLimits(line1: Element.Line, line2: Element.Line): Boolean {
     return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
         line1.yIntercept,
         line2.yIntercept
@@ -239,6 +249,10 @@ fun coincidesRough(num1: Double, num2: Double): Boolean {
 }
 
 fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {
+    return pointAndLineCoincideNoLimits(point, line) && line.withinLimits(point)
+}
+
+fun pointAndLineCoincideNoLimits(point: Point, line: Element.Line): Boolean {
     val d1 = line.point2.minus(line.point1)
     val d2 = line.point1.minus(point)
     val measure = (d1.x * d2.y - d2.x * d1.y) // / sqrt(d1.sqDistance)
