@@ -31,6 +31,7 @@ class EuclideaSetsTest {
     private val line = Line(point, Point(1.0, 2.0))
 
     private val sameLines = listOf(
+        Line(Point(1.0, 2.0), point),
         Line(Point(0.0 - d, 0.0), Point(1.0, 2.0)),
         Line(Point(0.0 + d, 0.0), Point(1.0, 2.0)),
         Line(Point(0.0 - d, 0.0 - d), Point(1.0 - d, 2.0 - d)),
@@ -136,6 +137,37 @@ class EuclideaSetsTest {
                 point,
                 circle
             ) + differentPoints + differentLines + differentCircles
+        )
+    }
+
+    private val lineWithLimit = Line(point, Point(1.0, 2.0), limit1 = true)
+
+    private val sameLinesWithLimit = listOf(
+        Line(Point(1.0, 2.0), point, limit2 = true),
+        Line(Point(0.0 - d, 0.0), Point(1.0, 2.0), limit1 = true),
+        Line(Point(0.0 + d, 0.0), Point(1.0, 2.0), limit1 = true),
+        Line(Point(0.0 - d, 0.0 - d), Point(1.0 - d, 2.0 - d), limit1 = true),
+        Line(Point(0.0 + d, 0.0 + d), Point(1.0 + d, 2.0 + d), limit1 = true),
+        Line(Point(0.0, 0.0 - d), Point(1.0 + d, 2.0 - d), limit1 = true)
+    )
+
+    private val differentLinesWithLimit = listOf(
+        Line(point, Point(1.0, 2.0)),
+        Line(point, Point(1.0, 2.0), limit1 = true, limit2 = true),
+        Line(Point(1.0, 2.0), point, limit1 = true),
+        Line(Point(0.0, 1.0), Point(1.0, 2.0)),
+        Line(Point(0.0, 1.0), Point(0.0, 2.0)),
+        Line(Point(0.0, 1.0), Point(1.0, 0.0)),
+        Line(Point(1.0, 0.0), Point(1.0, 2.0))
+    )
+
+    @Test
+    fun lineSetWithLimit() {
+        euclideaSetTest(
+            set = LineSet(),
+            item = lineWithLimit,
+            sameItems = sameLinesWithLimit,
+            differentItems = differentLinesWithLimit
         )
     }
 

@@ -44,7 +44,8 @@ abstract class IndexedSet<T>(
 
     private fun <U : T> canonicalImpl(item: U): U? {
         // Optimize for already canonical
-        if (item in set) return item
+        // TODO fix this for lines with base points switched
+        // if (item in set) return item
 
         val primary = primaryDim(item)
         val range = coincidingRange(primary)
@@ -122,8 +123,10 @@ class LineSet : IndexedSet<Line>(
         { it.yDir },
         { it.yIntercept },
         { it.xIntercept },
-        { it.limit1 },
-        { it.limit2 })
+        { it.xMin },
+        { it.xMax },
+        { it.yMin },
+        { it.yMax })
 ) {
 
     override fun primaryDim(item: Line): Double {

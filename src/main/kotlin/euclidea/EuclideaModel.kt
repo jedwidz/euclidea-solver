@@ -51,6 +51,10 @@ sealed class Element : Primitive {
         val intercept: Double?
         val xDir: Double
         val yDir: Double
+        val xMin: Double?
+        val xMax: Double?
+        val yMin: Double?
+        val yMax: Double?
 
         init {
             val dx = point2.x - point1.x
@@ -67,6 +71,20 @@ sealed class Element : Primitive {
             val sign = if (abs(x) < Epsilon) sign(y) else sign(x)
             xDir = x * sign
             yDir = y * sign
+            val xBounds = limits(point1.x, point2.x)
+            xMin = xBounds.first
+            xMax = xBounds.second
+            val yBounds = limits(point1.y, point2.y)
+            yMin = yBounds.first
+            yMax = yBounds.second
+        }
+
+        private fun limits(v1: Double, v2: Double): Pair<Double?, Double?> {
+            return if (v1 <= v2) {
+                (if (limit1) v1 - Epsilon else null) to (if (limit2) v2 + Epsilon else null)
+            } else {
+                (if (limit2) v2 - Epsilon else null) to (if (limit1) v1 + Epsilon else null)
+            }
         }
 
         override fun minus(point: Point): Line {
@@ -90,17 +108,10 @@ sealed class Element : Primitive {
         fun hasLimit() = limit1 || limit2
 
         fun withinLimits(point: Point): Boolean {
-            fun sameSide(x: Double, o: Double, a: Double): Boolean {
-                return a >= o - Epsilon && x >= o - Epsilon
-                        || a <= o + Epsilon && x <= o + Epsilon
-            }
-
-            fun sameSide(pointA: Point, pointB: Point): Boolean {
-                return sameSide(point.x, pointA.x, pointB.x)
-                        && sameSide(point.y, pointA.y, pointB.y)
-            }
-            return (!limit1 || sameSide(point1, point2))
-                    && (!limit2 || sameSide(point2, point1))
+            return (xMin == null || point.x >= xMin)
+                    && (xMax == null || point.x <= xMax)
+                    && (yMin == null || point.y >= yMin)
+                    && (yMax == null || point.y <= yMax)
         }
     }
 
@@ -214,10 +225,10 @@ private fun coincidesNullable(num1: Double?, num2: Double?): Boolean {
 
 private fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
     return linesCoincideNoLimits(line1, line2)
-            && (!line2.hasLimit() || line2.withinLimits(line1.point1)
-            && line2.withinLimits(line1.point2))
-            && (!line1.hasLimit() || line1.withinLimits(line2.point1)
-            && line1.withinLimits(line2.point2))
+            && coincidesNullable(line1.xMin, line2.xMin)
+            && coincidesNullable(line1.xMax, line2.xMax)
+            && coincidesNullable(line1.yMin, line2.yMin)
+            && coincidesNullable(line1.yMax, line2.yMax)
 }
 
 private fun linesCoincideNoLimits(line1: Element.Line, line2: Element.Line): Boolean {
