@@ -14,8 +14,8 @@ class SolvePuzzle9_7Test {
 
     @Test
     fun improveSolution() {
-        // solution not found ~5 sec
-        Solver().improveSolution(3, 8)
+        // solution not found ~4 min 35 sec
+        Solver().improveSolution(4, 8)
     }
 
     data class Params(
@@ -110,6 +110,13 @@ class SolvePuzzle9_7Test {
                     val solution3 = lineTool(solutionC, solutionA)
                     return listOf(solution1, solution2, solution3)
                 }
+            }
+        }
+
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+            val solutionElements = constructSolution(params)
+            return { context ->
+                solutionElements.count { !context.hasElement(it) }
             }
         }
 
