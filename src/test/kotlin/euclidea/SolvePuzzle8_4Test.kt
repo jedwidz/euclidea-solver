@@ -14,8 +14,8 @@ class SolvePuzzle8_4Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ~2 min 32 sec
-        Solver().improveSolution(3, 13, 5)
+        // solution found ~26s
+        Solver().improveSolution(3, 13)
     }
 
     data class Params(
