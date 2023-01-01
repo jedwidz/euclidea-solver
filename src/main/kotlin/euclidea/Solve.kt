@@ -42,7 +42,6 @@ fun solve(
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
-    var counter = 0
     val pendingElements = ElementSet()
     val passedElements = ElementSet()
 
@@ -172,9 +171,6 @@ fun solve(
             val removedElements = mutableSetOf<Element>()
             val newPassedElements = mutableSetOf<Element>()
             for (newElement in pendingList) {
-                counter++
-//                if (counter == 29442628)
-//                    println("Was here")
                 val removed = pendingElements.remove(newElement)
                 assert(removed)
                 passedElements.add(newElement)
