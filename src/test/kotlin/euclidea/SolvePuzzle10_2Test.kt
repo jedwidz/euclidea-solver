@@ -15,7 +15,7 @@ class SolvePuzzle10_2Test {
 
     @Test
     fun improveSolution() {
-        // found solution ~1hr 11min
+        // found solution ~22 min 34 sec
         Solver().improveSolution(4, 6)
     }
 
