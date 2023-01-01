@@ -10,6 +10,7 @@ import euclidea.EuclideaTools.perpendicularTool
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.measureTimeMillis
 
 
@@ -72,6 +73,7 @@ fun solve(
     val parallelSolver = object {
         val results = ConcurrentLinkedQueue<EuclideaContext>()
         val executor = Executors.newFixedThreadPool(threadCount)
+        val outstandingCount = AtomicInteger()
 
         fun yieldResult(context: EuclideaContext) {
             results.add(context)
@@ -85,9 +87,16 @@ fun solve(
 
         fun fork(solveState: SolveState, solveScratch: SolveScratch) {
             val newSolveScratch = solveScratch.dupe()
+            outstandingCount.incrementAndGet()
             executor.submit {
                 val timeMillis = measureTimeMillis {
-                    sub(solveState, newSolveScratch)
+                    try {
+                        sub(solveState, newSolveScratch)
+                    } finally {
+                        val count = outstandingCount.decrementAndGet()
+                        if (count == 0)
+                            executor.shutdown()
+                    }
                 }
                 println("Batch completed in ${timeMillis}ms")
             }
