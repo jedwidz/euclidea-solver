@@ -26,6 +26,10 @@ interface EuclideaSet<T> {
     operator fun minusAssign(items: Collection<T>) {
         items.forEach { remove(it) }
     }
+
+    operator fun <U : T> plusAssign(from: EuclideaSet<U>) {
+        from.items().forEach { add(it) }
+    }
 }
 
 abstract class IndexedSet<T>(
