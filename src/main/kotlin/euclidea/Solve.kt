@@ -165,7 +165,8 @@ fun solve(
                 }
             }
 
-            val pendingList = maybePrioritize(maybePass(pendingElements.items()))
+            val (keep, skippedNewElements) = maybePass(pendingElements.items())
+            val pendingList = maybePrioritize(keep)
             // println("$depth - ${pendingList.size}")
 
             val removedElements = mutableSetOf<Element>()
