@@ -10,6 +10,7 @@ import euclidea.EuclideaTools.perpendicularTool
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.system.measureTimeMillis
 
 
 data class SolveContext(
@@ -85,7 +86,10 @@ fun solve(
         fun fork(solveState: SolveState, solveScratch: SolveScratch) {
             val newSolveScratch = solveScratch.dupe()
             executor.submit {
-                sub(solveState, newSolveScratch)
+                val timeMillis = measureTimeMillis {
+                    sub(solveState, newSolveScratch)
+                }
+                println("Batch completed in ${timeMillis}ms")
             }
         }
 
