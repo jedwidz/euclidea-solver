@@ -32,6 +32,11 @@ private data class PendingNode(
     }
 }
 
+private data class SolveScratch(
+    val pendingElements: ElementSet = ElementSet(),
+    val passedElements: ElementSet = ElementSet()
+)
+
 fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
@@ -42,10 +47,11 @@ fun solve(
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
-    val pendingElements = ElementSet()
-    val passedElements = ElementSet()
 
-    fun sub(solveState: SolveState): EuclideaContext? {
+    fun sub(solveState: SolveState, solveScratch: SolveScratch): EuclideaContext? {
+        val pendingElements: ElementSet = solveScratch.pendingElements
+        val passedElements: ElementSet = solveScratch.passedElements
+
         val (solveContext, oldPoints) = solveState
         val (context, depth) = solveContext
         val nextDepth = depth + 1
@@ -191,7 +197,7 @@ fun solve(
                         (lowerBound == null || lowerBound + nextDepth <= maxDepth) &&
                         (prune == null || !prune(nextSolveContext))
                     ) {
-                        sub(next)?.let { return@sub it }
+                        sub(next, solveScratch)?.let { return@sub it }
                     }
                 }
             }
@@ -203,6 +209,7 @@ fun solve(
     }
     if (check(initialContext))
         return initialContext
-    return sub(SolveState(SolveContext(initialContext, 0), setOf(), 0, initialContext.elements))
+    val solveScratch = SolveScratch()
+    return sub(SolveState(SolveContext(initialContext, 0), setOf(), 0, initialContext.elements), solveScratch)
 }
 
