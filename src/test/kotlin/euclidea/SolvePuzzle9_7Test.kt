@@ -14,8 +14,8 @@ class SolvePuzzle9_7Test {
 
     @Test
     fun improveSolution() {
-        // solution not found ~4 min 35 sec
-        Solver().improveSolution(4, 8)
+        // solution found ~20 min 52 sec
+        Solver().improveSolution(5, 8)
     }
 
     data class Params(
@@ -120,19 +120,22 @@ class SolvePuzzle9_7Test {
             }
         }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 5E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> !element.isCircleFromCircle
-//                    1 -> !element.isCircleFromCircle
-//                    2 -> !element.isLineFromLine
-//                    3 -> !element.isLineFromLine
-//                    4 -> !element.isLineFromLine
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 5E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isCircleFromCircle
+                    1 -> !element.isCircleFromCircle
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isCircleFromCircle
+                    4 -> !element.isLineFromLine
+                    5 -> !element.isCircleFromCircle
+                    6 -> !element.isLineFromLine
+                    7 -> !element.isLineFromLine
+                    else -> false
+                }
+            }
+        }
 
         override fun referenceSolution(
             params: Params,
