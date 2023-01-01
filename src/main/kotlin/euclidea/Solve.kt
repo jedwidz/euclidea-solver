@@ -52,8 +52,8 @@ private fun ElementSet.dupe(): ElementSet {
     return res
 }
 
-private val threadCount = 4  // Runtime.getRuntime().availableProcessors()
-private val forkDepth = 1
+private val threadCount = 6  // Runtime.getRuntime().availableProcessors()
+private val forkDepth = 2
 
 fun solve(
     initialContext: EuclideaContext,
