@@ -14,10 +14,10 @@ object EuclideaTools {
         return makeCircle(center, distance(center, sample), sample, source = null)
     }
 
-    fun perpendicularTool(line: Element.Line, point: Point): Element.Line {
+    fun perpendicularTool(line: Element.Line, point: Point, probe: Point? = null): Element.Line {
         val direction = line.point2.minus(line.point1)
         val point2 = Point(point.x + direction.y, point.y - direction.x)
-        return makeLine(point, point2, LineSource.Perpendicular(line, point))
+        return makeLine(point, point2, LineSource.Perpendicular(line, point, probe))
     }
 
     fun perpendicularBisectorTool(point1: Point, point2: Point): Element.Line {
@@ -37,10 +37,10 @@ object EuclideaTools {
         return makeLine(pointO, aim, LineSource.AngleBisect(pointA, pointO, pointB))
     }
 
-    fun parallelTool(line: Element.Line, point: Point): Element.Line {
+    fun parallelTool(line: Element.Line, point: Point, probe: Point? = null): Element.Line {
         val direction = line.point2.minus(line.point1)
         val point2 = Point(point.x + direction.x, point.y + direction.y)
-        return makeLine(point, point2, LineSource.Parallel(line, point))
+        return makeLine(point, point2, LineSource.Parallel(line, point, probe))
     }
 
     fun nonCollapsingCompassTool(pointA: Point, pointB: Point, center: Point): Element.Circle {
@@ -62,11 +62,123 @@ object EuclideaTools {
         return lineTool(point, other) to listOf(circle1, circle2)
     }
 
-    fun bisect(point1: Point, point2: Point): Pair<Element.Line, List<Element.Circle>> {
+    fun perpendicular(line: Element.Line, point: Point, probe: Point?): Pair<Element.Line, List<Element>> {
+        val extended = line.extended()
+        if (pointAndLineCoincide(point, extended)) {
+            // Erect perpendicular, requires a probe point
+            if (probe === null)
+                invalid()
+            if (pointAndLineCoincide(probe, extended)) {
+                // 4E construction
+                val equal = circleTool(point, probe)
+                val (point1, point2) = intersectTwoPoints(equal, extended)
+                val circle1 = circleTool(point1, point2)
+                val circle2 = circleTool(point2, point1)
+                val aim = intersectTwoPoints(circle1, circle2).first
+                return lineTool(point, aim) to listOf(equal, circle1, circle2)
+            } else {
+                // 3E construction
+                val equal = circleTool(probe, point)
+                val other = intersectTwoPointsOther(equal, extended, point)
+                val cross = lineTool(other, probe)
+                val aim = intersectTwoPointsOther(cross, equal, other)
+                return lineTool(point, aim) to listOf(equal, cross)
+            }
+        } else
+            return dropPerpendicular(extended.point1, extended.point2, point)
+    }
+
+    fun parallel(line: Element.Line, point: Point, probe: Point?): Pair<Element.Line, List<Element>> {
+        val extended = line.extended()
+        if (pointAndLineCoincide(point, extended))
+            return extended to listOf()
+        else {
+            // TODO support alternative circles-only construction
+            if (probe === null || !pointAndLineCoincide(probe, extended))
+                invalid()
+            // 4E construction
+            val circle1 = circleTool(probe, point)
+            val dirs = intersectTwoPoints(circle1, extended)
+            // TODO choice point
+            val dir = dirs.first
+            val circle2 = circleTool(dir, point)
+            val other = intersectTwoPointsOther(circle2, circle1, point)
+            // TODO could use probe rather than dir here
+            val cross = lineTool(other, dir)
+            val aim = intersectTwoPointsOther(cross, circle2, other)
+            return lineTool(point, aim) to listOf(circle1, circle2, cross)
+        }
+    }
+
+    fun perpendicularBisect(point1: Point, point2: Point): Pair<Element.Line, List<Element.Circle>> {
         val circle1 = circleTool(point1, point2)
         val circle2 = circleTool(point2, point1)
         val (cross1, cross2) = intersectTwoPoints(circle1, circle2)
         return lineTool(cross1, cross2) to listOf(circle1, circle2)
+    }
+
+    fun angleBisect(
+        pointA: Point,
+        pointO: Point,
+        pointB: Point,
+        toO: Boolean = true
+    ): Pair<Element.Line, List<Element>> {
+        // TODO tool consumes 4E, but this construction is 5E
+        val lineB = Element.Line(pointO, pointB)
+        val rayB = Element.Line(pointO, pointB, limit1 = true)
+        val equalA = circleTool(pointO, pointA)
+        val aimB = intersectOnePoint(equalA, rayB)
+        val circleA = circleTool(pointA, if (toO) pointO else aimB)
+        val circleB = circleTool(aimB, if (toO) pointO else pointA)
+        val (cross1, cross2) = intersectTwoPoints(equalA, circleB)
+        return lineTool(cross1, cross2) to listOf(lineB, equalA, circleA, circleB)
+    }
+
+    fun nonCollapsingCompass(pointA: Point, pointB: Point, center: Point): Pair<Element.Circle, List<Element.Circle>> {
+        // Optimal 5E construction
+        val circle1 = circleTool(pointA, center)
+        val circle2 = circleTool(center, pointA)
+        val (cross1, cross2) = intersectTwoPoints(circle1, circle2)
+        val circle3 = circleTool(cross1, pointB)
+        val circle4 = circleTool(cross2, pointB)
+        val aim = intersectTwoPointsOther(circle3, circle4, pointB)
+        return circleTool(center, aim) to listOf(circle1, circle2, circle3, circle4)
+    }
+
+    fun nonCollapsingCompassConstruction(pointA: Point, pointB: Point, center: Point): ElementSet {
+        val res = ElementSet()
+        res += nonCollapsingCompass(pointA, pointB, center).second
+        res += nonCollapsingCompass(pointB, pointA, center).second
+        // TODO ? include 4L parallelogram construction
+        return res
+    }
+
+
+    fun angleBisectConstruction(pointA: Point, pointO: Point, pointB: Point): ElementSet {
+        val res = ElementSet()
+        for (toO in listOf(true, false)) {
+            res += angleBisect(pointA, pointO, pointB, toO = toO).second
+            res += angleBisect(pointB, pointO, pointA, toO = toO).second
+        }
+        return res
+    }
+
+    fun perpendicularConstruction(line: Element.Line, point: Point, probe: Point?): ElementSet {
+        val res = ElementSet()
+        res += perpendicular(line, point, probe).second
+        return res
+    }
+
+    fun perpendicularBisectConstruction(point1: Point, point2: Point): ElementSet {
+        val res = ElementSet()
+        res += perpendicularBisect(point1, point2).second
+        return res
+    }
+
+    fun parallelConstruction(line: Element.Line, point: Point, probe: Point?): ElementSet {
+        val res = ElementSet()
+        res += parallel(line, point, probe).second
+        return res
     }
 
     private fun makeLine(point1: Point, point2: Point, source: LineSource?): Element.Line {

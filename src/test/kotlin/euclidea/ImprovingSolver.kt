@@ -35,7 +35,8 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         maxExtraElements: Int,
         maxDepth: Int,
         nonNewElementLimit: Int? = null,
-        consecutiveNonNewElementLimit: Int? = null
+        consecutiveNonNewElementLimit: Int? = null,
+        useTargetConstruction: Boolean = false
     ) {
         val namer = Namer()
         val params = makeParams()
@@ -88,9 +89,14 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         }
 
         val targetElementSet = ElementSet()
-        targetElementSet += startingContext.elements
-        sampleSolutionContext?.let { targetElementSet += it.elements }
-        prefixContext?.let { targetElementSet += it.elements }
+        fun accumTargetElements(context: EuclideaContext) {
+            targetElementSet += context.elements
+            if (useTargetConstruction)
+                targetElementSet += context.constructionElementSet()
+        }
+        accumTargetElements(startingContext)
+        sampleSolutionContext?.let { accumTargetElements(it) }
+        prefixContext?.let { accumTargetElements(it) }
 
         val passWithPrefix: ((SolveContext, Element) -> Boolean) = { solveContext, element ->
             !checkPrefix(solveContext.depth, element) || (pass !== null && pass(solveContext, element))

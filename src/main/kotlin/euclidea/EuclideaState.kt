@@ -76,4 +76,10 @@ data class EuclideaContext(
         res += elements.flatMap { element -> element.constructionPoints() }
         return res
     }
+
+    fun constructionElementSet(): ElementSet {
+        val res = ElementSet()
+        res += elements.flatMap { element -> element.constructionElements() }
+        return res
+    }
 }

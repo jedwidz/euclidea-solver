@@ -1,5 +1,10 @@
 package euclidea
 
+import euclidea.EuclideaTools.angleBisectConstruction
+import euclidea.EuclideaTools.nonCollapsingCompassConstruction
+import euclidea.EuclideaTools.parallelConstruction
+import euclidea.EuclideaTools.perpendicularBisectConstruction
+import euclidea.EuclideaTools.perpendicularConstruction
 import kotlin.math.*
 
 interface Primitive
@@ -26,10 +31,10 @@ data class Point(val x: Double, val y: Double) : Primitive {
 }
 
 sealed class LineSource {
-    data class Perpendicular(val line: Element.Line, val point: Point) : LineSource()
+    data class Perpendicular(val line: Element.Line, val point: Point, val probe: Point? = null) : LineSource()
     data class PerpendicularBisect(val point1: Point, val point2: Point) : LineSource()
     data class AngleBisect(val pointA: Point, val pointO: Point, val pointB: Point) : LineSource()
-    data class Parallel(val line: Element.Line, val point: Point) : LineSource()
+    data class Parallel(val line: Element.Line, val point: Point, val probe: Point? = null) : LineSource()
 }
 
 sealed class CircleSource {
@@ -112,6 +117,12 @@ sealed class Element : Primitive {
                     && (xMax == null || point.x <= xMax)
                     && (yMin == null || point.y >= yMin)
                     && (yMax == null || point.y <= yMax)
+        }
+
+        fun extended(): Line {
+            return if (hasLimit())
+                copy(limit1 = false, limit2 = false)
+            else this
         }
     }
 
@@ -476,6 +487,26 @@ fun Element.constructionPoints(): List<Point> {
             null -> listOf(point1, point2)
         }
     }
+}
+
+fun Element.constructionElements(): List<Element> {
+    return when (this) {
+        is Element.Circle -> when (source) {
+            is CircleSource.NonCollapsingCompass -> nonCollapsingCompassConstruction(
+                source.pointA,
+                source.pointB,
+                center
+            )
+            null -> ElementSet()
+        }
+        is Element.Line -> when (source) {
+            is LineSource.AngleBisect -> angleBisectConstruction(source.pointA, source.pointO, source.pointB)
+            is LineSource.Parallel -> parallelConstruction(source.line, source.point, source.probe)
+            is LineSource.Perpendicular -> perpendicularConstruction(source.line, source.point, source.probe)
+            is LineSource.PerpendicularBisect -> perpendicularBisectConstruction(source.point1, source.point2)
+            null -> ElementSet()
+        }
+    }.items()
 }
 
 fun meetAtOnePoint(element1: Element, element2: Element): Boolean {
