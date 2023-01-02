@@ -43,6 +43,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         nameParams(params, namer)
         val (setup, startingContext) =
             initialContext(params, namer)
+        val initialElementCount = startingContext.elements.size
 
         val (sampleSolutionSetup, sampleSolutionContext) =
             referenceSolution(params, namer)
@@ -83,7 +84,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         fun checkPrefix(index: Int, element: Element): Boolean {
             if (prefixContext === null)
                 return true
-            return prefixContext.elements.getOrNull(index)?.let { prefixElement ->
+            return prefixContext.elements.getOrNull(initialElementCount + index)?.let { prefixElement ->
                 coincides(element, prefixElement)
             } ?: true
         }
