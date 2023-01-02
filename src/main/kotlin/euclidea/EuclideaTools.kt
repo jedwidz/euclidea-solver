@@ -88,13 +88,13 @@ object EuclideaTools {
             return dropPerpendicular(extended.point1, extended.point2, point)
     }
 
-    enum class ParallelOption { AllCircles, WithLine }
+    enum class ParallelOption { AllCircles, WithCircleThenLine, WithCircleThenLineVariant, WithLineThenCircle }
 
     fun parallel(
         line: Element.Line,
         point: Point,
         probe: Point?,
-        option: ParallelOption = ParallelOption.WithLine,
+        option: ParallelOption = ParallelOption.WithCircleThenLine,
         useSecondDir: Boolean = false
     ): Pair<Element.Line, List<Element>> {
         val extended = line.extended()
@@ -103,6 +103,17 @@ object EuclideaTools {
         else {
             if (probe === null || !pointAndLineCoincide(probe, extended))
                 invalid()
+            fun withCircleThenLine(variant: Boolean): Pair<Element.Line, List<Element>> {
+                // 4E construction, with one construction line (not through `point`)
+                val circle1 = circleTool(probe, point)
+                val dirs = intersectTwoPoints(circle1, extended)
+                val dir = if (useSecondDir) dirs.second else dirs.first
+                val circle2 = circleTool(dir, point)
+                val other = intersectTwoPointsOther(circle2, circle1, point)
+                val cross = lineTool(other, if (variant) probe else dir)
+                val aim = intersectTwoPointsOther(cross, if (variant) circle1 else circle2, other)
+                return lineTool(point, aim) to listOf(extended, circle1, circle2, cross)
+            }
             when (option) {
                 ParallelOption.AllCircles -> {
                     // 4E construction, with all circles
@@ -114,16 +125,17 @@ object EuclideaTools {
                     val aim = intersectTwoPointsOther(circle2, circle3, probe)
                     return lineTool(point, aim) to listOf(extended, circle1, circle2, circle3)
                 }
-                else -> {
-                    // 4E construction, with one construction line
+                ParallelOption.WithCircleThenLine -> return withCircleThenLine(false)
+                ParallelOption.WithCircleThenLineVariant -> return withCircleThenLine(true)
+                ParallelOption.WithLineThenCircle -> {
+                    // 4E construction, with one construction line through `point`
+                    val cross = lineTool(point, probe)
                     val circle1 = circleTool(probe, point)
+                    val other = intersectTwoPointsOther(circle1, cross, point)
                     val dirs = intersectTwoPoints(circle1, extended)
                     val dir = if (useSecondDir) dirs.second else dirs.first
-                    val circle2 = circleTool(dir, point)
-                    val other = intersectTwoPointsOther(circle2, circle1, point)
-                    // TODO could use probe rather than dir here
-                    val cross = lineTool(other, dir)
-                    val aim = intersectTwoPointsOther(cross, circle2, other)
+                    val circle2 = circleTool(dir, other)
+                    val aim = intersectTwoPointsOther(circle2, circle1, other)
                     return lineTool(point, aim) to listOf(extended, circle1, circle2, cross)
                 }
             }
