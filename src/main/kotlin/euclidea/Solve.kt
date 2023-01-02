@@ -94,6 +94,9 @@ fun solve(
                 val timeMillis = measureTimeMillis {
                     try {
                         sub(solveState, newSolveScratch)
+                    } catch (e: Exception) {
+                        println("Batch threw exception... $e")
+                        e.printStackTrace()
                     } finally {
                         val count = outstandingCount.decrementAndGet()
                         if (count == 0)
