@@ -16,8 +16,9 @@ class SolvePuzzle10_9Test {
 
     @Test
     fun improveSolution() {
-        SolvePuzzle9_9Test.Solver().improveSolution(
-            maxExtraElements = 4,
+        // solution found 1 sec
+        Solver().improveSolution(
+            maxExtraElements = 2,
             maxDepth = 7,
 //            nonNewElementLimit = 4,
 //            consecutiveNonNewElementLimit = 3,
@@ -67,7 +68,7 @@ class SolvePuzzle10_9Test {
             with(params) {
                 return Setup to EuclideaContext(
                     config = EuclideaConfig(
-                        maxSqDistance = sq(15.0),
+                        maxSqDistance = sq(10.0),
                         perpendicularBisectorToolEnabled = true,
                         nonCollapsingCompassToolEnabled = true
                     ),
@@ -167,7 +168,6 @@ class SolvePuzzle10_9Test {
             )
             with(params) {
                 with(setup) {
-                    // Optimal 6L solution
                     @Suppress("unused") val context = object {
                         // Sub-optimal 8L solution
                         val lineAB = lineTool(baseA, baseB)
