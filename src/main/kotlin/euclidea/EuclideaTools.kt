@@ -94,7 +94,8 @@ object EuclideaTools {
         line: Element.Line,
         point: Point,
         probe: Point?,
-        option: ParallelOption = ParallelOption.WithLine
+        option: ParallelOption = ParallelOption.WithLine,
+        useSecondDir: Boolean = false
     ): Pair<Element.Line, List<Element>> {
         val extended = line.extended()
         if (pointAndLineCoincide(point, extended))
@@ -107,8 +108,7 @@ object EuclideaTools {
                     // 4E construction, with all circles
                     val circle1 = circleTool(probe, point)
                     val dirs = intersectTwoPoints(circle1, extended)
-                    // TODO choice point
-                    val dir = dirs.first
+                    val dir = if (useSecondDir) dirs.second else dirs.first
                     val circle2 = circleTool(dir, probe)
                     val circle3 = circleTool(point, probe)
                     val aim = intersectTwoPointsOther(circle2, circle3, probe)
@@ -118,8 +118,7 @@ object EuclideaTools {
                     // 4E construction, with one construction line
                     val circle1 = circleTool(probe, point)
                     val dirs = intersectTwoPoints(circle1, extended)
-                    // TODO choice point
-                    val dir = dirs.first
+                    val dir = if (useSecondDir) dirs.second else dirs.first
                     val circle2 = circleTool(dir, point)
                     val other = intersectTwoPointsOther(circle2, circle1, point)
                     // TODO could use probe rather than dir here
@@ -199,7 +198,8 @@ object EuclideaTools {
     fun parallelConstruction(line: Element.Line, point: Point, probe: Point?): ElementSet {
         val res = ElementSet()
         for (option in ParallelOption.values()) {
-            res += parallel(line, point, probe, option).second
+            for (useSecondDir in listOf(false, true))
+                res += parallel(line, point, probe, option, useSecondDir = useSecondDir).second
         }
         return res
     }
