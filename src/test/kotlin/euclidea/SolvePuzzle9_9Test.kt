@@ -15,7 +15,13 @@ class SolvePuzzle9_9Test {
 
     @Test
     fun improveSolution() {
-        Solver().improveSolution(5, 7)
+        Solver().improveSolution(
+            maxExtraElements = 4,
+            maxDepth = 7,
+            nonNewElementLimit = 3,
+            consecutiveNonNewElementLimit = 3,
+            useTargetConstruction = true
+        )
     }
 
     data class Params(
@@ -26,8 +32,8 @@ class SolvePuzzle9_9Test {
         val probe1Scale: Double,
         val probe2Scale: Double
     ) {
-        val probe1 = baseB + (baseA - baseB) * probe1Scale
-        val probe2 = baseA + (baseB - baseA) * probe2Scale
+        val probe1 = baseO + (baseA - baseO) * probe1Scale
+        val probe2 = baseO + (baseB - baseO) * probe2Scale
     }
 
     data class Setup(
@@ -72,7 +78,7 @@ class SolvePuzzle9_9Test {
                 with(context) {
                     return Setup(line1, line2) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(15.0)
+                            maxSqDistance = sq(4.0)
                         ),
                         points = listOf(baseO, baseA, baseB, center/*, probe1, probe2*/),
                         elements = listOf(line1, line2)
@@ -119,22 +125,41 @@ class SolvePuzzle9_9Test {
 //            }
 //        }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 5E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> !element.isCircleFromCircle
-//                    1 -> !element.isCircleFromCircle
-//                    2 -> !element.isLineFromLine
-//                    3 -> !element.isCircleFromCircle
-//                    4 -> !element.isLineFromLine
-//                    5 -> !element.isCircleFromCircle
-//                    6 -> !element.isLineFromLine
-//                    7 -> !element.isLineFromLine
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
+            val referenceSolutionContext = referenceSolution(params, Namer()).second
+
+            val referenceElements = ElementSet()
+            referenceElements += referenceSolutionContext.elements
+            referenceElements += referenceSolutionContext.constructionElementSet().items()
+
+            val solutionElements = ElementSet()
+            solutionElements += constructSolution(params)
+
+            val interestPoints = referenceSolutionContext.constructionPointSet().items()
+
+            return { _, element ->
+                val solutionScore = if (element in solutionElements) 1 else 0
+                val referenceScore = if (element in referenceElements) 1 else 0
+                val interestPointsScore = interestPoints.count { pointAndElementCoincide(it, element) }
+                solutionScore * 100 + referenceScore * 20 + interestPointsScore
+            }
+        }
+
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 7E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isLineFromLine
+                    1 -> !element.isCircleFromCircle
+                    2 -> !element.isCircleFromCircle
+                    3 -> !element.isLineFromLine
+                    4 -> !element.isCircleFromCircle
+                    5 -> !element.isLineFromLine
+                    6 -> !element.isLineFromLine
+                    else -> false
+                }
+            }
+        }
 
         override fun referenceSolution(
             params: Params,
@@ -145,17 +170,16 @@ class SolvePuzzle9_9Test {
             )
             with(params) {
                 with(setup) {
-                    // Optimal 6L solution
                     @Suppress("unused") val context = object {
                         // Optimal 6L solution
-                        val parallel1 = parallelTool(line1, center)
+                        val parallel1 = parallelTool(line1, center, probe = probe1)
                         val other1 = intersectOnePoint(parallel1, line2)
-                        val parallel2 = parallelTool(line2, center)
+                        val parallel2 = parallelTool(line2, center, probe = probe2)
                         val other2 = intersectOnePoint(parallel2, line1)
                         val other = lineTool(other1, other2)
                         val circle = circleTool(center, other1)
                         val target = intersectTwoPointsOther(circle, parallel1, other1)
-                        val solution = parallelTool(other, target)
+                        val solution = parallelTool(other, target, probe = other1)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
