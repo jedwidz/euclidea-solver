@@ -18,11 +18,11 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // Nothing found 10 min 50 sec
+        // solution found 1 min 54 sec
         Solver().improveSolution(
-            maxExtraElements = 3,
-            maxDepth = 6
-//            nonNewElementLimit = 2,
+            maxExtraElements = 4,
+            maxDepth = 6,
+            nonNewElementLimit = 1
 //            consecutiveNonNewElementLimit = 3,
 //            useTargetConstruction = true
         )
@@ -140,7 +140,7 @@ class SolvePuzzle11_6Test {
                     // Assumed partial solution, agreeing with hints
                     @Suppress("unused") val context = object {
                         val half = angleBisectorTool(baseA, baseO, baseB)
-                        val perp = perpendicularTool(line2, sample, probe = baseO)
+                        // val perp = perpendicularTool(line2, sample, probe = baseO)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
