@@ -19,7 +19,7 @@ class SolvePuzzle10_9Test {
         // solution found 1 sec
         Solver().improveSolution(
             maxExtraElements = 2,
-            maxDepth = 7,
+            maxDepth = 8,
 //            nonNewElementLimit = 4,
 //            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
@@ -69,8 +69,7 @@ class SolvePuzzle10_9Test {
                 return Setup to EuclideaContext(
                     config = EuclideaConfig(
                         maxSqDistance = sq(10.0),
-                        perpendicularBisectorToolEnabled = true,
-                        nonCollapsingCompassToolEnabled = true
+                        perpendicularBisectorToolEnabled = true
                     ),
                     points = listOf(baseA, baseB, baseC/*, probe1, probe2*/),
                     elements = listOf()
@@ -147,13 +146,14 @@ class SolvePuzzle10_9Test {
             // Euclidea 7L L-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
-                    0 -> !element.isCircleFromCircle
-                    1 -> !element.isCircleFromCircle
-                    2 -> !element.isLineFromLine
-                    3 -> !element.isLineFromPerpendicularBisector
-                    4 -> !element.isCircleFromCircle
+                    0 -> !element.isLineFromLine
+                    1 -> !element.isLineFromLine
+                    2 -> !element.isCircleFromCircle
+                    3 -> !element.isCircleFromCircle
+                    4 -> !element.isLineFromPerpendicularBisector
                     5 -> !element.isCircleFromCircle
-                    6 -> !element.isCircleFromNonCollapsingCompass
+                    6 -> !element.isCircleFromCircle
+                    7 -> !element.isCircleFromCircle
                     else -> false
                 }
             }
