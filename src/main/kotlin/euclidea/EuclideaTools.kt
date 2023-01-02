@@ -75,14 +75,14 @@ object EuclideaTools {
                 val circle1 = circleTool(point1, point2)
                 val circle2 = circleTool(point2, point1)
                 val aim = intersectTwoPoints(circle1, circle2).first
-                return lineTool(point, aim) to listOf(equal, circle1, circle2)
+                return lineTool(point, aim) to listOf(extended, equal, circle1, circle2)
             } else {
                 // 3E construction
                 val equal = circleTool(probe, point)
                 val other = intersectTwoPointsOther(equal, extended, point)
                 val cross = lineTool(other, probe)
                 val aim = intersectTwoPointsOther(cross, equal, other)
-                return lineTool(point, aim) to listOf(equal, cross)
+                return lineTool(point, aim) to listOf(extended, equal, cross)
             }
         } else
             return dropPerpendicular(extended.point1, extended.point2, point)
@@ -106,7 +106,7 @@ object EuclideaTools {
             // TODO could use probe rather than dir here
             val cross = lineTool(other, dir)
             val aim = intersectTwoPointsOther(cross, circle2, other)
-            return lineTool(point, aim) to listOf(circle1, circle2, cross)
+            return lineTool(point, aim) to listOf(extended, circle1, circle2, cross)
         }
     }
 
