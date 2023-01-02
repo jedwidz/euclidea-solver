@@ -6,6 +6,7 @@ import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import kotlin.math.max
 
 class SolvePuzzle11_6Test {
     // Circle in Angle
@@ -17,12 +18,12 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // nothing found ~2 hr 32 min
+        // Nothing found 3 min 41 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 6,
-//            nonNewElementLimit = 4,
-//            consecutiveNonNewElementLimit = 3,
+            nonNewElementLimit = 4,
+            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
     }
@@ -113,7 +114,7 @@ class SolvePuzzle11_6Test {
             )
             with(params) {
                 with(setup) {
-                    // Sub-optimal 8L solution
+                    // Sub-optimal 7L solution
                     val half = angleBisectorTool(baseA, baseO, baseB)
                     val line = lineTool(baseO, sample)
                     // Or could use a perpendicular bisector here
@@ -131,12 +132,37 @@ class SolvePuzzle11_6Test {
             }
         }
 
-//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-//            val solutionElements = constructSolution(params)
-//            return { context ->
-//                solutionElements.count { !context.hasElement(it) }
-//            }
-//        }
+        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Assumed partial solution, agreeing with hints
+                    @Suppress("unused") val context = object {
+                        val half = angleBisectorTool(baseA, baseO, baseB)
+                        val perpB = perpendicularTool(line2, baseB, probe = baseO)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
+
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+            val solution = constructSolution(params)
+            val center = solution.center
+            return { context ->
+                // Assumes that solution is the last element (no extraneous elements)
+                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+                    0
+                else {
+                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
+                    // Need two elements to locate center, then the solution circle itself
+                    max(0, 2 - onCenter) + 1
+                }
+            }
+        }
 
         override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
             val referenceSolutionContext = referenceSolution(params, Namer()).second
@@ -183,7 +209,7 @@ class SolvePuzzle11_6Test {
             with(params) {
                 with(setup) {
                     @Suppress("unused") val context = object {
-                        // Sub-optimal 8L solution
+                        // Sub-optimal 7L solution
                         val half = angleBisectorTool(baseA, baseO, baseB)
                         val line = lineTool(baseO, sample)
 
