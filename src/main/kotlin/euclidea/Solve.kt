@@ -23,6 +23,7 @@ private data class SolveState(
     val solveContext: SolveContext,
     val oldPoints: Set<Point>,
     val nonNewElementCount: Int,
+    val consecutiveNonNewElementCount: Int,
     val lastAddedElements: List<Element>
 )
 
@@ -60,6 +61,7 @@ fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
     nonNewElementLimit: Int? = null,
+    consecutiveNonNewElementLimit: Int? = null,
     prune: ((SolveContext) -> Boolean)? = null,
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
@@ -197,8 +199,11 @@ fun solve(
                         else -> {
                             val keep = mutableListOf<Element>()
                             val skippedNewElements = mutableListOf<Element>()
+                            val skipNonNewElements =
+                                consecutiveNonNewElementLimit != null && solveState.consecutiveNonNewElementCount >= consecutiveNonNewElementLimit
                             items.forEach { element ->
-                                if (pass(solveContext, element)) {
+                                val skipAsNonNewElement = skipNonNewElements && element !in newElements
+                                if (skipAsNonNewElement || pass(solveContext, element)) {
                                     if (element in newElements)
                                         skippedNewElements += element
                                 } else keep += element
@@ -242,11 +247,19 @@ fun solve(
                     if (isNonNewElement)
                         removedElements.add(newElement)
                     val nextNonNewElementCount = solveState.nonNewElementCount + (if (isNonNewElement) 1 else 0)
+                    val nextConsecutiveNonNewElementCount =
+                        if (isNonNewElement) solveState.consecutiveNonNewElementCount + 1 else 0
                     if (nonNewElementLimit == null || nextNonNewElementCount < nonNewElementLimit) {
                         val nextContext = withElement(newElement)
                         val nextSolveContext = SolveContext(nextContext, nextDepth)
                         val next =
-                            SolveState(nextSolveContext, nextOldPoints, nextNonNewElementCount, listOf(newElement))
+                            SolveState(
+                                nextSolveContext,
+                                nextOldPoints,
+                                nextNonNewElementCount,
+                                nextConsecutiveNonNewElementCount,
+                                listOf(newElement)
+                            )
                         val lowerBound = remainingStepsLowerBound?.let { it(nextContext) }
                         if ((lowerBound == null || lowerBound <= 0) && check(nextContext))
                             yieldResult(nextContext)
@@ -268,7 +281,7 @@ fun solve(
         }
     }
     parallelSolver.fork(
-        SolveState(SolveContext(initialContext, 0), setOf(), 0, initialContext.elements),
+        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements),
         SolveScratch()
     )
     return parallelSolver.awaitResult()
