@@ -18,7 +18,7 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // Nothing found 10 min 48 sec
+        // Nothing found 10 min 50 sec
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 6
@@ -116,15 +116,14 @@ class SolvePuzzle11_6Test {
                 with(setup) {
                     // Sub-optimal 7L solution
                     val half = angleBisectorTool(baseA, baseO, baseB)
+                    val perp = perpendicularTool(line2, sample, probe = baseO)
+                    val touch = intersectOnePoint(perp, line2)
+                    val center1 = intersectOnePoint(perp, half)
+                    val circle1 = circleTool(center1, touch)
                     val line = lineTool(baseO, sample)
-                    // Or could use a perpendicular bisector here
-                    // val perpB = perpendicularBisectorTool(baseO, baseB)
-                    val perpB = perpendicularTool(line2, baseB)
-                    val center1 = intersectOnePoint(perpB, half)
-                    val circle1 = circleTool(center1, baseB)
-                    val aim1 = intersectTwoPoints(circle1, line).second
+                    val aim1 = intersectTwoPoints(circle1, line).first
                     val cross1 = lineTool(center1, aim1)
-                    val cross2 = parallelTool(cross1, sample)
+                    val cross2 = parallelTool(cross1, sample, probe = center1)
                     val center2 = intersectOnePoint(cross2, half)
                     val solution = circleTool(center2, sample)
                     return solution
@@ -141,7 +140,7 @@ class SolvePuzzle11_6Test {
                     // Assumed partial solution, agreeing with hints
                     @Suppress("unused") val context = object {
                         val half = angleBisectorTool(baseA, baseO, baseB)
-                        val perp = perpendicularTool(line2, sample, probe = baseB)
+                        val perp = perpendicularTool(line2, sample, probe = baseO)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
@@ -211,14 +210,12 @@ class SolvePuzzle11_6Test {
                     @Suppress("unused") val context = object {
                         // Sub-optimal 7L solution
                         val half = angleBisectorTool(baseA, baseO, baseB)
+                        val perp = perpendicularTool(line2, sample, probe = baseO)
+                        val touch = intersectOnePoint(perp, line2)
+                        val center1 = intersectOnePoint(perp, half)
+                        val circle1 = circleTool(center1, touch)
                         val line = lineTool(baseO, sample)
-
-                        // Or could use a perpendicular bisector here
-                        // val perpB = perpendicularBisectorTool(baseO, baseB)
-                        val perpB = perpendicularTool(line2, baseB, probe = baseO)
-                        val center1 = intersectOnePoint(perpB, half)
-                        val circle1 = circleTool(center1, baseB)
-                        val aim1 = intersectTwoPoints(circle1, line).second
+                        val aim1 = intersectTwoPoints(circle1, line).first
                         val cross1 = lineTool(center1, aim1)
                         val cross2 = parallelTool(cross1, sample, probe = center1)
                         val center2 = intersectOnePoint(cross2, half)
