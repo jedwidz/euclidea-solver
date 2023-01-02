@@ -462,6 +462,22 @@ val Element.isCircleFromNonCollapsingCompass: Boolean
         return this is Element.Circle && source is CircleSource.NonCollapsingCompass
     }
 
+fun Element.constructionPoints(): List<Point> {
+    return when (this) {
+        is Element.Circle -> when (source) {
+            is CircleSource.NonCollapsingCompass -> listOf(center, source.pointA, source.pointB)
+            null -> listOfNotNull(center, sample)
+        }
+        is Element.Line -> when (source) {
+            is LineSource.AngleBisect -> listOf(source.pointA, source.pointO, source.pointB)
+            is LineSource.Parallel -> listOf(source.line.point1, source.line.point2, source.point)
+            is LineSource.Perpendicular -> listOf(source.line.point1, source.line.point2, source.point)
+            is LineSource.PerpendicularBisect -> listOf(source.point1, source.point2)
+            null -> listOf(point1, point2)
+        }
+    }
+}
+
 fun meetAtOnePoint(element1: Element, element2: Element): Boolean {
     return intersect(element1, element2) is Intersection.OnePoint
 }

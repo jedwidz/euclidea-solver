@@ -70,5 +70,10 @@ data class EuclideaContext(
         // Linear lookup, maybe should be more efficient
         return points.firstOrNull() { coincides(it, point) }
     }
-}
 
+    fun constructionPointSet(): PointSet {
+        val res = PointSet()
+        res += elements.flatMap { element -> element.constructionPoints() }
+        return res
+    }
+}
