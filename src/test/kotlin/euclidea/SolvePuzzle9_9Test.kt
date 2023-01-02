@@ -15,11 +15,12 @@ class SolvePuzzle9_9Test {
 
     @Test
     fun improveSolution() {
+        // no solution found 17 sec
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 1,
             maxDepth = 7,
-            nonNewElementLimit = 3,
-            consecutiveNonNewElementLimit = 3,
+//            nonNewElementLimit = 4,
+//            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
     }
@@ -78,9 +79,9 @@ class SolvePuzzle9_9Test {
                 with(context) {
                     return Setup(line1, line2) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(4.0)
+                            maxSqDistance = sq(8.0)
                         ),
-                        points = listOf(baseO, baseA, baseB, center/*, probe1, probe2*/),
+                        points = listOf(baseO/*, baseA, baseB*/, center/*, probe1, probe2*/),
                         elements = listOf(line1, line2)
                     )
                 }
@@ -172,9 +173,9 @@ class SolvePuzzle9_9Test {
                 with(setup) {
                     @Suppress("unused") val context = object {
                         // Optimal 6L solution
-                        val parallel1 = parallelTool(line1, center, probe = probe1)
+                        val parallel1 = parallelTool(line1, center, probe = baseO)
                         val other1 = intersectOnePoint(parallel1, line2)
-                        val parallel2 = parallelTool(line2, center, probe = probe2)
+                        val parallel2 = parallelTool(line2, center, probe = baseO)
                         val other2 = intersectOnePoint(parallel2, line1)
                         val other = lineTool(other1, other2)
                         val circle = circleTool(center, other1)
