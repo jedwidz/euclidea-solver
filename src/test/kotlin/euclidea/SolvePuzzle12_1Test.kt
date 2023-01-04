@@ -14,9 +14,10 @@ class SolvePuzzle12_1Test {
 
     @Test
     fun improveSolution() {
+        // no solution found 3 min 20 sec
         Solver().improveSolution(
             maxExtraElements = 2,
-            maxDepth = 5,
+            maxDepth = 8,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -66,11 +67,6 @@ class SolvePuzzle12_1Test {
                 return Setup to EuclideaContext(
                     config = EuclideaConfig(
                         maxSqDistance = sq(10.0),
-                        perpendicularToolEnabled = true,
-                        perpendicularBisectorToolEnabled = true,
-                        angleBisectorToolEnabled = true,
-                        parallelToolEnabled = true,
-                        nonCollapsingCompassToolEnabled = true,
                     ),
                     points = listOf(baseA, baseB, baseC/*, probe1, probe2*/),
                     elements = listOf()
