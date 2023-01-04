@@ -2,6 +2,7 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
@@ -18,9 +19,10 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
+        // no solution found 15 min 57 sec
         Solver().improveSolution(
             maxExtraElements = 2,
-            maxDepth = 10,
+            maxDepth = 8,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -197,35 +199,37 @@ class SolvePuzzle13_6Test {
             }
         }
 
-//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-//            return listOf(this::alternateSolution)
-//        }
-//
-//        fun alternateSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Optimal 5L solution
-//                        val lineA = lineTool(center, baseA)
-//                        val solutionA = perpendicularTool(lineA, baseA, probe = baseB)
-//                        val bisectAB = perpendicularBisectorTool(baseA, baseB)
-//
-//                        // Needs to be the 'further away' intersection
-//                        val pointC = intersectTwoPoints(bisectAB, circle).second
-//                        val solutionC = perpendicularTool(bisectAB, pointC, probe = baseA)
-//                        val vertex = intersectOnePoint(bisectAB, solutionA)
-//                        val solutionB = lineTool(vertex, baseB)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::optimal6LSolution)
+        }
+
+        fun optimal6LSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 6L solution
+                        val lineAB = lineTool(pointA, pointB)
+                        val bisect = perpendicularBisectorTool(pointA, pointB)
+                        val midAB = intersectOnePoint(bisect, lineAB)
+                        val inline = intersectOnePoint(lineAB, line)
+                        val circle1 = nonCollapsingCompassTool(inline, midAB, pointB)
+                        val ref = intersectTwoPoints(circle1, bisect).second
+                        val circle2 = nonCollapsingCompassTool(ref, midAB, inline)
+                        val ground = intersectTwoPoints(circle2, line).second
+                        val perp = perpendicularTool(line, ground, probe = midAB)
+                        val center = intersectOnePoint(perp, bisect)
+                        val solution = circleTool(center, ground)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
