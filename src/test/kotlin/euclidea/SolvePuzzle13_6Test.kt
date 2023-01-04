@@ -18,10 +18,9 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // solution found 10 sec
         Solver().improveSolution(
-            maxExtraElements = 4,
-            maxDepth = 6,
+            maxExtraElements = 2,
+            maxDepth = 10,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -74,8 +73,8 @@ class SolvePuzzle13_6Test {
                             maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,
                             perpendicularBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            perpendicularToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
                         ),
                         // base is included as a probe point
@@ -153,15 +152,17 @@ class SolvePuzzle13_6Test {
         }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-            // Euclidea 6L L-star moves hint
+            // Euclidea 10E E-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
-                    0 -> !element.isLineFromLine
-                    1 -> !element.isLineFromPerpendicularBisector
-                    2 -> !element.isCircleFromNonCollapsingCompass
-                    3 -> !element.isCircleFromNonCollapsingCompass
-                    4 -> !element.isLineFromPerpendicular
+                    0 -> !element.isLineFromPerpendicularBisector
+                    1 -> !element.isCircleFromCircle
+                    2 -> !element.isCircleFromCircle
+                    3 -> !element.isLineFromLine
+                    4 -> !element.isCircleFromCircle
                     5 -> !element.isCircleFromCircle
+                    6 -> !element.isLineFromLine
+                    7 -> !element.isCircleFromCircle
                     else -> false
                 }
             }
