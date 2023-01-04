@@ -1,7 +1,10 @@
 package euclidea
 
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
+import euclidea.EuclideaTools.perpendicularBisectorTool
+import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 
 class SolvePuzzle12_1Test {
@@ -14,7 +17,7 @@ class SolvePuzzle12_1Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 3 min 20 sec
+        // solution found 2 min 24 sec
         Solver().improveSolution(
             maxExtraElements = 2,
             maxDepth = 8,
@@ -129,22 +132,17 @@ class SolvePuzzle12_1Test {
         }
 
 //        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 13E E-star moves hint
+//            // Euclidea 8E E-star moves hint
 //            return { solveContext, element ->
 //                when (solveContext.depth) {
 //                    0 -> !element.isCircleFromCircle
-//                    1 -> !element.isLineFromLine
+//                    1 -> !element.isCircleFromCircle
 //                    2 -> !element.isCircleFromCircle
 //                    3 -> !element.isCircleFromCircle
 //                    4 -> !element.isLineFromLine
-//                    5 -> !element.isLineFromLine
+//                    5 -> !element.isCircleFromCircle
 //                    6 -> !element.isLineFromLine
-//                    7 -> !element.isCircleFromCircle
-//                    8 -> !element.isCircleFromCircle
-//                    9 -> !element.isLineFromLine
-//                    10 -> !element.isCircleFromCircle
-//                    11 -> !element.isLineFromLine
-//                    12 -> !element.isCircleFromCircle
+//                    7 -> !element.isLineFromLine
 //                    else -> false
 //                }
 //            }
@@ -167,6 +165,36 @@ class SolvePuzzle12_1Test {
                         val solutionA = parallelTool(lineBC, baseA, probe = baseB)
                         val solutionB = parallelTool(lineCA, baseB, probe = baseC)
                         val solutionC = parallelTool(lineAB, baseC, probe = baseA)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
+
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::optimal5LSolution)
+        }
+
+        fun optimal5LSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 5L solution
+                        val bisectBC = perpendicularBisectorTool(baseB, baseC)
+                        val solutionA = perpendicularTool(bisectBC, baseA)
+                        val measure = nonCollapsingCompassTool(baseB, baseC, baseA)
+                        val aim = intersectTwoPoints(measure, solutionA)
+                        val aimB = aim.second
+                        val aimC = aim.first
+                        val solutionB = lineTool(baseB, aimB)
+                        val solutionC = lineTool(baseC, aimC)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
