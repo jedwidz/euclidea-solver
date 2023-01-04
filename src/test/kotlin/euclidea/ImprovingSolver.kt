@@ -5,7 +5,11 @@ import kotlin.test.assertTrue
 abstract class ImprovingSolver<Params : Any, Setup> {
 
     fun checkReferenceSolution() {
-        checkImpl(this::referenceSolution)
+        allReferenceSolutions().map(this::checkImpl)
+    }
+
+    private fun allReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+        return listOf(this::referenceSolution) + additionalReferenceSolutions()
     }
 
     private fun checkImpl(solution: (Params, Namer) -> Pair<Setup, EuclideaContext?>) {
@@ -45,8 +49,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             initialContext(params, namer)
         val initialElementCount = startingContext.elements.size
 
-        val (sampleSolutionSetup, sampleSolutionContext) =
-            referenceSolution(params, namer)
+        val sampleSolutionContexts = allReferenceSolutions().mapNotNull { it(params, namer).second }
 
         val isSolution = isSolution(params, setup)
         val visitPriority = visitPriority(params, setup)
@@ -74,9 +77,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             }
         }
 
-        if (sampleSolutionContext !== null) {
-            assertTrue(isSolution(sampleSolutionContext))
-        }
+        assertTrue(sampleSolutionContexts.all { isSolution(it) })
 
         val prefixNamer = Namer()
         val prefixContext = solutionPrefix(params, prefixNamer)?.second
@@ -96,7 +97,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
                 targetElementSet += context.constructionElementSet()
         }
         accumTargetElements(startingContext)
-        sampleSolutionContext?.let { accumTargetElements(it) }
+        sampleSolutionContexts.forEach { accumTargetElements(it) }
         prefixContext?.let { accumTargetElements(it) }
 
         val passWithPrefix: ((SolveContext, Element) -> Boolean) = { solveContext, element ->
@@ -168,6 +169,11 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         // No solution
         val (setup, _) = initialContext(params, namer)
         return setup to null
+    }
+
+    protected open fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+        // No solutions
+        return listOf()
     }
 
     protected abstract fun initialContext(
