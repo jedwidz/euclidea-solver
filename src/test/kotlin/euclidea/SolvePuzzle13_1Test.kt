@@ -18,7 +18,7 @@ class SolvePuzzle13_1Test {
     fun improveSolution() {
         Solver().improveSolution(
             maxExtraElements = 2,
-            maxDepth = 4,
+            maxDepth = 8,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -71,11 +71,11 @@ class SolvePuzzle13_1Test {
                     return Setup(circle, line) to EuclideaContext(
                         config = EuclideaConfig(
                             maxSqDistance = sq(10.0),
-                            parallelToolEnabled = true,
-                            perpendicularBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            perpendicularToolEnabled = true,
-                            angleBisectorToolEnabled = true,
+//                            parallelToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            perpendicularToolEnabled = true,
+//                            angleBisectorToolEnabled = true,
                         ),
                         points = listOf(center, base),
                         elements = listOf(circle, line)
