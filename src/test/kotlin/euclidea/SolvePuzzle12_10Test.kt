@@ -2,6 +2,7 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 
@@ -15,10 +16,9 @@ class SolvePuzzle12_10Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 2 sec
         Solver().improveSolution(
             maxExtraElements = 2,
-            maxDepth = 5,
+            maxDepth = 7,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -73,11 +73,11 @@ class SolvePuzzle12_10Test {
                     return Setup(circle, baseA, baseB) to EuclideaContext(
                         config = EuclideaConfig(
                             maxSqDistance = sq(10.0),
-                            parallelToolEnabled = true,
-                            perpendicularBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            perpendicularToolEnabled = true,
-                            angleBisectorToolEnabled = true,
+//                            parallelToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            perpendicularToolEnabled = true,
+//                            angleBisectorToolEnabled = true,
                         ),
                         points = listOf(center, baseA, baseB),
                         elements = listOf(circle)
@@ -92,29 +92,47 @@ class SolvePuzzle12_10Test {
         ): (EuclideaContext) -> Boolean {
             val solution = constructSolution(params)
             return { context ->
-                context.hasElements(solution)
+                solution.any { context.hasElements(it) }
             }
         }
 
-        private fun constructSolution(params: Params): List<Element.Line> {
+        private fun constructSolution(params: Params): List<List<Element.Line>> {
             val namer = Namer()
             val (setup, _) = initialContext(
                 params, namer
             )
             with(params) {
                 with(setup) {
-                    // Sub-optimal 6L solution
-                    val lineA = lineTool(center, baseA)
-                    val solutionA = perpendicularTool(lineA, baseA, probe = baseB)
-                    val lineB = lineTool(center, baseB)
-                    val solutionB = perpendicularTool(lineB, baseB, probe = baseA)
-                    val vertex1 = intersectOnePoint(solutionA, solutionB)
-                    val measure = circleTool(center, vertex1)
-                    val vertex2 = intersectOnePoint(lineB, solutionA)
-                    val vertex3 = intersectTwoPointsOther(measure, solutionB, vertex1)
-                    val solutionC = lineTool(vertex2, vertex3)
+                    // Accept either of the following solutions (third possibility omitted for symmetry)...
 
-                    return listOf(solutionA, solutionB, solutionC)
+                    val solution1 = run {
+                        // Sub-optimal 6L solution
+                        val lineA = lineTool(center, baseA)
+                        val solutionA = perpendicularTool(lineA, baseA, probe = baseB)
+                        val lineB = lineTool(center, baseB)
+                        val solutionB = perpendicularTool(lineB, baseB, probe = baseA)
+                        val vertex1 = intersectOnePoint(solutionA, solutionB)
+                        val measure = circleTool(center, vertex1)
+                        val vertex2 = intersectOnePoint(lineB, solutionA)
+                        val vertex3 = intersectTwoPointsOther(measure, solutionB, vertex1)
+                        val solutionC = lineTool(vertex2, vertex3)
+                        listOf(solutionA, solutionB, solutionC)
+                    }
+
+                    val solution2 = run {
+                        // Optimal 5L solution
+                        val lineA = lineTool(center, baseA)
+                        val solutionA = perpendicularTool(lineA, baseA, probe = baseB)
+                        val bisectAB = perpendicularBisectorTool(baseA, baseB)
+                        // Needs to be the 'further away' intersection
+                        val pointC = intersectTwoPoints(bisectAB, circle).second
+                        val solutionC = perpendicularTool(bisectAB, pointC, probe = baseA)
+                        val vertex = intersectOnePoint(bisectAB, solutionA)
+                        val solutionB = lineTool(vertex, baseB)
+                        listOf(solutionA, solutionB, solutionC)
+                    }
+
+                    return listOf(solution1, solution2)
                 }
             }
         }
@@ -137,27 +155,27 @@ class SolvePuzzle12_10Test {
 //        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutionElements = constructSolution(params)
+            val solutions = constructSolution(params)
             return { context ->
-                solutionElements.count { !context.hasElement(it) }
+                solutions.map { solutionElements -> solutionElements.count { !context.hasElement(it) } }.min()
             }
         }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 7E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> !element.isLineFromLine
-//                    1 -> !element.isCircleFromCircle
-//                    2 -> !element.isCircleFromCircle
-//                    3 -> !element.isLineFromLine
-//                    4 -> !element.isLineFromLine
-//                    5 -> !element.isCircleFromCircle
-//                    6 -> !element.isLineFromLine
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 7E E-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isLineFromLine
+                    1 -> !element.isCircleFromCircle
+                    2 -> !element.isCircleFromCircle
+                    3 -> !element.isLineFromLine
+                    4 -> !element.isLineFromLine
+                    5 -> !element.isLineFromLine
+                    6 -> !element.isLineFromLine
+                    else -> false
+                }
+            }
+        }
 
         override fun referenceSolution(
             params: Params,
@@ -186,35 +204,35 @@ class SolvePuzzle12_10Test {
             }
         }
 
-//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-//            return listOf(this::optimal6LSolution)
-//        }
-//
-//        fun optimal6LSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Optimal 6L solution
-//                        val bisectAB = perpendicularBisectorTool(center, dirA)
-//                        val midAB = intersectOnePoint(bisectAB, lineAB)
-//                        val cross = lineTool(midAB, dirB)
-//                        val circle1 = circleTool(dirB, midAB)
-//                        val doubled = intersectTwoPointsOther(circle1, cross, midAB)
-//                        val circle2 = circleTool(doubled, dirB)
-//                        val tripled = intersectTwoPointsOther(circle2, cross, dirB)
-//                        val solutionA = lineTool(center, tripled)
-//                        val solutionB = lineTool(dirA, tripled)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::alternateSolution)
+        }
+
+        fun alternateSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 5L solution
+                        val lineA = lineTool(center, baseA)
+                        val solutionA = perpendicularTool(lineA, baseA, probe = baseB)
+                        val bisectAB = perpendicularBisectorTool(baseA, baseB)
+
+                        // Needs to be the 'further away' intersection
+                        val pointC = intersectTwoPoints(bisectAB, circle).second
+                        val solutionC = perpendicularTool(bisectAB, pointC, probe = baseA)
+                        val vertex = intersectOnePoint(bisectAB, solutionA)
+                        val solutionB = lineTool(vertex, baseB)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
