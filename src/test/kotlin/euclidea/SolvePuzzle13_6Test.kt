@@ -19,12 +19,12 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 15 min 57 sec
+        // no solution found 3 hr
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 8,
-//            nonNewElementLimit = 7,
-//            consecutiveNonNewElementLimit = 4,
+            nonNewElementLimit = 4,
+            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
     }
@@ -72,7 +72,7 @@ class SolvePuzzle13_6Test {
                 with(context) {
                     return Setup(line) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(10.0),
+                            maxSqDistance = sq(15.0),
 //                            parallelToolEnabled = true,
                             perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
@@ -121,22 +121,21 @@ class SolvePuzzle13_6Test {
             }
         }
 
-//        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    // Assumed partial solution, agreeing with hints
-//                    @Suppress("unused") val context = object {
-//                        val half = EuclideaTools.angleBisectorTool(baseA, baseO, baseB)
-//                        // val perp = perpendicularTool(line2, sample, probe = baseO)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Seems a fair bet...
+                        val bisect = perpendicularBisectorTool(pointA, pointB)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solution = constructSolution(params)
