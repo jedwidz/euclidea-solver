@@ -120,7 +120,8 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             },
             visitPriority = visitPriority,
             pass = passWithPrefix,
-            remainingStepsLowerBound = remainingStepsLowerBound
+            remainingStepsLowerBound = remainingStepsLowerBound,
+            excludeElements = excludeElements(params, setup)
         ) { context ->
             isSolution(context) && checkSolution(context)
         }
@@ -140,6 +141,13 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         params: Params,
         setup: Setup
     ): (EuclideaContext) -> Boolean
+
+    protected open fun excludeElements(
+        params: Params,
+        setup: Setup
+    ): ElementSet? {
+        return null
+    }
 
     protected open fun visitPriority(
         params: Params,

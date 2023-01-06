@@ -66,6 +66,7 @@ fun solve(
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
+    excludeElements: ElementSet? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
 
@@ -120,7 +121,7 @@ fun solve(
 
                 val newElements = mutableSetOf<Element>()
                 fun tryAdd(e: Element?) {
-                    if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e)) {
+                    if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e) && excludeElements?.let { e in it } != true) {
                         pendingElements += e
                         newElements.add(e)
                     }
