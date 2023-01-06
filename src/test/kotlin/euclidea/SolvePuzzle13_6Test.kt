@@ -19,12 +19,12 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // Gave up after 1 day 5 hr
+        // no solution found - 2 hr 17 min
         Solver().improveSolution(
-            maxExtraElements = 4,
-            maxDepth = 8,
-            nonNewElementLimit = 4,
-            consecutiveNonNewElementLimit = 2,
+            maxExtraElements = 3,
+            maxDepth = 7,
+//            nonNewElementLimit = 4,
+//            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
     }
@@ -38,6 +38,7 @@ class SolvePuzzle13_6Test {
 
     data class Setup(
         val line: Element.Line,
+        val bisect: Element.Line,
     )
 
     class Solver : ImprovingSolver<Params, Setup>() {
@@ -67,14 +68,15 @@ class SolvePuzzle13_6Test {
             with(params) {
                 val context = object {
                     val line = Element.Line(base, dir)
+                    val bisect = perpendicularBisectorTool(pointA, pointB)
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line) to EuclideaContext(
+                    return Setup(line, bisect) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(15.0),
+                            maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,
-                            perpendicularBisectorToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
 //                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
@@ -82,7 +84,7 @@ class SolvePuzzle13_6Test {
                         // base is included as a probe point
                         points = listOf(pointA, pointB, base),
                         elements = listOf(line)
-                    )
+                    ).withElement(bisect)
                 }
             }
         }
@@ -94,6 +96,15 @@ class SolvePuzzle13_6Test {
             val solution = constructSolution(params)
             return { context ->
                 context.hasElement(solution)
+            }
+        }
+
+        override fun excludeElements(params: Params, setup: Setup): ElementSet {
+            with(params) {
+                val elements = ElementSet()
+                // Hints suggest we don't need these...
+                elements += listOf(circleTool(pointA, pointB), circleTool(pointB, pointA))
+                return elements
             }
         }
 
@@ -121,21 +132,20 @@ class SolvePuzzle13_6Test {
             }
         }
 
-        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    @Suppress("unused") val context = object {
-                        // Seems a fair bet...
-                        val bisect = perpendicularBisectorTool(pointA, pointB)
-                    }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
-                }
-            }
-        }
+//        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+//            val (setup, initialContext) = initialContext(
+//                params, namer
+//            )
+//            with(params) {
+//                with(setup) {
+//                    @Suppress("unused") val context = object {
+//                        val bisect = perpendicularBisect(pointA, pointB)
+//                    }
+//                    namer.nameReflected(context)
+//                    return setup to initialContext.withElements(elementsReflected(context))
+//                }
+//            }
+//        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solution = constructSolution(params)
@@ -156,14 +166,15 @@ class SolvePuzzle13_6Test {
             // Euclidea 10E E-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
-                    0 -> !element.isLineFromPerpendicularBisector
+                    // Moved to setup
+                    // 0 -> !element.isLineFromPerpendicularBisector
+                    0 -> !element.isCircleFromCircle
                     1 -> !element.isCircleFromCircle
-                    2 -> !element.isCircleFromCircle
-                    3 -> !element.isLineFromLine
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isCircleFromCircle
                     4 -> !element.isCircleFromCircle
-                    5 -> !element.isCircleFromCircle
-                    6 -> !element.isLineFromLine
-                    7 -> !element.isCircleFromCircle
+                    5 -> !element.isLineFromLine
+                    6 -> !element.isCircleFromCircle
                     else -> false
                 }
             }
@@ -180,7 +191,7 @@ class SolvePuzzle13_6Test {
                 with(setup) {
                     @Suppress("unused") val context = object {
                         // Sub-optimal 7L solution
-                        val bisect = perpendicularBisectorTool(pointA, pointB)
+//                        val bisect = perpendicularBisectorTool(pointA, pointB)
                         val intercept = intersectOnePoint(bisect, line)
                         val lineB = lineTool(intercept, pointB)
                         val perp = perpendicularTool(line, base, probe = pointB)
@@ -214,7 +225,8 @@ class SolvePuzzle13_6Test {
                     @Suppress("unused") val context = object {
                         // Optimal 6L solution
                         val lineAB = lineTool(pointA, pointB)
-                        val bisect = perpendicularBisectorTool(pointA, pointB)
+
+                        //                        val bisect = perpendicularBisectorTool(pointA, pointB)
                         val midAB = intersectOnePoint(bisect, lineAB)
                         val inline = intersectOnePoint(lineAB, line)
                         val circle1 = nonCollapsingCompassTool(inline, midAB, pointB)
