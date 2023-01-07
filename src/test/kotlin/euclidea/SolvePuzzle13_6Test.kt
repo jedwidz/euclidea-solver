@@ -19,9 +19,10 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found - 2 hr 17 min
+        // gave up after 18 hr 50 min
+        // TODO add more sample solutions, allow either V
         Solver().improveSolution(
-            maxExtraElements = 3,
+            maxExtraElements = 4,
             maxDepth = 7,
 //            nonNewElementLimit = 4,
 //            consecutiveNonNewElementLimit = 2,
