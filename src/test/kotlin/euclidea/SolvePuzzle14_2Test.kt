@@ -4,7 +4,6 @@ import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.parallelTool
 import org.junit.jupiter.api.Test
-import kotlin.test.assertTrue
 
 class SolvePuzzle14_2Test {
     // Circle Tangent to Two Circles
@@ -16,11 +15,11 @@ class SolvePuzzle14_2Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 20 sec
+        // no solution found 15 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 4,
             maxDepth = 4,
-            nonNewElementLimit = 2,
+//            nonNewElementLimit = 2,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
@@ -44,7 +43,7 @@ class SolvePuzzle14_2Test {
             return Params(
                 center1 = Point(0.0, 0.0),
                 sample1 = Point(0.5, 0.0),
-                center2 = Point(1.0, 4.0),
+                center2 = Point(1.0, 0.4),
                 sample2 = Point(0.9, 0.3)
             )
         }
@@ -53,7 +52,7 @@ class SolvePuzzle14_2Test {
             return Params(
                 center1 = Point(0.0, 0.0),
                 sample1 = Point(0.501, 0.002),
-                center2 = Point(1.03, 4.04),
+                center2 = Point(1.03, 0.404),
                 sample2 = Point(0.91, 0.311)
             )
         }
@@ -72,11 +71,11 @@ class SolvePuzzle14_2Test {
                     return Setup(circle1, circle2) to EuclideaContext(
                         config = EuclideaConfig(
                             perpendicularBisectorToolEnabled = true,
-                            perpendicularToolEnabled = true,
-                            angleBisectorToolEnabled = true,
+//                            perpendicularToolEnabled = true,
+//                            angleBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
-                            parallelToolEnabled = true,
-                            maxSqDistance = sq(10.0)
+//                            parallelToolEnabled = true,
+                            maxSqDistance = sq(20.0)
                         ),
                         points = listOf(center1, sample1, center2/*, sample2*/),
                         elements = listOf(circle1, circle2)
@@ -89,11 +88,17 @@ class SolvePuzzle14_2Test {
             params: Params,
             setup: Setup
         ): (EuclideaContext) -> Boolean {
-            val solution = constructSolution(params)
-            // Validate
-            assertTrue(listOf(setup.circle1, setup.circle2).all { meetAtOnePoint(solution, it) })
+            fun allGood(circle: Element.Circle): Boolean {
+                return pointAndCircleCoincide(params.sample1, circle) &&
+                        listOf(setup.circle1, setup.circle2).all { meetAtOnePoint(circle, it) }
+            }
+//            val solution = constructSolution(params)
+//            // Validate
+//            assertTrue(allGood(solution))
             return { context ->
-                context.hasElement(solution)
+//                context.hasElement(solution)
+                val last = context.elements.last()
+                last is Element.Circle && allGood(last)
             }
         }
 
