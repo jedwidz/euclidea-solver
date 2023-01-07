@@ -1,5 +1,6 @@
 package euclidea
 
+import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
@@ -18,9 +19,9 @@ class SolvePuzzle13_4Test {
 
     @Test
     fun improveSolution() {
-        // gave up 9 min 16 sec
+        // no solution found 1 min 25 sec
         Solver().improveSolution(
-            maxExtraElements = 5,
+            maxExtraElements = 3,
             maxDepth = 8,
 //            nonNewElementLimit = 4,
 //            consecutiveNonNewElementLimit = 3,
@@ -212,36 +213,36 @@ class SolvePuzzle13_4Test {
             }
         }
 
-//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-//            return listOf(this::optimal6LSolution)
-//        }
-//
-//        private fun optimal6LSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Optimal 6L solution
-//                        val circle1 = nonCollapsingCompassTool(base2, dir2, vertex)
-//                        val right = intersectOnePoint(circle1, line1)
-//                        val circle2 = circleTool(right, vertex)
-//                        val bisect = perpendicularBisectorTool(vertex, base1)
-//                        val center3 = intersectTwoPoints(bisect, circle2).second
-//                        val circle3 = circleTool(vertex, center3)
-//                        val point = intersectTwoPointsOther(circle3, line1, vertex)
-//                        val parallel = parallelTool(side1, point, probe = vertex)
-//                        val solutionP2 = intersectOnePoint(parallel, side2)
-//                        val solution = parallelTool(line1, solutionP2, probe = base1)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::optimal6LSolution)
+        }
+
+        private fun optimal6LSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 6L solution
+                        val perpC = perpendicularTool(lineCA, pointC, probe = pointB)
+                        val measure = circleTool(pointC, pointA)
+                        val down = intersectTwoPoints(measure, perpC).first
+                        val cross = lineTool(down, pointB)
+                        val aim = intersectOnePoint(cross, lineCA)
+                        val solution1 = perpendicularTool(lineCA, aim, probe = pointB)
+                        val solutionP1 = intersectOnePoint(solution1, lineBC)
+                        val solution2 = perpendicularTool(perpC, solutionP1, probe = pointC)
+                        val solutionP2 = intersectOnePoint(solution2, lineAB)
+                        val solution3 = perpendicularTool(lineCA, solutionP2, probe = pointA)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
