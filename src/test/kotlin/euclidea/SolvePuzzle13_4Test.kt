@@ -19,12 +19,12 @@ class SolvePuzzle13_4Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 5 min 24 sec
+        // no solution found ?
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 5,
             maxDepth = 8,
-            nonNewElementLimit = 4,
-            consecutiveNonNewElementLimit = 3,
+//            nonNewElementLimit = 4,
+//            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
     }
@@ -46,7 +46,7 @@ class SolvePuzzle13_4Test {
         override fun makeParams(): Params {
             return Params(
                 pointA = Point(0.0, 0.0),
-                pointB = Point(0.55, 0.45),
+                pointB = Point(0.58, 0.45),
                 pointC = Point(1.0, 0.0)
             )
         }
@@ -54,7 +54,7 @@ class SolvePuzzle13_4Test {
         override fun makeReplayParams(): Params {
             return Params(
                 pointA = Point(0.0, 0.0),
-                pointB = Point(0.551, 0.452),
+                pointB = Point(0.581, 0.452),
                 pointC = Point(1.003, 0.004)
             )
         }
