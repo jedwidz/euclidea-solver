@@ -15,9 +15,9 @@ class SolvePuzzle14_2Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 15 sec
+        // solution found 23 sec
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 2,
             maxDepth = 4,
 //            nonNewElementLimit = 2,
 //            consecutiveNonNewElementLimit = 2,
@@ -77,7 +77,7 @@ class SolvePuzzle14_2Test {
 //                            parallelToolEnabled = true,
                             maxSqDistance = sq(20.0)
                         ),
-                        points = listOf(center1, sample1, center2/*, sample2*/),
+                        points = listOf(center1, sample1, center2, sample2),
                         elements = listOf(circle1, circle2)
                     )
                 }
