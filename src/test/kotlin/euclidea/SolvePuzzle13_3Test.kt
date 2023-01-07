@@ -16,12 +16,12 @@ class SolvePuzzle13_3Test {
 
     @Test
     fun improveSolution() {
-        // gave up 11 min 9 sec
+        // solution found 4 sec
         Solver().improveSolution(
             maxExtraElements = 2,
             maxDepth = 6,
-            nonNewElementLimit = 4,
-            consecutiveNonNewElementLimit = 3,
+//            nonNewElementLimit = 4,
+//            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
     }
@@ -72,14 +72,14 @@ class SolvePuzzle13_3Test {
                     return Setup(circle1, circle2) to EuclideaContext(
                         config = EuclideaConfig(
                             perpendicularBisectorToolEnabled = true,
-                            perpendicularToolEnabled = true,
-                            angleBisectorToolEnabled = true,
+//                            perpendicularToolEnabled = true,
+//                            angleBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
-                            parallelToolEnabled = true,
+//                            parallelToolEnabled = true,
                             maxSqDistance = sq(5.0)
                         ),
                         // base1 and base2 act as probe points
-                        points = listOf(vertex, center /*base1, base2*/),
+                        points = listOf(vertex, center, base1, base2),
                         elements = listOf(circle1, circle2)
                     )
                 }
@@ -158,23 +158,20 @@ class SolvePuzzle13_3Test {
 //            }
 //        }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 9E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> !element.isLineFromLine
-//                    1 -> !element.isLineFromLine
-//                    2 -> !element.isCircleFromCircle
-//                    3 -> !element.isCircleFromCircle
-//                    4 -> !element.isLineFromLine
-//                    5 -> !element.isCircleFromCircle
-//                    6 -> !element.isLineFromLine
-//                    7 -> !element.isCircleFromCircle
-//                    8 -> !element.isLineFromLine
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 6L L-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isCircleFromNonCollapsingCompass
+                    1 -> !element.isLineFromPerpendicularBisector
+                    2 -> !element.isCircleFromCircle
+                    3 -> !element.isLineFromLine
+                    4 -> !element.isLineFromLine
+                    5 -> !element.isLineFromLine
+                    else -> false
+                }
+            }
+        }
 
         override fun referenceSolution(
             params: Params,
