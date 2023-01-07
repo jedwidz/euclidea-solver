@@ -15,10 +15,10 @@ class SolvePuzzle14_2Test {
 
     @Test
     fun improveSolution() {
-        // solution found 23 sec
+        // solution found 17 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
-            maxDepth = 4,
+            maxExtraElements = 3,
+            maxDepth = 7,
 //            nonNewElementLimit = 2,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -70,12 +70,12 @@ class SolvePuzzle14_2Test {
                 with(context) {
                     return Setup(circle1, circle2) to EuclideaContext(
                         config = EuclideaConfig(
-                            perpendicularBisectorToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
 //                            parallelToolEnabled = true,
-                            maxSqDistance = sq(20.0)
+                            maxSqDistance = sq(8.0)
                         ),
                         points = listOf(center1, sample1, center2, sample2),
                         elements = listOf(circle1, circle2)
@@ -131,13 +131,16 @@ class SolvePuzzle14_2Test {
 //        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-            // Euclidea 4L L-star moves hint
+            // Euclidea 7E E-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
                     0 -> !element.isLineFromLine
-                    1 -> !element.isCircleFromNonCollapsingCompass
-                    2 -> !element.isLineFromPerpendicularBisector
-                    3 -> !element.isCircleFromCircle
+                    1 -> !element.isLineFromLine
+                    2 -> !element.isCircleFromCircle
+                    3 -> !element.isLineFromLine
+                    4 -> !element.isLineFromLine
+                    5 -> !element.isLineFromLine
+                    6 -> !element.isCircleFromCircle
                     else -> false
                 }
             }
