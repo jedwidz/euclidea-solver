@@ -512,3 +512,10 @@ fun Element.constructionElements(): List<Element> {
 fun meetAtOnePoint(element1: Element, element2: Element): Boolean {
     return intersect(element1, element2) is Intersection.OnePoint
 }
+
+fun onePointIntersection(element1: Element, element2: Element): Point? {
+    return when (val intersection = intersect(element1, element2)) {
+        is Intersection.OnePoint -> intersection.point
+        else -> null
+    }
+}
