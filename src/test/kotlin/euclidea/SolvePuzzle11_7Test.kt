@@ -22,7 +22,7 @@ class SolvePuzzle11_7Test {
     @Test
     fun improveSolution() {
         Solver().improveSolution(
-            // no solution found ?
+            // gave up 1 hr 37 min
             maxExtraElements = 2,
             maxDepth = 9,
             nonNewElementLimit = 5,
