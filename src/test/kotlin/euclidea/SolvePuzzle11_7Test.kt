@@ -7,6 +7,8 @@ import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sqrt
 
 class SolvePuzzle11_7Test {
@@ -20,11 +22,11 @@ class SolvePuzzle11_7Test {
     @Test
     fun improveSolution() {
         Solver().improveSolution(
-            // no solution found 5 min 16 sec
-            maxExtraElements = 1,
+            // no solution found ?
+            maxExtraElements = 2,
             maxDepth = 9,
-//            nonNewElementLimit = 4,
-//            consecutiveNonNewElementLimit = 2,
+            nonNewElementLimit = 5,
+            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
     }
@@ -120,10 +122,29 @@ class SolvePuzzle11_7Test {
             }
         }
 
-//        private fun constructSolution(params: Params): Element.Line {
-//            // cheekily use reference solution
-//            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
-//        }
+        private fun constructSolution(params: Params): Element.Line {
+            // cheekily use reference solution
+            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
+        }
+
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+            with(setup) {
+                val solution = constructSolution(params)
+                val point1 = intersectOnePoint(solution, side1)
+                val point2 = intersectOnePoint(solution, side2)
+                return { context ->
+                    // Assumes that solution is the last element (no extraneous elements)
+                    if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+                        0
+                    else {
+                        val onPoint1 = context.elements.count { pointAndElementCoincide(point1, it) }
+                        val onPoint2 = context.elements.count { pointAndElementCoincide(point2, it) }
+                        // Assume solution uses at least one of the highlighted points
+                        max(0, min(2 - onPoint1, 2 - onPoint2)) + 1
+                    }
+                }
+            }
+        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
             // Euclidea 9E E-star moves hint
@@ -169,6 +190,38 @@ class SolvePuzzle11_7Test {
                         val sample3 = intersectTwoPoints(circle2, extend1).second
                         val circle3 = circleTool(baseA1, sample3)
                         val point = intersectOnePoint(circle3, line1)
+                        val parallel = parallelTool(side1, point, probe = baseA1)
+                        val solutionP2 = intersectOnePoint(parallel, side2)
+                        val solution = parallelTool(line1, solutionP2, probe = baseA2)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
+
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::optimal6LSolution)
+        }
+
+        private fun optimal6LSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 6L solution
+                        val circle1 = nonCollapsingCompassTool(baseB1, baseB2, baseA1)
+                        val right = intersectOnePoint(circle1, line1)
+                        val circle2 = circleTool(right, baseA1)
+                        val bisect = perpendicularBisectorTool(baseA1, baseA2)
+                        val center3 = intersectTwoPoints(bisect, circle2).second
+                        val circle3 = circleTool(baseA1, center3)
+                        val point = intersectTwoPointsOther(circle3, line1, baseA1)
                         val parallel = parallelTool(side1, point, probe = baseA1)
                         val solutionP2 = intersectOnePoint(parallel, side2)
                         val solution = parallelTool(line1, solutionP2, probe = baseA2)
