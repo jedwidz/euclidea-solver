@@ -519,3 +519,17 @@ fun onePointIntersection(element1: Element, element2: Element): Point? {
         else -> null
     }
 }
+
+fun formsSquare(elements: LineSet): Boolean {
+    if (elements.size != 4)
+        return false
+    val points = PointSet()
+    points += elements.items().pairs().mapNotNull { (line1, line2) -> onePointIntersection(line1, line2) }
+    if (points.size != 4)
+        return false
+    val center = points.centroid()!!
+    val sampleVertex = points.items().minBy { point -> distance(center, point) }
+    val angle = 360.0 / 4.toDouble()
+    return (1 until 4).map { i -> rotatePoint(center, sampleVertex, angle * i.toDouble()) }
+        .all { vertex -> points.contains(vertex) }
+}

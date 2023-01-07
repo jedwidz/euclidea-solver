@@ -30,6 +30,8 @@ interface EuclideaSet<T> {
     operator fun <U : T> plusAssign(from: EuclideaSet<U>) {
         from.items().forEach { add(it) }
     }
+
+    abstract val size: Int
 }
 
 abstract class IndexedSet<T>(
@@ -102,6 +104,9 @@ abstract class IndexedSet<T>(
             else -> existing
         }
     }
+
+    override val size: Int
+        get() = set.size
 }
 
 class PointSet : IndexedSet<Point>(compareBy({ it.x }, { it.y })) {
@@ -116,6 +121,18 @@ class PointSet : IndexedSet<Point>(compareBy({ it.x }, { it.y })) {
 
     override fun bound(d: Double): Point {
         return Point(d, 0.0)
+    }
+
+    fun centroid(): Point? {
+        val points = items()
+        val count = points.size
+        return if (count <= 0)
+            null
+        else {
+            val x = points.sumOf { it.x } / size.toDouble()
+            val y = points.sumOf { it.y } / size.toDouble()
+            Point(x, y)
+        }
     }
 }
 
@@ -143,6 +160,14 @@ class LineSet : IndexedSet<Line>(
 
     override fun bound(d: Double): Line {
         return Line(Point(d, 0.0), Point(d, 1.0))
+    }
+
+    companion object {
+        fun of(lines: Collection<Line>): LineSet {
+            val lineSet = LineSet()
+            lineSet += lines
+            return lineSet
+        }
     }
 }
 
@@ -214,6 +239,9 @@ class ElementSet : EuclideaSet<Element> {
     private fun unreachable(): Nothing {
         throw UnsupportedOperationException("Unreachable code reached")
     }
+
+    override val size: Int
+        get() = lineSet.size + circleSet.size
 }
 
 class PrimitiveSet : EuclideaSet<Primitive> {
@@ -272,4 +300,7 @@ class PrimitiveSet : EuclideaSet<Primitive> {
             else -> unsupported(item)
         }
     }
+
+    override val size: Int
+        get() = elementSet.size + pointSet.size
 }
