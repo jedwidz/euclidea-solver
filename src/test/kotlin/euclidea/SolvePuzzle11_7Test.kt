@@ -7,6 +7,7 @@ import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import kotlin.math.sqrt
 
 class SolvePuzzle11_7Test {
     // Geometric Mean of Trapezoid Bases
@@ -97,29 +98,28 @@ class SolvePuzzle11_7Test {
             params: Params,
             setup: Setup
         ): (EuclideaContext) -> Boolean {
-            // cheekily use reference solution
-            val solution = constructSolution(params)
-            return { context ->
-                coincides(context.elements.last(), solution)
-//                val last = context.elements.last()
-//                last is Element.Line && linesParallel(last, solution)
+            with(params) {
+                with(setup) {
+                    val oa = (baseA2 - baseA1).distance
+                    val ob = (baseB2 - baseB1).distance
+                    val oc = sqrt(oa * ob)
+                    return { context ->
+                        val last = context.elements.last()
+                        last is Element.Line && linesParallel(last, line1) &&
+                                onePointIntersection(last, side1)?.let { intersect1 ->
+                                    onePointIntersection(last, side2)?.let { intersect2 ->
+                                        coincides(oc, distance(intersect1, intersect2))
+                                    }
+                                } ?: false
+                    }
+                }
             }
-//            with(params) {
-//                val oa = (baseA2 - baseA1).distance
-//                val ob = (baseB2 - baseB1).distance
-//                val oc = (dir - baseA1).distance
-//                val od = 2.0 * oa * ob / (oa + ob)
-//                val checkSolutionPoint = baseA1 + (dir - baseA1) * (od / oc)
-//                return { context ->
-//                    context.hasPoint(checkSolutionPoint)
-//                }
-//        }
         }
 
-        private fun constructSolution(params: Params): Element.Line {
-            // cheekily use reference solution
-            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
-        }
+//        private fun constructSolution(params: Params): Element.Line {
+//            // cheekily use reference solution
+//            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
+//        }
 
 //        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
 //            // Euclidea 3L L-star moves hint
@@ -142,25 +142,26 @@ class SolvePuzzle11_7Test {
             )
             with(params) {
                 with(setup) {
-                    // Sub-optimal 8L/9L solution
                     @Suppress("unused") val context = object {
+                        // Sub-optimal 8L/9L solution; fussy about starting parameters
                         val extendA = lineTool(baseA1, baseA2)
                         val circle1 = nonCollapsingCompassTool(baseB1, baseB2, baseA1)
                         val left = intersectTwoPoints(circle1, extendA).first
                         val bisect = perpendicularBisectorTool(left, baseA2)
-
-                        // Can make this an 8L solution by tweaking parameters, and using side1 directly
-                        val extend1 = lineTool(baseA1, baseB1)
-                        val solutionP1 = intersectOnePoint(bisect, extend1 /*side1*/)
                         val perp = perpendicularTool(side1, baseA1, probe = baseA2)
                         val center2 = intersectOnePoint(perp, bisect)
                         val circle2 = circleTool(center2, baseA2)
-                        val sample3 = intersectOnePoint(circle2, side1)
+
+                        // Can make this an 8L solution by tweaking parameters, and using side1 directly
+                        val extend1 = lineTool(baseA1, baseB1)
+
+                        // val sample3 = intersectOnePoint(circle2, side1)
+                        val sample3 = intersectTwoPoints(circle2, extend1).second
                         val circle3 = circleTool(baseA1, sample3)
                         val point = intersectOnePoint(circle3, line1)
                         val parallel = parallelTool(side1, point, probe = baseA1)
                         val solutionP2 = intersectOnePoint(parallel, side2)
-                        val solution = lineTool(solutionP1, solutionP2)
+                        val solution = parallelTool(line1, solutionP2, probe = baseA2)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
