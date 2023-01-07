@@ -17,11 +17,11 @@ class SolvePuzzle13_7Test {
 
     @Test
     fun improveSolution() {
-        // solution found 20 sec
+        // solution found ?
         Solver().improveSolution(
             maxExtraElements = 3,
-            maxDepth = 7,
-            nonNewElementLimit = 5,
+            maxDepth = 10,
+            nonNewElementLimit = 6,
             consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
         )
@@ -67,14 +67,14 @@ class SolvePuzzle13_7Test {
                 with(context) {
                     return Setup(circle) to EuclideaContext(
                         config = EuclideaConfig(
-                            perpendicularBisectorToolEnabled = true,
-                            perpendicularToolEnabled = true,
-                            angleBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            parallelToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
+//                            perpendicularToolEnabled = true,
+//                            angleBisectorToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            parallelToolEnabled = true,
                             maxSqDistance = sq(5.0)
                         ),
-                        points = listOf(center, base/*, sample*/),
+                        points = listOf(center, base, sample),
                         elements = listOf(circle)
                     )
                 }
