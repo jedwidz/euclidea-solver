@@ -2,6 +2,7 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
@@ -17,12 +18,12 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // gave up 8 min 8 sec
+        // no solution found 25 min 53 sec
         Solver().improveSolution(
-            maxExtraElements = 3,
+            maxExtraElements = 2,
             maxDepth = 8,
-//            nonNewElementLimit = 5,
-//            consecutiveNonNewElementLimit = 3,
+            nonNewElementLimit = 3,
+            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
     }
@@ -73,11 +74,11 @@ class SolvePuzzle13_5Test {
                     return Setup(rayA, rayC) to EuclideaContext(
                         config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
-                            perpendicularToolEnabled = true,
+//                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
 //                            parallelToolEnabled = true,
-                            maxSqDistance = sq(8.0)
+                            maxSqDistance = sq(4.0)
                         ),
                         // dirA and dirC act as probe points
                         points = listOf(baseB, baseM, dirA/*, dirC */),
@@ -214,36 +215,36 @@ class SolvePuzzle13_5Test {
             }
         }
 
-//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-//            return listOf(this::optimal6LSolution)
-//        }
-//
-//        private fun optimal6LSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Optimal 6L solution
-//                        val circle1 = nonCollapsingCompassTool(base2, dir2, vertex)
-//                        val right = intersectOnePoint(circle1, line1)
-//                        val circle2 = circleTool(right, vertex)
-//                        val bisect = perpendicularBisectorTool(vertex, base1)
-//                        val center3 = intersectTwoPoints(bisect, circle2).second
-//                        val circle3 = circleTool(vertex, center3)
-//                        val point = intersectTwoPointsOther(circle3, line1, vertex)
-//                        val parallel = parallelTool(side1, point, probe = vertex)
-//                        val solutionP2 = intersectOnePoint(parallel, side2)
-//                        val solution = parallelTool(line1, solutionP2, probe = base1)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::optimal5LSolution)
+        }
+
+        private fun optimal5LSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 5L solution
+                        val perpAM = perpendicularTool(rayA, baseM)
+                        val intA = intersectOnePoint(perpAM, rayA)
+                        val intC = intersectOnePoint(perpAM, rayC)
+                        val measure1 = nonCollapsingCompassTool(intA, intC, baseM)
+                        val pointA = intersectTwoPoints(measure1, rayA).first
+                        val measure2 = nonCollapsingCompassTool(pointA, intA, intC)
+                        val solutionE = intersectTwoPoints(measure2, rayC).first
+                        val solutionDE = perpendicularTool(rayC, solutionE, probe = baseM)
+                        val solutionD = intersectOnePoint(solutionDE, rayA)
+                        val solutionDM = lineTool(solutionD, baseM)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
