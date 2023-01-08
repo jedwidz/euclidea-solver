@@ -17,10 +17,10 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // solution found 10 sec
+        // gave up 8 min 8 sec
         Solver().improveSolution(
             maxExtraElements = 3,
-            maxDepth = 5,
+            maxDepth = 8,
 //            nonNewElementLimit = 5,
 //            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
@@ -169,14 +169,17 @@ class SolvePuzzle13_5Test {
 //        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-            // Euclidea 5L L-star moves hint
+            // Euclidea 8E E-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
-                    0 -> !element.isLineFromPerpendicular
-                    1 -> !element.isCircleFromNonCollapsingCompass
-                    2 -> !element.isCircleFromNonCollapsingCompass
-                    3 -> !element.isLineFromPerpendicular
-                    4 -> !element.isLineFromLine
+                    0 -> !element.isCircleFromCircle
+                    1 -> !element.isCircleFromCircle
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isCircleFromCircle
+                    4 -> !element.isCircleFromCircle
+                    5 -> !element.isLineFromLine
+                    6 -> !element.isCircleFromCircle
+                    7 -> !element.isLineFromLine
                     else -> false
                 }
             }
