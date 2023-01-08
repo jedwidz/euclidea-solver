@@ -253,6 +253,11 @@ fun linesParallel(line1: Element.Line, line2: Element.Line): Boolean {
     return coincides(line1.xDir, line2.xDir) && coincides(line1.yDir, line2.yDir)
 }
 
+fun linesPerpendicular(line1: Element.Line, line2: Element.Line): Boolean {
+    return coincides(line1.xDir, line2.yDir) && coincides(-line1.yDir, line2.xDir) ||
+            coincides(-line1.xDir, line2.yDir) && coincides(line1.yDir, line2.xDir)
+}
+
 private fun circlesCoincide(circle1: Element.Circle, circle2: Element.Circle): Boolean {
     return coincides(circle1.center, circle2.center) && coincides(circle1.radius, circle2.radius)
 }
