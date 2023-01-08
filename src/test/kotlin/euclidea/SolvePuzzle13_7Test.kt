@@ -18,12 +18,12 @@ class SolvePuzzle13_7Test {
 
     @Test
     fun improveSolution() {
-        // gave up 12 min 10 sec
+        // solution found 1 hr 28 min
         Solver().improveSolution(
-            maxExtraElements = 3,
+            maxExtraElements = 4,
             maxDepth = 10,
-            nonNewElementLimit = 6,
-            consecutiveNonNewElementLimit = 4,
+//            nonNewElementLimit = 6,
+//            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
         )
     }
@@ -73,7 +73,7 @@ class SolvePuzzle13_7Test {
 //                            angleBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
 //                            parallelToolEnabled = true,
-                            maxSqDistance = sq(5.0)
+                            maxSqDistance = sq(8.0)
                         ),
                         points = listOf(center, base, sample),
                         elements = listOf(circle)
