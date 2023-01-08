@@ -72,11 +72,11 @@ class SolvePuzzle13_5Test {
                 with(context) {
                     return Setup(rayA, rayC) to EuclideaContext(
                         config = EuclideaConfig(
-                            perpendicularBisectorToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
                             perpendicularToolEnabled = true,
-                            angleBisectorToolEnabled = true,
+//                            angleBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
-                            parallelToolEnabled = true,
+//                            parallelToolEnabled = true,
                             maxSqDistance = sq(8.0)
                         ),
                         // dirA and dirC act as probe points
@@ -168,23 +168,19 @@ class SolvePuzzle13_5Test {
 //            }
 //        }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 9E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> !element.isLineFromLine
-//                    1 -> !element.isLineFromLine
-//                    2 -> !element.isCircleFromCircle
-//                    3 -> !element.isCircleFromCircle
-//                    4 -> !element.isLineFromLine
-//                    5 -> !element.isCircleFromCircle
-//                    6 -> !element.isLineFromLine
-//                    7 -> !element.isCircleFromCircle
-//                    8 -> !element.isLineFromLine
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 5L L-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isLineFromPerpendicular
+                    1 -> !element.isCircleFromNonCollapsingCompass
+                    2 -> !element.isCircleFromNonCollapsingCompass
+                    3 -> !element.isLineFromPerpendicular
+                    4 -> !element.isLineFromLine
+                    else -> false
+                }
+            }
+        }
 
         override fun referenceSolution(
             params: Params,
