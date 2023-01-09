@@ -18,9 +18,9 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 25 min 53 sec
+        // no solution found 19 min 56 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 8,
             nonNewElementLimit = 3,
             consecutiveNonNewElementLimit = 2,
@@ -81,7 +81,7 @@ class SolvePuzzle13_5Test {
                             maxSqDistance = sq(4.0)
                         ),
                         // dirA and dirC act as probe points
-                        points = listOf(baseB, baseM, dirA/*, dirC */),
+                        points = listOf(baseB, baseM/*, dirA, dirC */),
                         elements = listOf(rayA, rayC)
                     )
                 }
