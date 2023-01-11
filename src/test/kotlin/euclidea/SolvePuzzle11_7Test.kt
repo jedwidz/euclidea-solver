@@ -7,6 +7,7 @@ import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import kotlin.math.sqrt
 
 class SolvePuzzle11_7Test {
     // Geometric Mean of Trapezoid Bases
@@ -19,9 +20,9 @@ class SolvePuzzle11_7Test {
     @Test
     fun improveSolution() {
         Solver().improveSolution(
-            // partial solution found 32 sec
-            maxExtraElements = 6,
-            maxDepth = 6,
+            // ?
+            maxExtraElements = 2,
+            maxDepth = 9,
 //            nonNewElementLimit = 5,
 //            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
@@ -97,44 +98,70 @@ class SolvePuzzle11_7Test {
             }
         }
 
-//        override fun isSolution(
-//            params: Params,
-//            setup: Setup
-//        ): (EuclideaContext) -> Boolean {
-//            with(params) {
-//                with(setup) {
-//                    val oa = (baseA2 - baseA1).distance
-//                    val ob = (baseB2 - baseB1).distance
-//                    val oc = sqrt(oa * ob)
-//                    return { context ->
-//                        val last = context.elements.last()
-//                        last is Element.Line && linesParallel(last, line1) &&
-//                                onePointIntersection(last, side1)?.let { intersect1 ->
-//                                    onePointIntersection(last, side2)?.let { intersect2 ->
-//                                        coincides(oc, distance(intersect1, intersect2))
-//                                    }
-//                                } ?: false
-//                    }
-//                }
-//            }
-//        }
-
         override fun isSolution(
             params: Params,
             setup: Setup
         ): (EuclideaContext) -> Boolean {
-            val solution = constructSolution(params)
-            // Partial solution... any point on the solution line...
-            return { context ->
-                context.points.any {
-                    pointAndLineCoincide(it, solution)
+            with(params) {
+                with(setup) {
+                    val oa = (baseA2 - baseA1).distance
+                    val ob = (baseB2 - baseB1).distance
+                    val oc = sqrt(oa * ob)
+                    return { context ->
+                        val last = context.elements.last()
+                        last is Element.Line && linesParallel(last, line1) &&
+                                onePointIntersection(last, side1)?.let { intersect1 ->
+                                    onePointIntersection(last, side2)?.let { intersect2 ->
+                                        coincides(oc, distance(intersect1, intersect2))
+                                    }
+                                } ?: false
+                    }
                 }
             }
         }
 
-        private fun constructSolution(params: Params): Element.Line {
-            // cheekily use reference solution
-            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
+//        override fun isSolution(
+//            params: Params,
+//            setup: Setup
+//        ): (EuclideaContext) -> Boolean {
+//            val solution = constructSolution(params)
+//            // Partial solution... any point on the solution line...
+//            return { context ->
+//                context.points.any {
+//                    pointAndLineCoincide(it, solution)
+//                }
+//            }
+//        }
+
+//        private fun constructSolution(params: Params): Element.Line {
+//            // cheekily use reference solution
+//            return referenceSolution(params, Namer()).second.elements.last() as Element.Line
+//        }
+
+        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Find the first point on the solution line
+                    @Suppress("unused") val context = object {
+                        val extend1 = lineTool(baseA1, baseB1)
+                        val extend2 = lineTool(baseA2, baseB2)
+                        val apex = intersectOnePoint(extend1, extend2)
+                        val circle1 = circleTool(baseA1, apex)
+                        val low = intersectTwoPointsOther(circle1, extend1, apex)
+                        val circle2 = circleTool(low, baseB1)
+                        val side = intersectTwoPoints(circle2, circle1).second
+                        val cross = lineTool(side, baseB1)
+                        val aim = intersectTwoPoints(cross, circle1).second
+                        val circle3 = circleTool(apex, aim)
+                        val solutionP = intersectOnePoint(circle3, side1)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
         }
 
 //        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
