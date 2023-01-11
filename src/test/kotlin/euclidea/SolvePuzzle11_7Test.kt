@@ -7,9 +7,6 @@ import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
 
 class SolvePuzzle11_7Test {
     // Geometric Mean of Trapezoid Bases
@@ -22,11 +19,11 @@ class SolvePuzzle11_7Test {
     @Test
     fun improveSolution() {
         Solver().improveSolution(
-            // gave up 12 hr 53 min
-            maxExtraElements = 4,
-            maxDepth = 9,
-            nonNewElementLimit = 5,
-            consecutiveNonNewElementLimit = 3,
+            // partial solution found 32 sec
+            maxExtraElements = 6,
+            maxDepth = 6,
+//            nonNewElementLimit = 5,
+//            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
     }
@@ -100,24 +97,37 @@ class SolvePuzzle11_7Test {
             }
         }
 
+//        override fun isSolution(
+//            params: Params,
+//            setup: Setup
+//        ): (EuclideaContext) -> Boolean {
+//            with(params) {
+//                with(setup) {
+//                    val oa = (baseA2 - baseA1).distance
+//                    val ob = (baseB2 - baseB1).distance
+//                    val oc = sqrt(oa * ob)
+//                    return { context ->
+//                        val last = context.elements.last()
+//                        last is Element.Line && linesParallel(last, line1) &&
+//                                onePointIntersection(last, side1)?.let { intersect1 ->
+//                                    onePointIntersection(last, side2)?.let { intersect2 ->
+//                                        coincides(oc, distance(intersect1, intersect2))
+//                                    }
+//                                } ?: false
+//                    }
+//                }
+//            }
+//        }
+
         override fun isSolution(
             params: Params,
             setup: Setup
         ): (EuclideaContext) -> Boolean {
-            with(params) {
-                with(setup) {
-                    val oa = (baseA2 - baseA1).distance
-                    val ob = (baseB2 - baseB1).distance
-                    val oc = sqrt(oa * ob)
-                    return { context ->
-                        val last = context.elements.last()
-                        last is Element.Line && linesParallel(last, line1) &&
-                                onePointIntersection(last, side1)?.let { intersect1 ->
-                                    onePointIntersection(last, side2)?.let { intersect2 ->
-                                        coincides(oc, distance(intersect1, intersect2))
-                                    }
-                                } ?: false
-                    }
+            val solution = constructSolution(params)
+            // Partial solution... any point on the solution line...
+            return { context ->
+                context.points.any {
+                    pointAndLineCoincide(it, solution)
                 }
             }
         }
@@ -127,24 +137,24 @@ class SolvePuzzle11_7Test {
             return referenceSolution(params, Namer()).second.elements.last() as Element.Line
         }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            with(setup) {
-                val solution = constructSolution(params)
-                val point1 = intersectOnePoint(solution, side1)
-                val point2 = intersectOnePoint(solution, side2)
-                return { context ->
-                    // Assumes that solution is the last element (no extraneous elements)
-                    if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
-                        0
-                    else {
-                        val onPoint1 = context.elements.count { pointAndElementCoincide(point1, it) }
-                        val onPoint2 = context.elements.count { pointAndElementCoincide(point2, it) }
-                        // Assume solution uses at least one of the highlighted points
-                        max(0, min(2 - onPoint1, 2 - onPoint2)) + 1
-                    }
-                }
-            }
-        }
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            with(setup) {
+//                val solution = constructSolution(params)
+//                val point1 = intersectOnePoint(solution, side1)
+//                val point2 = intersectOnePoint(solution, side2)
+//                return { context ->
+//                    // Assumes that solution is the last element (no extraneous elements)
+//                    if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+//                        0
+//                    else {
+//                        val onPoint1 = context.elements.count { pointAndElementCoincide(point1, it) }
+//                        val onPoint2 = context.elements.count { pointAndElementCoincide(point2, it) }
+//                        // Assume solution uses at least one of the highlighted points
+//                        max(0, min(2 - onPoint1, 2 - onPoint2)) + 1
+//                    }
+//                }
+//            }
+//        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
             // Euclidea 9E E-star moves hint
