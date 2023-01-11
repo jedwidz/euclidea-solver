@@ -78,7 +78,7 @@ class SolvePuzzle13_5Test {
 //                            angleBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
 //                            parallelToolEnabled = true,
-                            maxSqDistance = sq(8.0)
+                            maxSqDistance = sq(20.0)
                         ),
                         // dirA and dirC act as probe points
                         points = listOf(baseB, baseM /* dirA, dirC */),
