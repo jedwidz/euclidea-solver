@@ -18,9 +18,9 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // gave up 1 day 13 hr
+        // gave up 16 min 24 sec (could be worth another try)
         Solver().improveSolution(
-            maxExtraElements = 5,
+            maxExtraElements = 3,
             maxDepth = 8,
             nonNewElementLimit = 3,
             consecutiveNonNewElementLimit = 2,
@@ -81,7 +81,7 @@ class SolvePuzzle13_5Test {
                             maxSqDistance = sq(4.0)
                         ),
                         // dirA and dirC act as probe points
-                        points = listOf(baseB, baseM/*, dirA, dirC */),
+                        points = listOf(baseB, baseM, dirA/*, dirC */),
                         elements = listOf(rayA, rayC)
                     )
                 }
@@ -196,39 +196,6 @@ class SolvePuzzle13_5Test {
             with(params) {
                 with(setup) {
                     @Suppress("unused") val context = object {
-                        // Sub-optimal 6L solution
-                        val lineBM = lineTool(baseB, baseM)
-                        val sampleDE = perpendicularTool(rayC, dirA)
-                        val sampleE = intersectOnePoint(sampleDE, rayC)
-                        val sampleD = intersectOnePoint(sampleDE, rayA)
-                        val circleSampleDE = circleTool(sampleD, sampleE)
-                        val sampleM = intersectTwoPoints(circleSampleDE, lineBM).second
-                        val sampleDM = lineTool(sampleD, sampleM)
-                        val solutionDM = parallelTool(sampleDM, baseM, probe = dirA)
-                        val solutionD = intersectOnePoint(solutionDM, rayA)
-                        val solutionDE = perpendicularTool(rayC, solutionD, probe = baseB)
-                        val solutionE = intersectOnePoint(solutionDE, rayC)
-                    }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
-                }
-            }
-        }
-
-        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-            return listOf(this::optimal5LSolution)
-        }
-
-        private fun optimal5LSolution(
-            params: Params,
-            namer: Namer
-        ): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    @Suppress("unused") val context = object {
                         // Optimal 5L solution
                         val perpAM = perpendicularTool(rayA, baseM)
                         val intA = intersectOnePoint(perpAM, rayA)
@@ -246,5 +213,38 @@ class SolvePuzzle13_5Test {
                 }
             }
         }
+
+//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+//            return listOf(this::sample6LSolution)
+//        }
+//
+//        private fun sample6LSolution(
+//            params: Params,
+//            namer: Namer
+//        ): Pair<Setup, EuclideaContext> {
+//            val (setup, initialContext) = initialContext(
+//                params, namer
+//            )
+//            with(params) {
+//                with(setup) {
+//                    @Suppress("unused") val context = object {
+//                        // Sub-optimal 6L solution
+//                        val lineBM = lineTool(baseB, baseM)
+//                        val sampleDE = perpendicularTool(rayC, dirA)
+//                        val sampleE = intersectOnePoint(sampleDE, rayC)
+//                        val sampleD = intersectOnePoint(sampleDE, rayA)
+//                        val circleSampleDE = circleTool(sampleD, sampleE)
+//                        val sampleM = intersectTwoPoints(circleSampleDE, lineBM).second
+//                        val sampleDM = lineTool(sampleD, sampleM)
+//                        val solutionDM = parallelTool(sampleDM, baseM, probe = dirA)
+//                        val solutionD = intersectOnePoint(solutionDM, rayA)
+//                        val solutionDE = perpendicularTool(rayC, solutionD, probe = baseB)
+//                        val solutionE = intersectOnePoint(solutionDE, rayC)
+//                    }
+//                    namer.nameReflected(context)
+//                    return setup to initialContext.withElements(elementsReflected(context))
+//                }
+//            }
+//        }
     }
 }
