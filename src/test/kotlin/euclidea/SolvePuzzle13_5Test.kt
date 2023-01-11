@@ -18,7 +18,7 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 43 sec
+        // no solution found 8 sec
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 8,
@@ -169,16 +169,16 @@ class SolvePuzzle13_5Test {
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solution = constructSolution(params, setup)
             val solutionElements = solution.elements
-            val solutionElementsCount = solution.elements.size
             return { context ->
                 // E-hint suggests that line DM is constructed first, so we need a second point on this line (maybe D itself)
+                // ... and then 'line, circle, line' to complete
                 val foundPoint = context.points.any { point ->
                     !coincides(point, params.baseM) && pointAndLineCoincide(
                         point,
                         solution.solutionDM
                     )
                 }
-                if (!foundPoint) solutionElementsCount + 1 else solutionElements.count { !context.hasElement(it) }
+                if (!foundPoint) 4 else solutionElements.count { !context.hasElement(it) }
             }
         }
 
