@@ -18,12 +18,12 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 5 hr 21 min
+        // no solution found 43 sec
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 8,
-            nonNewElementLimit = 5,
-            consecutiveNonNewElementLimit = 4,
+//            nonNewElementLimit = 5,
+//            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
         )
     }
@@ -81,7 +81,7 @@ class SolvePuzzle13_5Test {
                             maxSqDistance = sq(8.0)
                         ),
                         // dirA and dirC act as probe points
-                        points = listOf(baseB, baseM, dirA/*, dirC */),
+                        points = listOf(baseB, baseM /* dirA, dirC */),
                         elements = listOf(rayA, rayC)
                     )
                 }
@@ -143,33 +143,42 @@ class SolvePuzzle13_5Test {
             }
         }
 
-        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    // Suspected partial solution, following hints and optimal L solution
-                    @Suppress("unused") val context = object {
-                        // Construction for:
-                        // val perpAM = perpendicularTool(rayA, baseM)
-                        val circleBM = circleTool(baseB, baseM)
-                        val circleAM = circleTool(dirA, baseM)
-                        val intersection = intersectTwoPoints(circleAM, circleBM)
-                        val intersection1 = intersection.first
-                        val intersection2 = intersection.second
-                        val perpAM = lineTool(intersection1, intersection2)
-                    }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
-                }
-            }
-        }
+//        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+//            val (setup, initialContext) = initialContext(
+//                params, namer
+//            )
+//            with(params) {
+//                with(setup) {
+//                    // Suspected partial solution, following hints and optimal L solution
+//                    @Suppress("unused") val context = object {
+//                        // Construction for:
+//                        // val perpAM = perpendicularTool(rayA, baseM)
+//                        val circleBM = circleTool(baseB, baseM)
+//                        val circleAM = circleTool(dirA, baseM)
+//                        val intersection = intersectTwoPoints(circleAM, circleBM)
+//                        val intersection1 = intersection.first
+//                        val intersection2 = intersection.second
+//                        val perpAM = lineTool(intersection1, intersection2)
+//                    }
+//                    namer.nameReflected(context)
+//                    return setup to initialContext.withElements(elementsReflected(context))
+//                }
+//            }
+//        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutionElements = constructSolution(params, setup).elements
+            val solution = constructSolution(params, setup)
+            val solutionElements = solution.elements
+            val solutionElementsCount = solution.elements.size
             return { context ->
-                solutionElements.count { !context.hasElement(it) }
+                // E-hint suggests that line DM is constructed first, so we need a second point on this line (maybe D itself)
+                val foundPoint = context.points.any { point ->
+                    !coincides(point, params.baseM) && pointAndLineCoincide(
+                        point,
+                        solution.solutionDM
+                    )
+                }
+                if (!foundPoint) solutionElementsCount + 1 else solutionElements.count { !context.hasElement(it) }
             }
         }
 
