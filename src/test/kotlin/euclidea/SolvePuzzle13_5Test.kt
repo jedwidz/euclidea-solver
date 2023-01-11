@@ -18,12 +18,12 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // gave up 16 min 24 sec (could be worth another try)
+        // ?
         Solver().improveSolution(
-            maxExtraElements = 3,
+            maxExtraElements = 2,
             maxDepth = 8,
-            nonNewElementLimit = 3,
-            consecutiveNonNewElementLimit = 2,
+            nonNewElementLimit = 4,
+            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
         )
     }
@@ -139,6 +139,29 @@ class SolvePuzzle13_5Test {
                     val solutionDE = perpendicularTool(rayC, solutionD, probe = baseB)
                     val solutionE = intersectOnePoint(solutionDE, rayC)
                     return Solution(solutionDE, solutionDM, solutionD, solutionE)
+                }
+            }
+        }
+
+        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Suspected partial solution, following hints and optimal L solution
+                    @Suppress("unused") val context = object {
+                        // Construction for:
+                        // val perpAM = perpendicularTool(rayA, baseM)
+                        val circleBM = circleTool(baseB, baseM)
+                        val circleAM = circleTool(dirA, baseM)
+                        val intersection = intersectTwoPoints(circleAM, circleBM)
+                        val intersection1 = intersection.first
+                        val intersection2 = intersection.second
+                        val perpAM = lineTool(intersection1, intersection2)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }
