@@ -18,11 +18,11 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 34 min 23 sec
+        // no solution found ?
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 8,
-            nonNewElementLimit = 4,
+            nonNewElementLimit = 5,
             consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
         )
@@ -78,7 +78,7 @@ class SolvePuzzle13_5Test {
 //                            angleBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
 //                            parallelToolEnabled = true,
-                            maxSqDistance = sq(4.0)
+                            maxSqDistance = sq(8.0)
                         ),
                         // dirA and dirC act as probe points
                         points = listOf(baseB, baseM, dirA/*, dirC */),
