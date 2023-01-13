@@ -1,5 +1,6 @@
 package euclidea
 
+import euclidea.EuclideaTools.angleBisectorTool
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.perpendicularTool
@@ -16,9 +17,9 @@ class SolvePuzzle13_10Test {
     @Test
     fun improveSolution() {
         Solver().improveSolution(
-            // solution found 12 sec
+            // solution found 2 min 43 sec
             maxExtraElements = 4,
-            maxDepth = 5,
+            maxDepth = 6,
 //            nonNewElementLimit = 5,
 //            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
@@ -81,7 +82,7 @@ class SolvePuzzle13_10Test {
                 with(context) {
                     return Setup(circle) to EuclideaContext(
                         config = EuclideaConfig(
-                            perpendicularBisectorToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
@@ -100,6 +101,18 @@ class SolvePuzzle13_10Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             val solution = constructSolution(params)
+            // check condition
+            with(params) {
+                with(setup) {
+                    solution.all { pointC ->
+                        if (pointAndCircleCoincide(pointC, circle)) {
+                            val bisect = angleBisectorTool(baseA, pointC, baseB)
+                            val lineOC = lineTool(baseO, pointC)
+                            coincides(bisect, lineOC)
+                        } else false
+                    }
+                }
+            }
             return { context ->
                 solution.any { context.hasPoint(it) }
             }
@@ -183,14 +196,15 @@ class SolvePuzzle13_10Test {
 //        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-            // Euclidea 5L L-star moves hint
+            // Euclidea 6E E-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
-                    0 -> !element.isLineFromPerpendicularBisector
+                    0 -> !element.isLineFromLine
                     1 -> !element.isCircleFromCircle
-                    2 -> !element.isLineFromLine
-                    3 -> !element.isCircleFromCircle
+                    2 -> !element.isCircleFromCircle
+                    3 -> !element.isLineFromLine
                     4 -> !element.isLineFromLine
+                    5 -> !element.isCircleFromCircle
                     else -> false
                 }
             }
