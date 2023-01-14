@@ -16,9 +16,9 @@ class SolvePuzzle14_4Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 43 sec
+        // no solution found 36 sec
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 3,
             maxDepth = 5,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
@@ -80,7 +80,7 @@ class SolvePuzzle14_4Test {
                 with(context) {
                     return Setup(lineAB, lineAC, lineBD, lineCD) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(8.0),
+                            maxSqDistance = sq(10.0),
                             parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
@@ -181,7 +181,7 @@ class SolvePuzzle14_4Test {
             val solutionPoints = solution.points
             return { context ->
 //                solutionElements.count { !context.hasElement(it) }
-                // Assume two solution points are first found
+                // Assume one solution point is first found
                 if (solutionElements.any { context.hasElement(it) })
                     0
                 else {
@@ -190,7 +190,7 @@ class SolvePuzzle14_4Test {
                             0,
                             2 - context.elements.count { pointAndElementCoincide(point, it) })
                     }
-                    remainingByPoint.sorted().subList(0, 2).min() + 1
+                    remainingByPoint.sorted().subList(0, 1).min() + 1
                 }
             }
         }
