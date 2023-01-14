@@ -17,10 +17,10 @@ class SolvePuzzle14_4Test {
 
     @Test
     fun improveSolution() {
-        // gave up 14 min 11 sec
+        // ?
         Solver().improveSolution(
             maxExtraElements = 2,
-            maxDepth = 6,
+            maxDepth = 9,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -81,8 +81,8 @@ class SolvePuzzle14_4Test {
                 with(context) {
                     return Setup(lineAB, lineAC, lineBD, lineCD) to EuclideaContext(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(10.0),
-                            parallelToolEnabled = true,
+                            maxSqDistance = sq(8.0),
+//                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
 //                            perpendicularToolEnabled = true,
@@ -228,7 +228,7 @@ class SolvePuzzle14_4Test {
         }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-            // Euclidea 8L L-star moves hint
+            // Euclidea 12E E-star moves hint
             return { solveContext, element ->
                 when (solveContext.depth) {
                     0 -> !element.isLineFromParallel
@@ -237,8 +237,9 @@ class SolvePuzzle14_4Test {
                     3 -> !element.isCircleFromCircle
                     4 -> !element.isLineFromLine
                     5 -> !element.isLineFromLine
-                    6 -> !element.isLineFromParallel
-                    7 -> !element.isLineFromParallel
+                    6 -> !element.isLineFromLine
+                    7 -> !element.isLineFromLine
+                    8 -> !element.isLineFromLine
                     else -> false
                 }
             }
@@ -277,35 +278,40 @@ class SolvePuzzle14_4Test {
             }
         }
 
-//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-//            return listOf(this::optimal6LSolution)
-//        }
-//
-//        fun optimal6LSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Optimal 6L solution
-//                        val bisectAB = perpendicularBisectorTool(baseA, baseB)
-//                        val midAB = intersectOnePoint(bisectAB, lineAB)
-//                        val cross = lineTool(midAB, baseC)
-//                        val circle1 = circleTool(baseC, midAB)
-//                        val doubled = intersectTwoPointsOther(circle1, cross, midAB)
-//                        val circle2 = circleTool(doubled, baseC)
-//                        val tripled = intersectTwoPointsOther(circle2, cross, baseC)
-//                        val solutionA = lineTool(baseA, tripled)
-//                        val solutionB = lineTool(baseB, tripled)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::optimal8LSolution)
+        }
+
+        fun optimal8LSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 8L solution
+                        val parAB = parallelTool(lineAB, center, probe = baseA)
+                        val onAC = intersectOnePoint(parAB, lineAC)
+                        val circleToC = circleTool(onAC, baseC)
+                        val solutionAC = intersectTwoPointsOther(circleToC, lineAC, baseC)
+                        val onBD = intersectOnePoint(parAB, lineBD)
+                        val circleToB = circleTool(onBD, baseB)
+                        val solutionBD = intersectTwoPointsOther(circleToB, lineBD, baseB)
+                        val solution4 = lineTool(solutionBD, solutionAC)
+                        val diagonal = lineTool(solutionAC, center)
+                        val solutionCD = intersectOnePoint(diagonal, lineCD)
+                        val solution3 = lineTool(solutionBD, solutionCD)
+                        val solution2 = parallelTool(solution4, solutionCD, probe = solutionAC)
+                        val solutionAB = intersectOnePoint(solution2, lineAB)
+                        val solution1 = lineTool(solutionAB, solutionAC)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
