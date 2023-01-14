@@ -31,7 +31,7 @@ interface EuclideaSet<T> {
         from.items().forEach { add(it) }
     }
 
-    abstract val size: Int
+    val size: Int
 }
 
 abstract class IndexedSet<T>(
@@ -132,6 +132,14 @@ class PointSet : IndexedSet<Point>(compareBy({ it.x }, { it.y })) {
             val x = points.sumOf { it.x } / size.toDouble()
             val y = points.sumOf { it.y } / size.toDouble()
             Point(x, y)
+        }
+    }
+
+    companion object {
+        fun of(points: Collection<Point>): PointSet {
+            val set = PointSet()
+            set += points
+            return set
         }
     }
 }
