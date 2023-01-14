@@ -19,8 +19,8 @@ class SolvePuzzle14_4Test {
     fun improveSolution() {
         // ?
         Solver().improveSolution(
-            maxExtraElements = 4,
-            maxDepth = 5,
+            maxExtraElements = 2,
+            maxDepth = 6,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -210,16 +210,19 @@ class SolvePuzzle14_4Test {
             val solutionPoints = solution.points
             return { context ->
 //                solutionElements.count { !context.hasElement(it) }
-                // Assume one solution point is first found
-                if (solutionElements.any { context.hasElement(it) })
-                    0
+                // Assume that two solution points are first found separately
+                val targetElementCount = 2
+                val foundElementCount = solutionElements.count { !context.hasElement(it) }
+                val remainingElements = max(0, targetElementCount - foundElementCount)
+                if (remainingElements < targetElementCount)
+                    remainingElements
                 else {
                     val remainingByPoint = solutionPoints.map { point ->
                         max(
                             0,
                             2 - context.elements.count { pointAndElementCoincide(point, it) })
                     }
-                    remainingByPoint.sorted().subList(0, 1).min() + 1
+                    remainingByPoint.sorted().subList(0, 2).sum() + targetElementCount
                 }
             }
         }
