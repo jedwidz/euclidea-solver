@@ -15,10 +15,10 @@ class SolvePuzzle14_4Test {
 
     @Test
     fun improveSolution() {
-        // gave up 6 min 20 sec
+        // gave up 7 min 41 sec
         Solver().improveSolution(
             maxExtraElements = 2,
-            maxDepth = 8,
+            maxDepth = 5,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
@@ -81,10 +81,10 @@ class SolvePuzzle14_4Test {
                         config = EuclideaConfig(
                             maxSqDistance = sq(8.0),
                             parallelToolEnabled = true,
-                            perpendicularBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            perpendicularToolEnabled = true,
-                            angleBisectorToolEnabled = true,
+//                            perpendicularBisectorToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            perpendicularToolEnabled = true,
+//                            angleBisectorToolEnabled = true,
                         ),
                         points = listOf(baseA, baseB, baseC, baseD, center),
                         elements = listOf(lineAB, lineAC, lineBD, lineCD)
@@ -99,7 +99,9 @@ class SolvePuzzle14_4Test {
         ): (EuclideaContext) -> Boolean {
             val solution = constructSolution(params).elements
             return { context ->
-                context.hasElements(solution)
+//                context.hasElements(solution)
+                // partial solution - just the first line
+                solution.any { context.hasElement(it) }
             }
         }
 
@@ -171,12 +173,12 @@ class SolvePuzzle14_4Test {
 //            }
 //        }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutionElements = constructSolution(params).elements
-            return { context ->
-                solutionElements.count { !context.hasElement(it) }
-            }
-        }
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solutionElements = constructSolution(params).elements
+//            return { context ->
+//                solutionElements.count { !context.hasElement(it) }
+//            }
+//        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
             // Euclidea 8L L-star moves hint
