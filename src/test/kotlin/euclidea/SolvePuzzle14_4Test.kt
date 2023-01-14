@@ -5,6 +5,7 @@ import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.parallelTool
 import org.junit.jupiter.api.Test
 import kotlin.math.max
+import kotlin.test.assertEquals
 
 class SolvePuzzle14_4Test {
     // Parallelogram on Four Lines
@@ -16,7 +17,7 @@ class SolvePuzzle14_4Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 44 sec
+        // ?
         Solver().improveSolution(
             maxExtraElements = 4,
             maxDepth = 5,
@@ -50,7 +51,7 @@ class SolvePuzzle14_4Test {
                 center = Point(0.0, 0.0),
                 baseA = Point(-0.4, -0.3),
                 baseB = Point(0.6, -0.3),
-                baseC = Point(-0.2, 0.2),
+                baseC = Point(-0.2, 0.15),
                 baseDScale = 0.6
             )
         }
@@ -60,7 +61,7 @@ class SolvePuzzle14_4Test {
                 center = Point(0.0, 0.0),
                 baseA = Point(-0.401, -0.302),
                 baseB = Point(0.603, -0.304),
-                baseC = Point(-0.205, 0.206),
+                baseC = Point(-0.205, 0.156),
                 baseDScale = 0.607
             )
         }
@@ -98,12 +99,40 @@ class SolvePuzzle14_4Test {
             params: Params,
             setup: Setup
         ): (EuclideaContext) -> Boolean {
-            val solution = constructSolution(params).elements
+            val solution = constructSolution(params)
+            validateSolution(setup, solution)
+            val solutionElements = solution.elements
             return { context ->
 //                context.hasElements(solution)
                 // partial solution - just the first line
-                solution.any { context.hasElement(it) }
+                solutionElements.any { context.hasElement(it) }
             }
+        }
+
+        private fun validateSolution(setup: Setup, solution: Solution) {
+            val solutionLines = LineSet.of(solution.elements)
+            val solutionPoints = PointSet.of(solution.points)
+            val baseLines = with(setup) {
+                listOf(lineAB, lineAC, lineBD, lineCD)
+            }
+            assertEquals(4, solutionLines.size)
+            assertEquals(4, solutionPoints.size)
+
+            val invalidLinePairs = solutionLines.items().pairs().filterNot { (line1, line2) ->
+                when (val intersection = intersect(line1, line2)) {
+                    Intersection.Disjoint -> true
+                    is Intersection.OnePoint -> intersection.point in solutionPoints
+                    else -> false
+                }
+            }
+            assertEquals(listOf(), invalidLinePairs)
+
+            val baseLineWithoutSolutionPoint = baseLines.filterNot { baseLine ->
+                solutionPoints.items().any { solutionPoint ->
+                    pointAndLineCoincide(solutionPoint, baseLine)
+                }
+            }
+            assertEquals(listOf(), baseLineWithoutSolutionPoint)
         }
 
         data class Solution(
@@ -140,7 +169,7 @@ class SolvePuzzle14_4Test {
                     val diagonal = lineTool(solutionAC, center)
                     val solutionCD = intersectOnePoint(diagonal, lineCD)
                     val solution2 = lineTool(solutionAB, solutionCD)
-                    val solution4 = parallelTool(solution2, baseA, probe = solutionAB)
+                    val solution4 = parallelTool(solution2, solutionAC, probe = solutionAB)
                     val solutionBD = intersectOnePoint(solution4, lineBD)
                     val solution3 = lineTool(solutionBD, solutionCD)
 
@@ -235,7 +264,7 @@ class SolvePuzzle14_4Test {
                         val diagonal = lineTool(solutionAC, center)
                         val solutionCD = intersectOnePoint(diagonal, lineCD)
                         val solution2 = lineTool(solutionAB, solutionCD)
-                        val solution4 = parallelTool(solution2, baseA, probe = solutionAB)
+                        val solution4 = parallelTool(solution2, solutionAC, probe = solutionAB)
                         val solutionBD = intersectOnePoint(solution4, lineBD)
                         val solution3 = lineTool(solutionBD, solutionCD)
                     }
