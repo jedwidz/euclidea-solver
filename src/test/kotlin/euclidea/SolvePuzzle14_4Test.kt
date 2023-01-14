@@ -4,6 +4,7 @@ import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.parallelTool
 import org.junit.jupiter.api.Test
+import kotlin.math.max
 
 class SolvePuzzle14_4Test {
     // Parallelogram on Four Lines
@@ -15,9 +16,9 @@ class SolvePuzzle14_4Test {
 
     @Test
     fun improveSolution() {
-        // gave up 7 min 41 sec
+        // no solution found 6 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 5,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
@@ -116,6 +117,7 @@ class SolvePuzzle14_4Test {
             val solutionCD: Point
         ) {
             val elements = listOf(solution1, solution2, solution3, solution4)
+            val points = listOf(solutionAB, solutionAC, solutionBD, solutionCD)
         }
 
         private fun constructSolution(params: Params): Solution {
@@ -173,12 +175,25 @@ class SolvePuzzle14_4Test {
 //            }
 //        }
 
-//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-//            val solutionElements = constructSolution(params).elements
-//            return { context ->
+        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+            val solution = constructSolution(params)
+            val solutionElements = solution.elements
+            val solutionPoints = solution.points
+            return { context ->
 //                solutionElements.count { !context.hasElement(it) }
-//            }
-//        }
+                // Assume that two solution points are first found separately
+                if (solutionElements.any { context.hasElement(it) })
+                    0
+                else {
+                    val remainingByPoint = solutionPoints.map { point ->
+                        max(
+                            0,
+                            2 - context.elements.count { pointAndElementCoincide(point, it) })
+                    }
+                    remainingByPoint.sorted().subList(0, 2).sum() + 1
+                }
+            }
+        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
             // Euclidea 8L L-star moves hint
