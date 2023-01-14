@@ -16,9 +16,9 @@ class SolvePuzzle14_4Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 6 sec
+        // no solution found 43 sec
         Solver().improveSolution(
-            maxExtraElements = 3,
+            maxExtraElements = 4,
             maxDepth = 5,
 //            nonNewElementLimit = 7,
 //            consecutiveNonNewElementLimit = 4,
@@ -181,7 +181,7 @@ class SolvePuzzle14_4Test {
             val solutionPoints = solution.points
             return { context ->
 //                solutionElements.count { !context.hasElement(it) }
-                // Assume that two solution points are first found separately
+                // Assume two solution points are first found
                 if (solutionElements.any { context.hasElement(it) })
                     0
                 else {
@@ -190,7 +190,7 @@ class SolvePuzzle14_4Test {
                             0,
                             2 - context.elements.count { pointAndElementCoincide(point, it) })
                     }
-                    remainingByPoint.sorted().subList(0, 2).sum() + 1
+                    remainingByPoint.sorted().subList(0, 2).min() + 1
                 }
             }
         }
