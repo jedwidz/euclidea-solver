@@ -15,7 +15,7 @@ class SolvePuzzle14_4Test {
 
     @Test
     fun improveSolution() {
-        // gave up 5 min 10 sec
+        // gave up 6 min 20 sec
         Solver().improveSolution(
             maxExtraElements = 2,
             maxDepth = 8,
@@ -178,21 +178,22 @@ class SolvePuzzle14_4Test {
             }
         }
 
-//        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
-//            // Euclidea 7E E-star moves hint
-//            return { solveContext, element ->
-//                when (solveContext.depth) {
-//                    0 -> !element.isLineFromLine
-//                    1 -> !element.isCircleFromCircle
-//                    2 -> !element.isCircleFromCircle
-//                    3 -> !element.isLineFromLine
-//                    4 -> !element.isLineFromLine
-//                    5 -> !element.isCircleFromCircle
-//                    6 -> !element.isLineFromLine
-//                    else -> false
-//                }
-//            }
-//        }
+        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+            // Euclidea 8L L-star moves hint
+            return { solveContext, element ->
+                when (solveContext.depth) {
+                    0 -> !element.isLineFromParallel
+                    1 -> !element.isCircleFromCircle
+                    2 -> !element.isLineFromLine
+                    3 -> !element.isCircleFromCircle
+                    4 -> !element.isLineFromLine
+                    5 -> !element.isLineFromLine
+                    6 -> !element.isLineFromParallel
+                    7 -> !element.isLineFromParallel
+                    else -> false
+                }
+            }
+        }
 
         override fun referenceSolution(
             params: Params,
