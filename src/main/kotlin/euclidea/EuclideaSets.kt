@@ -250,6 +250,14 @@ class ElementSet : EuclideaSet<Element> {
 
     override val size: Int
         get() = lineSet.size + circleSet.size
+
+    companion object {
+        fun of(elements: Collection<Element>): ElementSet {
+            val set = ElementSet()
+            set += elements
+            return set
+        }
+    }
 }
 
 class PrimitiveSet : EuclideaSet<Primitive> {

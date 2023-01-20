@@ -538,3 +538,16 @@ fun formsSquare(elements: LineSet): Boolean {
     return (1 until 4).map { i -> rotatePoint(center, sampleVertex, angle * i.toDouble()) }
         .all { vertex -> points.contains(vertex) }
 }
+
+fun mirrorAcross(line: Element.Line, point: Point): Point {
+    val proj = projection(line, point)
+    return proj - (point - proj)
+}
+
+private fun projection(line: Element.Line, point: Point): Point {
+    val d = point - line.point1
+    val dir = line.point2 - line.point1
+    val e = dir * (1.0 / dir.distance)
+    val dot = d.x * e.x + d.y * e.y
+    return line.point1 + e * dot
+}
