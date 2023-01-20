@@ -17,12 +17,12 @@ class SolvePuzzle14_1Test {
 
     @Test
     fun improveSolution() {
-        // partial solution found 2 sec
+        // no partial solution found 5 min 59 sec
         Solver().improveSolution(
-            maxExtraElements = 3,
+            maxExtraElements = 4,
             maxDepth = 6,
-            nonNewElementLimit = 3,
-            consecutiveNonNewElementLimit = 3,
+            nonNewElementLimit = 2,
+//            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
     }
@@ -103,7 +103,7 @@ class SolvePuzzle14_1Test {
             val sidePoints = listOf(sidePointB, sidePointC)
             return { context ->
                 // Partial solution
-                sidePoints.any { context.hasPoint(it) }
+                context.hasPoints(sidePoints)
 //                context.hasElements(solution.elements)
             }
         }
