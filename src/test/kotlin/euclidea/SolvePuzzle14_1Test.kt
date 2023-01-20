@@ -17,9 +17,9 @@ class SolvePuzzle14_1Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 1 min 16 sec
+        // no solution found 3 min 21 sec
         Solver().improveSolution(
-            maxExtraElements = 5,
+            maxExtraElements = 3,
             maxDepth = 8,
             nonNewElementLimit = 4,
             consecutiveNonNewElementLimit = 4,
@@ -149,14 +149,14 @@ class SolvePuzzle14_1Test {
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solution = constructSolution(params)
             val solutionElements = solution.elements
-            val sidePointB = intersectOnePoint(setup.lineAB, solution.solutionB)
-            val sidePointC = intersectOnePoint(setup.lineCA, solution.solutionC)
-            val sidePoints = listOf(sidePointB, sidePointC)
+//            val sidePointB = intersectOnePoint(setup.lineAB, solution.solutionB)
+//            val sidePointC = intersectOnePoint(setup.lineCA, solution.solutionC)
+//            val sidePoints = listOf(sidePointB, sidePointC)
             return { context ->
                 val remainingElements = solutionElements.count { !context.hasElement(it) }
-                // Assume Point D found first, then side points together
+                // Assume Point D found first
                 val remainingPoints =
-                    if (context.hasPoint(solution.pointD)) 0 else 1 + if (context.hasPoints(sidePoints)) 0 else 1
+                    if (context.hasPoint(solution.pointD)) 0 else 1
                 remainingPoints + remainingElements
             }
         }
