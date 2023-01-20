@@ -17,11 +17,11 @@ class SolvePuzzle14_1Test {
 
     @Test
     fun improveSolution() {
-        // gave up 3 hr 51 min
+        // partial solution found 2 sec
         Solver().improveSolution(
-            maxExtraElements = 4,
-            maxDepth = 8,
-            nonNewElementLimit = 5,
+            maxExtraElements = 3,
+            maxDepth = 6,
+            nonNewElementLimit = 3,
             consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
@@ -98,8 +98,13 @@ class SolvePuzzle14_1Test {
                     assertTrue(pointAndLineCoincide(pointD, lineBC))
                 }
             }
+            val sidePointB = intersectOnePoint(setup.lineAB, solution.solutionB)
+            val sidePointC = intersectOnePoint(setup.lineCA, solution.solutionC)
+            val sidePoints = listOf(sidePointB, sidePointC)
             return { context ->
-                context.hasElements(solution.elements)
+                // Partial solution
+                sidePoints.any { context.hasPoint(it) }
+//                context.hasElements(solution.elements)
             }
         }
 
@@ -146,21 +151,23 @@ class SolvePuzzle14_1Test {
 //            }
 //        }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solution = constructSolution(params)
-            val solutionElements = solution.elements
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solution = constructSolution(params)
+//            val solutionElements = solution.elements
 //            val sidePointB = intersectOnePoint(setup.lineAB, solution.solutionB)
 //            val sidePointC = intersectOnePoint(setup.lineCA, solution.solutionC)
 //            val sidePoints = listOf(sidePointB, sidePointC)
-            return { context ->
-                val remainingElements = solutionElements.count { !context.hasElement(it) }
-//                // Assume Point D found first
-//                val remainingPoints =
-//                    if (context.hasPoint(solution.pointD)) 0 else 1
-//                remainingPoints + remainingElements
-                remainingElements
-            }
-        }
+//            return { context ->
+//                // Partial solution
+//                sidePoints.any { context.hasPoint(it) }
+////                val remainingElements = solutionElements.count { !context.hasElement(it) }
+////                // Assume Point D found first
+////                val remainingPoints =
+////                    if (context.hasPoint(solution.pointD)) 0 else 1
+////                remainingPoints + remainingElements
+////                remainingElements
+//            }
+//        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
             // Euclidea 8E E-star moves hint
