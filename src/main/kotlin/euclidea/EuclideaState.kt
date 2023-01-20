@@ -18,12 +18,22 @@ data class EuclideaConfig(
 
 data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)
 
+// Should use `EuclideaContext.of` rather than primary constructor, in order to include intersection points of initial elements.
 data class EuclideaContext(
     val config: EuclideaConfig = EuclideaConfig(),
     val points: List<Point>,
     val elements: List<Element>,
     val pointSource: Map<Point, IntersectionSource> = mapOf()
 ) {
+    companion object {
+        fun of(
+            config: EuclideaConfig = EuclideaConfig(),
+            points: List<Point>,
+            elements: List<Element>
+        ): EuclideaContext {
+            return EuclideaContext(config, points, listOf()).withElements(elements)
+        }
+    }
 
     @Suppress("SuspiciousCollectionReassignment")
     fun withElement(element: Element): EuclideaContext {
