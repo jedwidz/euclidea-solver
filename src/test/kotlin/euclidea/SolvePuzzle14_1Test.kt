@@ -17,7 +17,7 @@ class SolvePuzzle14_1Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 3 min 21 sec
+        // no solution found 36 min 27 sec
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 8,
@@ -154,10 +154,11 @@ class SolvePuzzle14_1Test {
 //            val sidePoints = listOf(sidePointB, sidePointC)
             return { context ->
                 val remainingElements = solutionElements.count { !context.hasElement(it) }
-                // Assume Point D found first
-                val remainingPoints =
-                    if (context.hasPoint(solution.pointD)) 0 else 1
-                remainingPoints + remainingElements
+//                // Assume Point D found first
+//                val remainingPoints =
+//                    if (context.hasPoint(solution.pointD)) 0 else 1
+//                remainingPoints + remainingElements
+                remainingElements
             }
         }
 
