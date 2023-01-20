@@ -17,7 +17,7 @@ class SolvePuzzle14_1Test {
 
     @Test
     fun improveSolution() {
-        // no partial solution found 5 min 59 sec
+        // partial solution found 5 min 58 sec
         Solver().improveSolution(
             maxExtraElements = 4,
             maxDepth = 6,
@@ -101,9 +101,10 @@ class SolvePuzzle14_1Test {
             val sidePointB = intersectOnePoint(setup.lineAB, solution.solutionB)
             val sidePointC = intersectOnePoint(setup.lineCA, solution.solutionC)
             val sidePoints = listOf(sidePointB, sidePointC)
+            val pointsOfInterest = listOf(sidePointB, sidePointC, solution.pointD)
             return { context ->
                 // Partial solution
-                context.hasPoints(sidePoints)
+                pointsOfInterest.count { context.hasPoint(it) } >= 2
 //                context.hasElements(solution.elements)
             }
         }
