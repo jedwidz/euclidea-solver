@@ -79,7 +79,7 @@ class SolvePuzzle14_4Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(lineAB, lineAC, lineBD, lineCD) to EuclideaContext(
+                    return Setup(lineAB, lineAC, lineBD, lineCD) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(8.0),
 //                            parallelToolEnabled = true,

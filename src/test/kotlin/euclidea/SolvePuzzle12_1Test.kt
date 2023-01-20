@@ -67,7 +67,7 @@ class SolvePuzzle12_1Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                return Setup to EuclideaContext(
+                return Setup to EuclideaContext.of(
                     config = EuclideaConfig(
                         maxSqDistance = sq(10.0),
                     ),

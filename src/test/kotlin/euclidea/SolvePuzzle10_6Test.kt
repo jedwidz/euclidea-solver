@@ -54,7 +54,7 @@ class SolvePuzzle10_6Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(base) to EuclideaContext(
+                    return Setup(base) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(20.0),
                             perpendicularBisectorToolEnabled = true,

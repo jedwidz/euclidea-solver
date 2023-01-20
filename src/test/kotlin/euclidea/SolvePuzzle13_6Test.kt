@@ -73,7 +73,7 @@ class SolvePuzzle13_6Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line, bisect) to EuclideaContext(
+                    return Setup(line, bisect) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,
@@ -84,8 +84,8 @@ class SolvePuzzle13_6Test {
                         ),
                         // base is included as a probe point
                         points = listOf(pointA, pointB, base),
-                        elements = listOf(line)
-                    ).withElement(bisect)
+                        elements = listOf(line, bisect)
+                    )
                 }
             }
         }

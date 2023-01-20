@@ -62,7 +62,7 @@ class SolvePuzzle6_9Test {
                 namer.nameReflected(context)
                 with(context) {
                     val setup = Setup(triangle12, triangle23, triangle31)
-                    return setup to EuclideaContext(
+                    return setup to EuclideaContext.of(
                         config = EuclideaConfig(maxSqDistance = sq(8.0)),
                         points = listOf(base1, base2, base3),
                         elements = listOf(triangle12, triangle23, triangle31)

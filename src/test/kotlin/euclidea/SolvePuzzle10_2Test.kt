@@ -70,7 +70,7 @@ class SolvePuzzle10_2Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(circleA, circleB) to EuclideaContext(
+                    return Setup(circleA, circleB) to EuclideaContext.of(
                         config = EuclideaConfig(
                             perpendicularBisectorToolEnabled = true,
                             maxSqDistance = sq(5.0)

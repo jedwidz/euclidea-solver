@@ -69,7 +69,7 @@ class SolvePuzzle9_7Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line1, line2, line3) to EuclideaContext(
+                    return Setup(line1, line2, line3) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(15.0)
                         ),

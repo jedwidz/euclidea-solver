@@ -45,7 +45,7 @@ class SolvePuzzle4_11Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                return Setup to EuclideaContext(
+                return Setup to EuclideaContext.of(
                     config = EuclideaConfig(lineToolEnabled = false, maxSqDistance = sq(5.0)),
                     points = listOf(base1, base2),
                     elements = listOf()

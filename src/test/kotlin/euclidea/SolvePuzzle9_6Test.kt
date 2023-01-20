@@ -77,7 +77,7 @@ class SolvePuzzle9_6Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line1, line2, side1, side2, diag1, diag2, center) to EuclideaContext(
+                    return Setup(line1, line2, side1, side2, diag1, diag2, center) to EuclideaContext.of(
                         config = EuclideaConfig(
 //                            perpendicularBisectorToolEnabled = true,
 //                            perpendicularToolEnabled = true,

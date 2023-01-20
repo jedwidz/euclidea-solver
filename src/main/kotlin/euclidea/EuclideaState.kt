@@ -19,7 +19,7 @@ data class EuclideaConfig(
 data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)
 
 // Should use `EuclideaContext.of` rather than primary constructor, in order to include intersection points of initial elements.
-data class EuclideaContext(
+data class EuclideaContext private constructor(
     val config: EuclideaConfig = EuclideaConfig(),
     val points: List<Point>,
     val elements: List<Element>,

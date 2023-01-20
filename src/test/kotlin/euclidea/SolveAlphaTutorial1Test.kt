@@ -20,7 +20,7 @@ class SolveAlphaTutorial1Test {
             }
         }
         val solutionContext =
-            solve(EuclideaContext(points = listOf(point1, point2), elements = listOf(line)), 4) { context ->
+            solve(EuclideaContext.of(points = listOf(point1, point2), elements = listOf(line)), 4) { context ->
                 solutions.any { context.hasElements(it) }
             }
         dumpSolution(solutionContext)

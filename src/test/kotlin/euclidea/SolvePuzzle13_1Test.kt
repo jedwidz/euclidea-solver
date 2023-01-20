@@ -68,7 +68,7 @@ class SolvePuzzle13_1Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(circle, line) to EuclideaContext(
+                    return Setup(circle, line) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,

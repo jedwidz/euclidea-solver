@@ -73,7 +73,7 @@ class SolvePuzzle15_7Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    val baseContext = EuclideaContext(
+                    val baseContext = EuclideaContext.of(
                         config = EuclideaConfig(circleToolEnabled = false, maxSqDistance = sq(100.0)),
                         points = listOf(center),
                         elements = listOf(circle, line)

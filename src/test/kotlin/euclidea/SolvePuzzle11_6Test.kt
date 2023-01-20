@@ -80,7 +80,7 @@ class SolvePuzzle11_6Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line1, line2) to EuclideaContext(
+                    return Setup(line1, line2) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(10.0),
                             angleBisectorToolEnabled = true

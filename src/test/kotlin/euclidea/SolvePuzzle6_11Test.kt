@@ -51,7 +51,7 @@ class SolvePuzzle6_11Test {
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
             with(params) {
-                return Setup to EuclideaContext(
+                return Setup to EuclideaContext.of(
                     config = EuclideaConfig(maxSqDistance = sq(8.0)),
                     points = listOf(base1, base2, base3),
                     elements = listOf()

@@ -61,7 +61,7 @@ class SolvePuzzle7_8Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(base4, base, par1, par2) to EuclideaContext(
+                    return Setup(base4, base, par1, par2) to EuclideaContext.of(
                         config = EuclideaConfig(maxSqDistance = sq(8.0)),
                         points = listOf(base1, base2),
                         elements = listOf(base, par1, par2)
