@@ -18,7 +18,7 @@ class SolvePuzzle14_5Test {
 
     @Test
     fun improveSolution() {
-        // ?
+        // solution found 1 sec
         Solver().improveSolution(
             maxExtraElements = 4,
             maxDepth = 5,
@@ -80,7 +80,7 @@ class SolvePuzzle14_5Test {
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(circleA, circleB, circleC) to EuclideaContext(
+                    return Setup(circleA, circleB, circleC) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(50.0),
 //                            parallelToolEnabled = true,
