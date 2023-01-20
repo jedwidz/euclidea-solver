@@ -1,9 +1,9 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
+import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
-import kotlin.math.max
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_9Test {
@@ -16,10 +16,10 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // gave up 5 min 19 sec
+        // ?
         Solver().improveSolution(
-            maxExtraElements = 7,
-            maxDepth = 7,
+            maxExtraElements = 5,
+            maxDepth = 5,
             nonNewElementLimit = 2,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -45,7 +45,7 @@ class SolvePuzzle15_9Test {
             return Params(
                 center = Point(0.0, 0.7),
                 radius = 0.4,
-                base = Point(0.0, 0.0),
+                base = Point(0.1, 0.0),
                 dir = Point(0.9, 0.0),
                 sample = Point(1.0, 0.55),
             )
@@ -54,10 +54,10 @@ class SolvePuzzle15_9Test {
         override fun makeReplayParams(): Params {
             return Params(
                 center = Point(0.0, 0.701),
-                radius = 0.402,
-                base = Point(0.0, 0.0),
+                radius = 0.412,
+                base = Point(0.1011, 0.0),
                 dir = Point(0.9011, 0.0),
-                sample = Point(1.003, 0.554),
+                sample = Point(1.203, 0.564),
             )
         }
 
@@ -98,9 +98,51 @@ class SolvePuzzle15_9Test {
             assertTrue(pointAndLineCoincide(solution.center, setup.line))
             assertTrue(pointAndCircleCoincide(params.sample, solution))
             assertTrue(meetAtOnePoint(setup.circle, solution))
+            // Look for partial solution
+            val diameter1 = lineTool(params.center, solution.center)
+            val diameter2 = lineTool(params.sample, solution.center)
+            val elementsOfInterest = listOf(
+                solution,
+                perpendicularTool(setup.line, solution.center),
+                diameter1,
+                diameter2
+            )
+            val givenPoints = PointSet.of(listOf(params.center, params.sample, mirrorAcross(setup.line, params.sample)))
+            val givenElements = ElementSet.of(listOf(setup.line, setup.circle))
             return { context ->
-                context.hasElement(solution)
+                context.points.any { point ->
+                    point !in givenPoints && elementsOfInterest.any { element ->
+                        if (pointAndElementCoincide(
+                                point,
+                                element
+                            )
+                        ) {
+                            println("Partial solution: $point coincides with $element")
+                            true
+                        } else false
+                    }
+                } ||
+                        context.elements.any { element ->
+                            element !in givenElements &&
+                                    when (element) {
+                                        is Element.Circle -> if (coincides(element.radius, solution.radius)) {
+                                            println("Partial solution: $element has radius of $solution")
+                                            true
+                                        } else false
+                                        is Element.Line -> if (linesParallel(element, diameter1) || linesParallel(
+                                                element,
+                                                diameter2
+                                            )
+                                        ) {
+                                            println("Partial solution: $element is parallel with line of interest")
+                                            true
+                                        } else false
+                                    }
+                        }
             }
+//            return { context ->
+//                context.hasElement(solution)
+//            }
         }
 
         private fun constructSolution(params: Params): Element.Circle {
@@ -145,20 +187,20 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solution = constructSolution(params)
-            val center = solution.center
-            return { context ->
-                // Assumes that solution is the last element (no extraneous elements)
-                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
-                    0
-                else {
-                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
-                    // Need two elements to locate center, then the solution circle itself
-                    max(0, 2 - onCenter) + 1
-                }
-            }
-        }
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solution = constructSolution(params)
+//            val center = solution.center
+//            return { context ->
+//                // Assumes that solution is the last element (no extraneous elements)
+//                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+//                    0
+//                else {
+//                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
+//                    // Need two elements to locate center, then the solution circle itself
+//                    max(0, 2 - onCenter) + 1
+//                }
+//            }
+//        }
 
         override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
             // Euclidea 7E E-star moves hint
