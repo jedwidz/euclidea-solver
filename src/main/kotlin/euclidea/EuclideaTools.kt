@@ -63,13 +63,15 @@ object EuclideaTools {
     }
 
     fun perpendicular(line: Element.Line, point: Point, probe: Point?): Pair<Element.Line, List<Element>> {
+        // Requires a probe point
+        if (probe === null)
+            invalid()
         val extended = line.extended()
         if (pointAndLineCoincide(point, extended)) {
-            // Erect perpendicular, requires a probe point
-            if (probe === null)
-                invalid()
+            // Erect perpendicular
             if (pointAndLineCoincide(probe, extended)) {
                 // 4E construction
+                // TODO consider just disallowing this case, it's likely unintended
                 val equal = circleTool(point, probe)
                 val (point1, point2) = intersectTwoPoints(equal, extended)
                 val circle1 = circleTool(point1, point2)
@@ -84,8 +86,21 @@ object EuclideaTools {
                 val aim = intersectTwoPointsOther(cross, equal, other)
                 return lineTool(point, aim) to listOf(extended, equal, cross)
             }
-        } else
-            return dropPerpendicular(extended.point1, extended.point2, point)
+        } else {
+            // Drop perpendicular
+            if (pointAndLineCoincide(probe, extended)) {
+                // 3E construction
+                val circle1 = circleTool(probe, point)
+                // Arbitrary other point on the line
+                val probe2 = intersectTwoPoints(circle1, extended).first
+                val circle2 = circleTool(probe2, point)
+                val aim = intersectTwoPoints(circle1, circle2).first
+                return lineTool(point, aim) to listOf(extended, circle1, circle2)
+            } else {
+                // Could do a 4E construction here, but that's probably not the intention
+                invalid()
+            }
+        }
     }
 
     enum class ParallelOption { AllCircles, WithCircleThenLine, WithCircleThenLineVariant, WithLineThenCircle }
