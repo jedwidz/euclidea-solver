@@ -1,7 +1,9 @@
 package euclidea
 
 import euclidea.EuclideaTools.angleBisectorTool
+import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.parallelTool
+import euclidea.EuclideaTools.perpendicularBisectorTool
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
@@ -15,9 +17,9 @@ class SolvePuzzle14_1Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 1 min 18 sec
+        // no solution found 4 sec
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 2,
             maxDepth = 8,
             nonNewElementLimit = 4,
             consecutiveNonNewElementLimit = 3,
@@ -198,35 +200,33 @@ class SolvePuzzle14_1Test {
             }
         }
 
-//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-//            return listOf(this::optimal6LSolution)
-//        }
-//
-//        fun optimal6LSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Optimal 6L solution
-//                        val bisectAB = perpendicularBisectorTool(baseA, baseB)
-//                        val midAB = intersectOnePoint(bisectAB, lineAB)
-//                        val cross = lineTool(midAB, baseC)
-//                        val circle1 = circleTool(baseC, midAB)
-//                        val doubled = intersectTwoPointsOther(circle1, cross, midAB)
-//                        val circle2 = circleTool(doubled, baseC)
-//                        val tripled = intersectTwoPointsOther(circle2, cross, baseC)
-//                        val solutionA = lineTool(baseA, tripled)
-//                        val solutionB = lineTool(baseB, tripled)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::suboptimal9ESolution)
+        }
+
+        fun suboptimal9ESolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Sub-optimal 9E solution
+                        val diagonal = angleBisectorTool(baseB, baseA, baseC)
+                        val pointD = intersectOnePoint(diagonal, lineBC)
+                        val perpDiagonal = perpendicularBisectorTool(baseA, pointD)
+                        val sidePointB = intersectOnePoint(perpDiagonal, lineAB)
+                        val sidePointC = intersectOnePoint(perpDiagonal, lineCA)
+                        val solutionB = lineTool(sidePointB, pointD)
+                        val solutionC = lineTool(sidePointC, pointD)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
