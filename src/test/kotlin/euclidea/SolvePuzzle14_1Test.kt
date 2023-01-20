@@ -15,9 +15,9 @@ class SolvePuzzle14_1Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 1 min 13 sec
+        // no solution found 1 min 18 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 4,
             maxDepth = 8,
             nonNewElementLimit = 4,
             consecutiveNonNewElementLimit = 3,
@@ -69,7 +69,7 @@ class SolvePuzzle14_1Test {
                 with(context) {
                     return Setup(lineAB, lineBC, lineCA) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(10.0),
+                            maxSqDistance = sq(5.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
@@ -93,7 +93,6 @@ class SolvePuzzle14_1Test {
                 with(solution) {
                     assertTrue(linesParallel(lineAB, solutionC))
                     assertTrue(linesParallel(lineCA, solutionB))
-                    val pointD = intersectOnePoint(solutionB, solutionC)
                     assertTrue(pointAndLineCoincide(pointD, lineBC))
                 }
             }
@@ -107,6 +106,7 @@ class SolvePuzzle14_1Test {
             val solutionC: Element.Line
         ) {
             val elements = listOf(solutionB, solutionC)
+            val pointD = intersectOnePoint(solutionB, solutionC)
         }
 
         private fun constructSolution(params: Params): Solution {
@@ -145,9 +145,17 @@ class SolvePuzzle14_1Test {
 //        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutionElements = constructSolution(params).elements
+            val solution = constructSolution(params)
+            val solutionElements = solution.elements
+            val sidePointB = intersectOnePoint(setup.lineAB, solution.solutionB)
+            val sidePointC = intersectOnePoint(setup.lineCA, solution.solutionC)
+            val sidePoints = listOf(sidePointB, sidePointC)
             return { context ->
-                solutionElements.count { !context.hasElement(it) }
+                val remainingElements = solutionElements.count { !context.hasElement(it) }
+                // Assume Point D found first, then side points together
+                val remainingPoints =
+                    if (context.hasPoint(solution.pointD)) 0 else 1 + if (context.hasPoints(sidePoints)) 0 else 1
+                remainingPoints + remainingElements
             }
         }
 
