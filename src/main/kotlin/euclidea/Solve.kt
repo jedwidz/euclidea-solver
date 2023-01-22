@@ -236,7 +236,7 @@ fun solve(
 
                 val (keep, skippedNewElements) = maybePass(pendingElements.items())
                 val pendingList = maybePrioritize(keep)
-                // println("$depth - ${pendingList.size}")
+                println("$depth - ${pendingList.size}")
 
                 val removedElements = mutableSetOf<Element>()
                 val newPassedElements = mutableSetOf<Element>()
@@ -244,6 +244,9 @@ fun solve(
                     if (Thread.currentThread().isInterrupted)
                         return
                     val removed = pendingElements.remove(newElement)
+                    if (!removed) {
+                        println("Not removed)")
+                    }
                     assert(removed)
                     passedElements.add(newElement)
                     newPassedElements.add(newElement)
@@ -279,6 +282,7 @@ fun solve(
                     }
                 }
                 pendingElements -= skippedNewElements
+                println("removedElements.size: ${removedElements.size}")
                 pendingElements += removedElements
                 passedElements -= newPassedElements
             }

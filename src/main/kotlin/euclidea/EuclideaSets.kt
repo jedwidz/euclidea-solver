@@ -36,13 +36,23 @@ interface EuclideaSet<T> {
 
 abstract class IndexedSet<T>(
     // must compare on primaryDim first, and have equals consistent with T::equals
-    comparator: Comparator<in T>
+    private val comparator: Comparator<in T>
 ) : EuclideaSet<T> {
     protected abstract fun coincides(item1: T, item2: T): Boolean
     protected abstract fun bound(d: Double): T
-    protected abstract fun primaryDim(item: T): Double
 
-    private val set = sortedSetOf(comparator)
+    // 'Hash metric', which must differ by less than Epsilon for coinciding items
+    protected abstract fun hashMetric(item: T): Double
+
+    // compares on hashMetric first, and has equals consistent with T::equals
+    private val hashComparator = Comparator<T> { a, b ->
+        when (val compare = hashMetric(a).compareTo(hashMetric(b))) {
+            0 -> comparator.compare(a, b)
+            else -> compare
+        }
+    }
+
+    private val set = sortedSetOf(hashComparator)
 
     override operator fun contains(item: T): Boolean {
         return canonicalImpl(item) !== null
@@ -53,7 +63,7 @@ abstract class IndexedSet<T>(
         // TODO fix this for lines with base points switched
         // if (item in set) return item
 
-        val primary = primaryDim(item)
+        val primary = hashMetric(item)
         val range = coincidingRange(primary)
         val subSet = set.subSet(range.first, true, range.second, true)
 
@@ -119,16 +129,16 @@ class PointSet : IndexedSet<Point>(
     }
 ) {
 
-    override fun primaryDim(item: Point): Double {
-        return item.x
+    override fun hashMetric(item: Point): Double {
+        return (item.x + item.y) / 2.0
+    }
+
+    override fun bound(d: Double): Point {
+        return Point(d, d)
     }
 
     override fun coincides(item1: Point, item2: Point): Boolean {
         return euclidea.coincides(item1, item2)
-    }
-
-    override fun bound(d: Double): Point {
-        return Point(d, 0.0)
     }
 
     fun centroid(): Point? {
@@ -174,7 +184,7 @@ class LineSet : IndexedSet<Line>(
     }
 ) {
 
-    override fun primaryDim(item: Line): Double {
+    override fun hashMetric(item: Line): Double {
         return linePrimaryDim(item)
     }
 
@@ -207,17 +217,18 @@ class CircleSet : IndexedSet<Circle>(
     }
 ) {
 
-    override fun primaryDim(item: Circle): Double {
-        return item.center.x
+    override fun hashMetric(item: Circle): Double {
+        return (item.center.x + item.center.y + item.radius) / 3.0
+    }
+
+    override fun bound(d: Double): Circle {
+        return Circle(Point(d, d), d)
     }
 
     override fun coincides(item1: Circle, item2: Circle): Boolean {
         return circlesCoincide(item1, item2)
     }
 
-    override fun bound(d: Double): Circle {
-        return Circle(Point(d, 0.0), 0.0)
-    }
 }
 
 class ElementSet : EuclideaSet<Element> {
