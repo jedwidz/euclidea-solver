@@ -16,7 +16,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // gave up 9 hr 33 min
+        // ?
         Solver().improveSolution(
             maxExtraElements = 7,
             maxDepth = 7,
@@ -202,20 +202,17 @@ class SolvePuzzle15_9Test {
             }
         }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+        override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 7E E-star moves hint
-            return { solveContext, element ->
-                when (solveContext.depth) {
-                    0 -> !element.isLineFromPerpendicular
-                    1 -> !element.isCircleFromCircle
-                    2 -> !element.isLineFromLine
-                    3 -> !element.isCircleFromNonCollapsingCompass
-                    4 -> !element.isCircleFromNonCollapsingCompass
-                    5 -> !element.isLineFromLine
-                    6 -> !element.isCircleFromCircle
-                    else -> false
-                }
-            }
+            return listOf(
+                EuclideaTool.PerpendicularTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool
+            )
         }
 
 //        override fun referenceSolution(
