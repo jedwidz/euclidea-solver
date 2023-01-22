@@ -14,7 +14,7 @@ class SolvePuzzle8_4Test {
 
     @Test
     fun improveSolution() {
-        // solution found ~26s
+        // solution found 24s
         Solver().improveSolution(3, 13)
     }
 
@@ -105,26 +105,23 @@ class SolvePuzzle8_4Test {
 //            }
 //        }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+        override fun toolSequence(): List<EuclideaTool> {
             // Euclidea E-star moves hint
-            return { solveContext, element ->
-                when (solveContext.depth) {
-                    0 -> !element.isCircleFromCircle
-                    1 -> !element.isCircleFromCircle
-                    2 -> !element.isLineFromLine
-                    3 -> !element.isCircleFromCircle
-                    4 -> !element.isLineFromLine
-                    5 -> !element.isLineFromLine
-                    6 -> !element.isCircleFromCircle
-                    7 -> !element.isCircleFromCircle
-                    8 -> !element.isLineFromLine
-                    9 -> !element.isLineFromLine
-                    10 -> !element.isLineFromLine
-                    11 -> !element.isLineFromLine
-                    12 -> !element.isLineFromLine
-                    else -> false
-                }
-            }
+            return listOf(
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+            )
         }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
