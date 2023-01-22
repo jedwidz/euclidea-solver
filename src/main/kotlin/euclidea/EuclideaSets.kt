@@ -35,8 +35,6 @@ interface EuclideaSet<T> {
 }
 
 abstract class IndexedSet<T : Primitive>(
-    // must have equals consistent with T::equals
-    private val comparator: Comparator<in T>
 ) : EuclideaSet<T> {
     protected abstract fun coincides(item1: T, item2: T): Boolean
     protected abstract fun bound(d: Double): T
@@ -44,10 +42,12 @@ abstract class IndexedSet<T : Primitive>(
     // compares on hashMetric first
     private val hashComparator = Comparator<T> { a, b ->
         when (val compare = a.hashMetric.compareTo(b.hashMetric)) {
-            0 -> comparator.compare(a, b)
+            0 -> compareItems(a, b)
             else -> compare
         }
     }
+
+    protected abstract fun compareItems(a: T, b: T): Int
 
     private val set = sortedSetOf(hashComparator)
 
@@ -115,11 +115,12 @@ abstract class IndexedSet<T : Primitive>(
         get() = set.size
 }
 
-private val pointComparator = compareBy<Point>({ it.x }, { it.y })
+class PointSet : IndexedSet<Point>() {
 
-class PointSet : IndexedSet<Point>(
-    comparator = pointComparator
-) {
+    override fun compareItems(a: Point, b: Point): Int {
+        return a.compareTo(b)
+    }
+
     override fun bound(d: Double): Point {
         return Point(d, d)
     }
@@ -149,19 +150,12 @@ class PointSet : IndexedSet<Point>(
     }
 }
 
-private val lineComparator = compareBy<Line>(
-    { it.xDir },
-    { it.yDir },
-    { it.yIntercept },
-    { it.xIntercept },
-    { it.xMin },
-    { it.xMax },
-    { it.yMin },
-    { it.yMax })
+class LineSet : IndexedSet<Line>() {
 
-class LineSet : IndexedSet<Line>(
-    comparator = lineComparator
-) {
+    override fun compareItems(a: Line, b: Line): Int {
+        return a.compareTo(b)
+    }
+
     override fun bound(d: Double): Line {
         val scaledForHashMetric = d * 2.0
         return Line(Point(scaledForHashMetric, 0.0), Point(scaledForHashMetric, 1.0))
@@ -180,11 +174,12 @@ class LineSet : IndexedSet<Line>(
     }
 }
 
-private val circleSetComparator = compareBy<Circle>({ it.center.x }, { it.center.y }, { it.radius })
+class CircleSet : IndexedSet<Circle>() {
 
-class CircleSet : IndexedSet<Circle>(
-    comparator = circleSetComparator
-) {
+    override fun compareItems(a: Circle, b: Circle): Int {
+        return a.compareTo(b)
+    }
+
     override fun bound(d: Double): Circle {
         return Circle(Point(d, d), d)
     }

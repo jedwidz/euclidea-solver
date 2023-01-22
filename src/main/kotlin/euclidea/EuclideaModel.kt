@@ -13,8 +13,15 @@ interface Primitive {
     val hashMetric: Double
 }
 
-data class Point(val x: Double, val y: Double) : Primitive {
+data class Point(val x: Double, val y: Double) : Primitive, Comparable<Point> {
     override val hashMetric = (x + y) / 2.0
+
+    override fun compareTo(other: Point): Int {
+        return when (val compare = x.compareTo(other.x)) {
+            0 -> y.compareTo(other.y)
+            else -> compare
+        }
+    }
 
     val sqDistance: Double = sq(x) + sq(y)
     val distance = sqrt(sqDistance)
@@ -55,7 +62,7 @@ sealed class Element : Primitive {
         val limit1: Boolean = false,
         val limit2: Boolean = false,
         val source: LineSource? = null
-    ) : Element() {
+    ) : Element(), Comparable<Line> {
         override val hashMetric: Double
 
         val xIntercept: Double?
@@ -90,6 +97,36 @@ sealed class Element : Primitive {
 
             val intercept = smallerNullable(xIntercept, yIntercept)
             hashMetric = ((intercept ?: 0.0) + xDir) / 2.0
+        }
+
+        override fun compareTo(other: Line): Int {
+            // Not using `compareBy` for perf
+            @Suppress("NAME_SHADOWING")
+            return when (val compare = xDir.compareTo(other.xDir)) {
+                0 -> when (val compare = yDir.compareTo(other.yDir)) {
+                    0 -> when (val compare = compareToNullable(yIntercept, other.yIntercept)) {
+                        0 -> when (val compare = compareToNullable(xIntercept, other.xIntercept)) {
+                            0 -> when (val compare = compareToNullable(xMin, other.xMin)) {
+                                0 -> when (val compare = compareToNullable(xMax, other.xMax)) {
+                                    0 -> when (val compare = compareToNullable(yMin, other.yMin)) {
+                                        0 -> when (val compare = compareToNullable(yMax, other.yMax)) {
+                                            0 -> 0
+                                            else -> compare
+                                        }
+                                        else -> compare
+                                    }
+                                    else -> compare
+                                }
+                                else -> compare
+                            }
+                            else -> compare
+                        }
+                        else -> compare
+                    }
+                    else -> compare
+                }
+                else -> compare
+            }
         }
 
         private fun limits(v1: Double, v2: Double): Pair<Double?, Double?> {
@@ -139,8 +176,16 @@ sealed class Element : Primitive {
         val radius: Double,
         val sample: Point? = null,
         val source: CircleSource? = null
-    ) : Element() {
+    ) : Element(), Comparable<Circle> {
+
         override val hashMetric = (center.x + center.y + radius) / 3.0
+
+        override fun compareTo(other: Circle): Int {
+            return when (val compare = center.compareTo(other.center)) {
+                0 -> radius.compareTo(other.radius)
+                else -> compare
+            }
+        }
 
         override fun minus(point: Point): Circle {
             return Circle(center - point, radius, sample?.let { it - point })

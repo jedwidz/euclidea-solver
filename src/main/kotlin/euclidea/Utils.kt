@@ -63,3 +63,16 @@ fun <T : Any> Any.reflectProperties(kClass: KClass<T>): Map<String, T> {
 fun smallerNullable(a: Double?, b: Double?): Double? {
     return if (a == null) b else if (b == null) a else if (abs(a) < abs(b)) a else b
 }
+
+fun <T : Comparable<T>> compareToNullable(a: T?, b: T?): Int {
+    return when (a) {
+        null -> when (b) {
+            null -> 0
+            else -> -1
+        }
+        else -> when (b) {
+            null -> 1
+            else -> a.compareTo(b)
+        }
+    }
+}
