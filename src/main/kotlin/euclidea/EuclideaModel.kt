@@ -7,9 +7,15 @@ import euclidea.EuclideaTools.perpendicularBisectConstruction
 import euclidea.EuclideaTools.perpendicularConstruction
 import kotlin.math.*
 
-interface Primitive
+interface Primitive {
+    // 'Hash metric', which must differ by less than Epsilon for coinciding items
+    // Used as a dimension for indexing
+    val hashMetric: Double
+}
 
 data class Point(val x: Double, val y: Double) : Primitive {
+    override val hashMetric = (x + y) / 2.0
+
     val sqDistance: Double = sq(x) + sq(y)
     val distance = sqrt(sqDistance)
 
@@ -50,10 +56,10 @@ sealed class Element : Primitive {
         val limit2: Boolean = false,
         val source: LineSource? = null
     ) : Element() {
+        override val hashMetric: Double
 
         val xIntercept: Double?
         val yIntercept: Double?
-        val intercept: Double?
         val xDir: Double
         val yDir: Double
         val xMin: Double?
@@ -68,7 +74,6 @@ sealed class Element : Primitive {
                 if (abs(db) < Epsilon) null else a - (da / db) * b
             xIntercept = intercept(dx, dy, point1.x, point1.y)
             yIntercept = intercept(dy, dx, point1.y, point1.x)
-            intercept = smallerNullable(xIntercept, yIntercept)
 
             val len = sqrt(sq(dx) + sq(dy))
             val x = dx / len
@@ -82,6 +87,9 @@ sealed class Element : Primitive {
             val yBounds = limits(point1.y, point2.y)
             yMin = yBounds.first
             yMax = yBounds.second
+
+            val intercept = smallerNullable(xIntercept, yIntercept)
+            hashMetric = ((intercept ?: 0.0) + xDir) / 2.0
         }
 
         private fun limits(v1: Double, v2: Double): Pair<Double?, Double?> {
@@ -132,6 +140,8 @@ sealed class Element : Primitive {
         val sample: Point? = null,
         val source: CircleSource? = null
     ) : Element() {
+        override val hashMetric = (center.x + center.y + radius) / 3.0
+
         override fun minus(point: Point): Circle {
             return Circle(center - point, radius, sample?.let { it - point })
         }

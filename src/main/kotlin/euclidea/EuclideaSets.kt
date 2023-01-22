@@ -34,19 +34,16 @@ interface EuclideaSet<T> {
     val size: Int
 }
 
-abstract class IndexedSet<T>(
-    // must compare on primaryDim first, and have equals consistent with T::equals
+abstract class IndexedSet<T : Primitive>(
+    // must have equals consistent with T::equals
     private val comparator: Comparator<in T>
 ) : EuclideaSet<T> {
     protected abstract fun coincides(item1: T, item2: T): Boolean
     protected abstract fun bound(d: Double): T
 
-    // 'Hash metric', which must differ by less than Epsilon for coinciding items
-    protected abstract fun hashMetric(item: T): Double
-
-    // compares on hashMetric first, and has equals consistent with T::equals
+    // compares on hashMetric first
     private val hashComparator = Comparator<T> { a, b ->
-        when (val compare = hashMetric(a).compareTo(hashMetric(b))) {
+        when (val compare = a.hashMetric.compareTo(b.hashMetric)) {
             0 -> comparator.compare(a, b)
             else -> compare
         }
@@ -63,7 +60,7 @@ abstract class IndexedSet<T>(
         // TODO fix this for lines with base points switched
         // if (item in set) return item
 
-        val primary = hashMetric(item)
+        val primary = item.hashMetric
         val range = coincidingRange(primary)
         val subSet = set.subSet(range.first, true, range.second, true)
 
@@ -118,21 +115,11 @@ abstract class IndexedSet<T>(
         get() = set.size
 }
 
+private val pointComparator = compareBy<Point>({ it.x }, { it.y })
+
 class PointSet : IndexedSet<Point>(
-    // Inlined as a potential hotspot optimization
-    // compareBy({ it.x }, { it.y })
-    comparator = Comparator { a, b ->
-        when (val compare = a.x.compareTo(b.x)) {
-            0 -> a.y.compareTo(b.y)
-            else -> compare
-        }
-    }
+    comparator = pointComparator
 ) {
-
-    override fun hashMetric(item: Point): Double {
-        return (item.x + item.y) / 2.0
-    }
-
     override fun bound(d: Double): Point {
         return Point(d, d)
     }
@@ -162,9 +149,7 @@ class PointSet : IndexedSet<Point>(
     }
 }
 
-private fun linePrimaryDim(line: Line) = line.intercept ?: 0.0
-
-private val lineSetComparator = compareBy<Line>({ linePrimaryDim(it) },
+private val lineComparator = compareBy<Line>(
     { it.xDir },
     { it.yDir },
     { it.yIntercept },
@@ -175,25 +160,15 @@ private val lineSetComparator = compareBy<Line>({ linePrimaryDim(it) },
     { it.yMax })
 
 class LineSet : IndexedSet<Line>(
-    // Unwrap the first comparison, as a hotspot optimization
-    comparator = Comparator { a, b ->
-        when (val compare = linePrimaryDim(a).compareTo(linePrimaryDim(b))) {
-            0 -> lineSetComparator.compare(a, b)
-            else -> compare
-        }
-    }
+    comparator = lineComparator
 ) {
-
-    override fun hashMetric(item: Line): Double {
-        return linePrimaryDim(item)
+    override fun bound(d: Double): Line {
+        val scaledForHashMetric = d * 2.0
+        return Line(Point(scaledForHashMetric, 0.0), Point(scaledForHashMetric, 1.0))
     }
 
     override fun coincides(item1: Line, item2: Line): Boolean {
         return linesCoincide(item1, item2)
-    }
-
-    override fun bound(d: Double): Line {
-        return Line(Point(d, 0.0), Point(d, 1.0))
     }
 
     companion object {
@@ -205,22 +180,11 @@ class LineSet : IndexedSet<Line>(
     }
 }
 
-val circleSetComparator = compareBy<Circle>({ it.center.x }, { it.center.y }, { it.radius })
+private val circleSetComparator = compareBy<Circle>({ it.center.x }, { it.center.y }, { it.radius })
 
 class CircleSet : IndexedSet<Circle>(
-    // Unwrap the first comparison, as a hotspot optimization
-    comparator = Comparator { a, b ->
-        when (val compare = a.center.x.compareTo(b.center.x)) {
-            0 -> circleSetComparator.compare(a, b)
-            else -> compare
-        }
-    }
+    comparator = circleSetComparator
 ) {
-
-    override fun hashMetric(item: Circle): Double {
-        return (item.center.x + item.center.y + item.radius) / 3.0
-    }
-
     override fun bound(d: Double): Circle {
         return Circle(Point(d, d), d)
     }
