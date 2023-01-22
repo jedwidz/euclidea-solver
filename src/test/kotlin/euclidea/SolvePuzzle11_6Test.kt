@@ -3,7 +3,9 @@ package euclidea
 import euclidea.EuclideaTools.angleBisectorTool
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
+import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.math.max
@@ -18,9 +20,9 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // gave up 11 min 55 sec
+        // no solution found 20 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 1,
             maxDepth = 8,
             nonNewElementLimit = 4,
             consecutiveNonNewElementLimit = 3,
@@ -118,7 +120,7 @@ class SolvePuzzle11_6Test {
                     val center1 = intersectOnePoint(perp, half)
                     val circle1 = circleTool(center1, touch)
                     val line = lineTool(baseO, sample)
-                    val aim1 = intersectTwoPoints(circle1, line).first
+                    val aim1 = intersectTwoPoints(circle1, line).second
                     val cross1 = lineTool(center1, aim1)
                     val cross2 = parallelTool(cross1, sample, probe = center1)
                     val center2 = intersectOnePoint(cross2, half)
@@ -211,10 +213,44 @@ class SolvePuzzle11_6Test {
                         val center1 = intersectOnePoint(perp, half)
                         val circle1 = circleTool(center1, touch)
                         val line = lineTool(baseO, sample)
-                        val aim1 = intersectTwoPoints(circle1, line).first
+                        val aim1 = intersectTwoPoints(circle1, line).second
                         val cross1 = lineTool(center1, aim1)
                         val cross2 = parallelTool(cross1, sample, probe = center1)
                         val center2 = intersectOnePoint(cross2, half)
+                        val solution = circleTool(center2, sample)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
+
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::optimal6LSolution)
+        }
+
+        fun optimal6LSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Optimal 6L solution
+                        val half = angleBisectorTool(baseA, baseO, baseB)
+                        val perp = perpendicularTool(half, sample, probe = baseO)
+                        val touch1 = intersectOnePoint(perp, line1)
+                        val mid = intersectOnePoint(perp, half)
+                        val circle1 = nonCollapsingCompassTool(touch1, mid, sample)
+                        val aim1 = intersectTwoPoints(circle1, half).first
+                        val touch2 = intersectOnePoint(perp, line2)
+                        val circle2 = nonCollapsingCompassTool(aim1, mid, touch2)
+                        val ref = intersectTwoPoints(circle2, line2).first
+                        val cross = perpendicularBisectorTool(ref, sample)
+                        val center2 = intersectOnePoint(cross, half)
                         val solution = circleTool(center2, sample)
                     }
                     namer.nameReflected(context)
