@@ -16,10 +16,10 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // gave up 9 min 19 sec
+        // bogus partial solution found 3 hr 29 min
         Solver().improveSolution(
-            maxExtraElements = 5,
-            maxDepth = 5,
+            maxExtraElements = 6,
+            maxDepth = 6,
             nonNewElementLimit = 2,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -28,7 +28,7 @@ class SolvePuzzle15_9Test {
 
     data class Params(
         val center: Point,
-        val radius: Double,
+        val sample1: Point,
         val base: Point,
         val dir: Point,
         val sample: Point
@@ -44,7 +44,7 @@ class SolvePuzzle15_9Test {
         override fun makeParams(): Params {
             return Params(
                 center = Point(0.0, 0.7),
-                radius = 0.4,
+                sample1 = Point(0.3, 0.6),
                 base = Point(0.1, 0.0),
                 dir = Point(0.9, 0.0),
                 sample = Point(1.0, 0.55),
@@ -54,7 +54,7 @@ class SolvePuzzle15_9Test {
         override fun makeReplayParams(): Params {
             return Params(
                 center = Point(0.0, 0.701),
-                radius = 0.412,
+                sample1 = Point(0.312, 0.608),
                 base = Point(0.1011, 0.0),
                 dir = Point(0.9011, 0.0),
                 sample = Point(1.203, 0.564),
@@ -67,7 +67,7 @@ class SolvePuzzle15_9Test {
         ): Pair<Setup, EuclideaContext> {
             with(params) {
                 val context = object {
-                    val circle = Element.Circle(center, radius)
+                    val circle = circleTool(center, sample1)
                     val line = Element.Line(base, dir)
                 }
                 namer.nameReflected(context)
@@ -81,8 +81,8 @@ class SolvePuzzle15_9Test {
                             perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
                         ),
-                        // base and dir act as probes
-                        points = listOf(center, sample /* , base, dir */),
+                        // sample1, base and dir act as probes
+                        points = listOf(center, sample1, sample, base /*, dir */),
                         elements = listOf(circle, line)
                     )
                 }
@@ -159,7 +159,7 @@ class SolvePuzzle15_9Test {
                     val d = p2 - p1
                     val param = solveByBisection(0.0, 1.0) { x ->
                         val p = p1 + d * x
-                        val d1 = (p - center).distance - radius
+                        val d1 = (p - center).distance - circle.radius
                         val d2 = (p - sample).distance
                         d1 - d2
                     }
