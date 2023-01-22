@@ -108,7 +108,16 @@ abstract class IndexedSet<T>(
         get() = set.size
 }
 
-class PointSet : IndexedSet<Point>(compareBy({ it.x }, { it.y })) {
+class PointSet : IndexedSet<Point>(
+    // Inlined as a potential hotspot optimization
+    // compareBy({ it.x }, { it.y })
+    comparator = Comparator { a, b ->
+        when (val compare = a.x.compareTo(b.x)) {
+            0 -> a.y.compareTo(b.y)
+            else -> compare
+        }
+    }
+) {
 
     override fun primaryDim(item: Point): Double {
         return item.x
@@ -145,16 +154,24 @@ class PointSet : IndexedSet<Point>(compareBy({ it.x }, { it.y })) {
 
 private fun linePrimaryDim(line: Line) = line.intercept ?: 0.0
 
+private val lineSetComparator = compareBy<Line>({ linePrimaryDim(it) },
+    { it.xDir },
+    { it.yDir },
+    { it.yIntercept },
+    { it.xIntercept },
+    { it.xMin },
+    { it.xMax },
+    { it.yMin },
+    { it.yMax })
+
 class LineSet : IndexedSet<Line>(
-    compareBy({ linePrimaryDim(it) },
-        { it.xDir },
-        { it.yDir },
-        { it.yIntercept },
-        { it.xIntercept },
-        { it.xMin },
-        { it.xMax },
-        { it.yMin },
-        { it.yMax })
+    // Unwrap the first comparison, as a hotspot optimization
+    comparator = Comparator { a, b ->
+        when (val compare = linePrimaryDim(a).compareTo(linePrimaryDim(b))) {
+            0 -> lineSetComparator.compare(a, b)
+            else -> compare
+        }
+    }
 ) {
 
     override fun primaryDim(item: Line): Double {
@@ -178,7 +195,17 @@ class LineSet : IndexedSet<Line>(
     }
 }
 
-class CircleSet : IndexedSet<Circle>(compareBy({ it.center.x }, { it.center.y }, { it.radius })) {
+val circleSetComparator = compareBy<Circle>({ it.center.x }, { it.center.y }, { it.radius })
+
+class CircleSet : IndexedSet<Circle>(
+    // Unwrap the first comparison, as a hotspot optimization
+    comparator = Comparator { a, b ->
+        when (val compare = a.center.x.compareTo(b.center.x)) {
+            0 -> circleSetComparator.compare(a, b)
+            else -> compare
+        }
+    }
+) {
 
     override fun primaryDim(item: Circle): Double {
         return item.center.x
