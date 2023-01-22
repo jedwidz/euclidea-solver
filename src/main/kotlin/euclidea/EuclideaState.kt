@@ -18,11 +18,16 @@ data class EuclideaConfig(
 
 data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)
 
+private data class PointsInfo(
+    val points: List<Point>,
+    val pointSource: Map<Point, IntersectionSource> = mapOf()
+)
+
 // Should use `EuclideaContext.of` rather than primary constructor, in order to include intersection points of initial elements.
 data class EuclideaContext private constructor(
     val config: EuclideaConfig = EuclideaConfig(),
-    val points: List<Point>,
     val elements: List<Element>,
+    val points: List<Point>,
     val pointSource: Map<Point, IntersectionSource> = mapOf()
 ) {
     companion object {
@@ -31,29 +36,33 @@ data class EuclideaContext private constructor(
             points: List<Point>,
             elements: List<Element>
         ): EuclideaContext {
-            return EuclideaContext(config, points, listOf()).withElements(elements)
+            return EuclideaContext(config, listOf(), points).withElements(elements)
         }
     }
 
-    @Suppress("SuspiciousCollectionReassignment")
     fun withElement(element: Element): EuclideaContext {
         return if (hasElement(element))
             this
         else {
-            val updatedPoints = points.toMutableList()
-            val updatedPointSource = pointSource.toMutableMap()
-            for (e in elements) {
-                val intersection = intersect(e, element)
-                for (point in intersection.points()) {
-                    if (point.sqDistance < config.maxSqDistance)
-                        if (updatedPoints.none { p -> coincides(p, point) }) {
-                            updatedPoints += point
-                            updatedPointSource += point to IntersectionSource(e, element, intersection)
-                        }
-                }
-            }
-            EuclideaContext(config, updatedPoints, elements + element, updatedPointSource)
+            val (updatedPoints, updatedPointSource) = updatedPointsInfo(element)
+            EuclideaContext(config, elements + element, updatedPoints, updatedPointSource)
         }
+    }
+
+    private fun updatedPointsInfo(element: Element): PointsInfo {
+        val updatedPoints = points.toMutableList()
+        val updatedPointSource = pointSource.toMutableMap()
+        for (e in elements) {
+            val intersection = intersect(e, element)
+            for (point in intersection.points()) {
+                if (point.sqDistance < config.maxSqDistance)
+                    if (updatedPoints.none { p -> coincides(p, point) }) {
+                        updatedPoints += point
+                        updatedPointSource += point to IntersectionSource(e, element, intersection)
+                    }
+            }
+        }
+        return PointsInfo(updatedPoints, updatedPointSource)
     }
 
     fun withElements(elements: List<Element>): EuclideaContext {
