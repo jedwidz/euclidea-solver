@@ -294,8 +294,19 @@ fun solve(
             }
         }
     }
+    val effectiveToolSequence = if (toolSequence === null) null else {
+        val toolSteps = toolSequence.size
+        when {
+            toolSteps == maxDepth -> toolSequence
+            toolSteps > maxDepth -> {
+                println("Warning - truncating tool sequence of length $toolSteps to agree with max depth of $maxDepth")
+                toolSequence.take(maxDepth)
+            }
+            else -> error("Tool sequence of length $toolSteps less than max depth of $maxDepth")
+        }
+    }
     parallelSolver.fork(
-        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements, toolSequence),
+        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements, effectiveToolSequence),
         SolveScratch()
     )
     return parallelSolver.awaitResult()
