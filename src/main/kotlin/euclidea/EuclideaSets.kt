@@ -35,9 +35,9 @@ interface EuclideaSet<T> {
 }
 
 abstract class IndexedSet<T : Primitive>(
+    val primitiveType: PrimitiveType<T>
 ) : EuclideaSet<T> {
     protected abstract fun coincides(item1: T, item2: T): Boolean
-    protected abstract fun bound(d: Double): T
 
     // compares on hashMetric first
     private val hashComparator = Comparator<T> { a, b ->
@@ -70,7 +70,7 @@ abstract class IndexedSet<T : Primitive>(
     }
 
     private fun coincidingRange(primary: Double): Pair<T, T> {
-        return bound(primary - Epsilon) to bound(primary + Epsilon)
+        return primitiveType.exampleWithHashMetric(primary - Epsilon) to primitiveType.exampleWithHashMetric(primary + Epsilon)
     }
 
     override fun add(item: T): Boolean {
@@ -115,14 +115,10 @@ abstract class IndexedSet<T : Primitive>(
         get() = set.size
 }
 
-class PointSet : IndexedSet<Point>() {
+class PointSet : IndexedSet<Point>(Point.Companion.PointType) {
 
     override fun compareItems(a: Point, b: Point): Int {
         return a.compareTo(b)
-    }
-
-    override fun bound(d: Double): Point {
-        return Point(d, d)
     }
 
     override fun coincides(item1: Point, item2: Point): Boolean {
@@ -150,15 +146,10 @@ class PointSet : IndexedSet<Point>() {
     }
 }
 
-class LineSet : IndexedSet<Line>() {
+class LineSet : IndexedSet<Line>(Line.Companion.LineType) {
 
     override fun compareItems(a: Line, b: Line): Int {
         return a.compareTo(b)
-    }
-
-    override fun bound(d: Double): Line {
-        val scaledForHashMetric = d * 2.0
-        return Line(Point(scaledForHashMetric, 0.0), Point(scaledForHashMetric, 1.0))
     }
 
     override fun coincides(item1: Line, item2: Line): Boolean {
@@ -174,20 +165,15 @@ class LineSet : IndexedSet<Line>() {
     }
 }
 
-class CircleSet : IndexedSet<Circle>() {
+class CircleSet : IndexedSet<Circle>(Circle.Companion.CircleType) {
 
     override fun compareItems(a: Circle, b: Circle): Int {
         return a.compareTo(b)
     }
 
-    override fun bound(d: Double): Circle {
-        return Circle(Point(d, d), d)
-    }
-
     override fun coincides(item1: Circle, item2: Circle): Boolean {
         return circlesCoincide(item1, item2)
     }
-
 }
 
 class ElementSet : EuclideaSet<Element> {
