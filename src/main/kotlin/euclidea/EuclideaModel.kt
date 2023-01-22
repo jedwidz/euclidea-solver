@@ -234,7 +234,7 @@ private fun coincidesNullable(num1: Double?, num2: Double?): Boolean {
     return num1 === null && num2 === null || (num1 !== null && num2 !== null && coincides(num1, num2))
 }
 
-private fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
+fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
     return linesCoincideNoLimits(line1, line2)
             && coincidesNullable(line1.xMin, line2.xMin)
             && coincidesNullable(line1.xMax, line2.xMax)
@@ -258,7 +258,7 @@ fun linesPerpendicular(line1: Element.Line, line2: Element.Line): Boolean {
             coincides(-line1.xDir, line2.yDir) && coincides(line1.yDir, line2.xDir)
 }
 
-private fun circlesCoincide(circle1: Element.Circle, circle2: Element.Circle): Boolean {
+fun circlesCoincide(circle1: Element.Circle, circle2: Element.Circle): Boolean {
     return coincides(circle1.center, circle2.center) && coincides(circle1.radius, circle2.radius)
 }
 

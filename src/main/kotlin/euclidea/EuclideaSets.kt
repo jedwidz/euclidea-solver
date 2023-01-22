@@ -179,7 +179,7 @@ class LineSet : IndexedSet<Line>(
     }
 
     override fun coincides(item1: Line, item2: Line): Boolean {
-        return euclidea.coincides(item1, item2)
+        return linesCoincide(item1, item2)
     }
 
     override fun bound(d: Double): Line {
@@ -212,7 +212,7 @@ class CircleSet : IndexedSet<Circle>(
     }
 
     override fun coincides(item1: Circle, item2: Circle): Boolean {
-        return euclidea.coincides(item1, item2)
+        return circlesCoincide(item1, item2)
     }
 
     override fun bound(d: Double): Circle {
