@@ -18,7 +18,7 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // solution found 1 min 38 sec
+        // solution found 1 min 40 sec
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = 8,
@@ -229,7 +229,7 @@ class SolvePuzzle13_5Test {
                 with(setup) {
                     @Suppress("unused") val context = object {
                         // Optimal 5L solution
-                        val perpAM = perpendicularTool(rayA, baseM)
+                        val perpAM = perpendicularTool(rayA, baseM, probe = dirA)
                         val intA = intersectOnePoint(perpAM, rayA)
                         val intC = intersectOnePoint(perpAM, rayC)
                         val measure1 = nonCollapsingCompassTool(intA, intC, baseM)
