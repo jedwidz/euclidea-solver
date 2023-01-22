@@ -55,8 +55,7 @@ abstract class IndexedSet<T>(
 
         val primary = primaryDim(item)
         val range = coincidingRange(primary)
-        // Take some liberty here at the edge points of the range
-        val subSet = set.subSet(range.first, false, range.second, false)
+        val subSet = set.subSet(range.first, true, range.second, true)
 
         @Suppress("UNCHECKED_CAST", "UnnecessaryVariable")
         val res = subSet.firstOrNull { coincides(it, item) } as U?
