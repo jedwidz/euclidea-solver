@@ -19,13 +19,13 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // gave up after 18 hr 50 min
+        // no solution found 42 sec
         // TODO add more sample solutions, allow either V
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 2,
             maxDepth = 7,
-//            nonNewElementLimit = 4,
-//            consecutiveNonNewElementLimit = 2,
+            nonNewElementLimit = 3,
+            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
     }
@@ -163,22 +163,19 @@ class SolvePuzzle13_6Test {
             }
         }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+        override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 10E E-star moves hint
-            return { solveContext, element ->
-                when (solveContext.depth) {
-                    // Moved to setup
-                    // 0 -> !element.isLineFromPerpendicularBisector
-                    0 -> !element.isCircleFromCircle
-                    1 -> !element.isCircleFromCircle
-                    2 -> !element.isLineFromLine
-                    3 -> !element.isCircleFromCircle
-                    4 -> !element.isCircleFromCircle
-                    5 -> !element.isLineFromLine
-                    6 -> !element.isCircleFromCircle
-                    else -> false
-                }
-            }
+            return listOf(
+                // Moved to setup
+                // EuclideaTool.PerpendicularBisectorTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool
+            )
         }
 
         override fun referenceSolution(
