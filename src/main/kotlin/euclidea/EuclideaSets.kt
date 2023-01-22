@@ -2,6 +2,7 @@ package euclidea
 
 import euclidea.Element.Circle
 import euclidea.Element.Line
+import java.util.*
 
 interface EuclideaSet<T> {
     operator fun contains(item: T): Boolean
@@ -239,6 +240,12 @@ class ElementSet : EuclideaSet<Element> {
             set += elements
             return set
         }
+
+        fun copyOf(set: ElementSet): ElementSet {
+            val res = ElementSet()
+            res += set
+            return res
+        }
     }
 }
 
@@ -301,4 +308,53 @@ class PrimitiveSet : EuclideaSet<Primitive> {
 
     override val size: Int
         get() = elementSet.size + pointSet.size
+}
+
+class ElementsByTool : EuclideaSet<Element> {
+    // TODO- circular dependency between tools source file and this one
+    private val delegate = EnumMap<EuclideaTool, ElementSet>(EuclideaTool::class.java)
+
+    companion object {
+        fun copyOf(elementsByTool: ElementsByTool): ElementsByTool {
+            val res = ElementsByTool()
+            elementsByTool.delegate.mapValuesTo(res.delegate) { ElementSet.copyOf(it.value) }
+            return res
+        }
+    }
+
+    override fun contains(item: Element): Boolean {
+        return maybeSetFor(item)?.contains(item) ?: false
+    }
+
+    private fun maybeSetFor(item: Element) = delegate[item.sourceTool]
+
+    private fun setFor(item: Element) = delegate.getOrPut(item.sourceTool) { ElementSet() }
+
+    override fun removeOne(): Element? {
+        return delegate.values.firstNotNullOf { set -> set.removeOne() }
+    }
+
+    override fun add(item: Element): Boolean {
+        return setFor(item).add(item)
+    }
+
+    override fun remove(item: Element): Boolean {
+        return maybeSetFor(item)?.remove(item) ?: false
+    }
+
+    override fun items(): List<Element> {
+        // TODO could be inefficient
+        return delegate.values.flatMap { it.items() }
+    }
+
+    override fun <U : Element> canonicalOrNull(item: U): U? {
+        return maybeSetFor(item)?.canonicalOrNull(item)
+    }
+
+    override fun <U : Element> canonicalOrAdd(item: U): U {
+        return setFor(item).canonicalOrAdd(item)
+    }
+
+    override val size: Int
+        get() = delegate.values.sumOf { it.size }
 }

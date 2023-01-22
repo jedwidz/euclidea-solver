@@ -59,13 +59,28 @@ sealed class LineSource {
     data class PerpendicularBisect(val point1: Point, val point2: Point) : LineSource()
     data class AngleBisect(val pointA: Point, val pointO: Point, val pointB: Point) : LineSource()
     data class Parallel(val line: Element.Line, val point: Point, val probe: Point? = null) : LineSource()
+
+    val tool: EuclideaTool
+        get() = when (this) {
+            is AngleBisect -> EuclideaTool.AngleBisectorTool
+            is Parallel -> EuclideaTool.ParallelTool
+            is Perpendicular -> EuclideaTool.PerpendicularTool
+            is PerpendicularBisect -> EuclideaTool.PerpendicularBisectorTool
+        }
 }
 
 sealed class CircleSource {
     data class NonCollapsingCompass(val pointA: Point, val pointB: Point) : CircleSource()
+
+    val tool: EuclideaTool
+        get() = when (this) {
+            is NonCollapsingCompass -> EuclideaTool.NonCollapsingCompassTool
+        }
 }
 
 sealed class Element : Primitive {
+
+    abstract val sourceTool: EuclideaTool
 
     data class Line(
         val point1: Point,
@@ -181,6 +196,9 @@ sealed class Element : Primitive {
             else this
         }
 
+        override val sourceTool: EuclideaTool
+            get() = source?.tool ?: EuclideaTool.LineTool
+
         companion object {
             object LineType : PrimitiveType<Line> {
                 override fun exampleWithHashMetric(d: Double): Line {
@@ -214,6 +232,9 @@ sealed class Element : Primitive {
         override fun plus(point: Point): Circle {
             return Circle(center + point, radius, sample?.let { it + point })
         }
+
+        override val sourceTool: EuclideaTool
+            get() = source?.tool ?: EuclideaTool.CircleTool
 
         companion object {
             object CircleType : PrimitiveType<Circle> {

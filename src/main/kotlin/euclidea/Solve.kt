@@ -40,18 +40,12 @@ private data class PendingNode(
 }
 
 private data class SolveScratch(
-    val pendingElements: ElementSet = ElementSet(),
+    val pendingElements: ElementsByTool = ElementsByTool(),
     val passedElements: ElementSet = ElementSet()
 ) {
     fun dupe(): SolveScratch {
-        return SolveScratch(pendingElements.dupe(), passedElements.dupe())
+        return SolveScratch(ElementsByTool.copyOf(pendingElements), ElementSet.copyOf(passedElements))
     }
-}
-
-private fun ElementSet.dupe(): ElementSet {
-    val res = ElementSet()
-    res += this
-    return res
 }
 
 private val threadCount = 6  // Runtime.getRuntime().availableProcessors()
@@ -109,8 +103,8 @@ fun solve(
         }
 
         fun sub(solveState: SolveState, solveScratch: SolveScratch) {
-            val pendingElements: ElementSet = solveScratch.pendingElements
-            val passedElements: ElementSet = solveScratch.passedElements
+            val pendingElements = solveScratch.pendingElements
+            val passedElements = solveScratch.passedElements
 
             val (solveContext, oldPoints) = solveState
             val (context, depth) = solveContext

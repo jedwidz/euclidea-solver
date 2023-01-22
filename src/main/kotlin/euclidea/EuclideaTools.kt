@@ -4,6 +4,16 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
+enum class EuclideaTool {
+    LineTool,
+    CircleTool,
+    PerpendicularBisectorTool,
+    PerpendicularTool,
+    ParallelTool,
+    AngleBisectorTool,
+    NonCollapsingCompassTool
+}
+
 object EuclideaTools {
 
     fun lineTool(point1: Point, point2: Point): Element.Line {
