@@ -19,12 +19,12 @@ class SolvePuzzle13_4Test {
 
     @Test
     fun improveSolution() {
-        // gave up 14 min 7 sec
+        // solution found 3 sec
         Solver().improveSolution(
-            maxExtraElements = 5,
+            maxExtraElements = 2,
             maxDepth = 8,
-//            nonNewElementLimit = 4,
-//            consecutiveNonNewElementLimit = 3,
+            nonNewElementLimit = 3,
+            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
     }
@@ -78,7 +78,7 @@ class SolvePuzzle13_4Test {
 //                            angleBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
 //                            parallelToolEnabled = true,
-                            maxSqDistance = sq(20.0)
+                            maxSqDistance = sq(10.0)
                         ),
                         points = listOf(pointA, pointB, pointC),
                         elements = listOf(lineAB, lineBC, lineCA)
@@ -162,21 +162,18 @@ class SolvePuzzle13_4Test {
 //            }
 //        }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+        override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 12E E-star moves hint
-            return { solveContext, element ->
-                when (solveContext.depth) {
-                    0 -> !element.isLineFromPerpendicular
-                    1 -> !element.isCircleFromCircle
-                    2 -> !element.isLineFromLine
-                    3 -> !element.isLineFromPerpendicular
-                    4 -> !element.isCircleFromCircle
-                    5 -> !element.isCircleFromCircle
-                    6 -> !element.isLineFromLine
-                    7 -> !element.isLineFromLine
-                    else -> false
-                }
-            }
+            return listOf(
+                EuclideaTool.PerpendicularTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.PerpendicularTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool
+            )
         }
 
         override fun referenceSolution(
