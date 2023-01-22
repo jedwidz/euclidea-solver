@@ -18,19 +18,16 @@ data class EuclideaConfig(
 
 data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)
 
-private data class PointsInfo(
-    val points: List<Point>,
-    val pointSource: Map<Point, IntersectionSource> = mapOf()
-)
-
 // Should use `EuclideaContext.of` rather than primary constructor, in order to include intersection points of initial elements.
 data class EuclideaContext private constructor(
     val config: EuclideaConfig = EuclideaConfig(),
     val elements: List<Element>,
     private val pointsInfo: PointsInfo
 ) {
-    val points: List<Point> = pointsInfo.points
-    val pointSource: Map<Point, IntersectionSource> = pointsInfo.pointSource
+    val points
+        get() = pointsInfo.points
+    val pointSource
+        get() = pointsInfo.pointSource
 
     companion object {
         fun of(
@@ -38,7 +35,28 @@ data class EuclideaContext private constructor(
             points: List<Point>,
             elements: List<Element>
         ): EuclideaContext {
-            return EuclideaContext(config, listOf(), PointsInfo(points)).withElements(elements)
+            return EuclideaContext(config, listOf(), PointsInfo.Strict(points)).withElements(elements)
+        }
+
+        private sealed class PointsInfo {
+            abstract val points: List<Point>
+            abstract val pointSource: Map<Point, IntersectionSource>
+
+            data class Strict(
+                override val points: List<Point>,
+                override val pointSource: Map<Point, IntersectionSource> = mapOf()
+            ) : PointsInfo()
+
+            class Lazy(
+                previousContext: EuclideaContext,
+                newElement: Element
+            ) : PointsInfo() {
+                val delegate by lazy { previousContext.updatedPointsInfo(newElement) }
+                override val points
+                    get() = delegate.points
+                override val pointSource
+                    get() = delegate.pointSource
+            }
         }
     }
 
@@ -46,7 +64,7 @@ data class EuclideaContext private constructor(
         return if (hasElement(element))
             this
         else
-            EuclideaContext(config, elements + element, updatedPointsInfo(element))
+            EuclideaContext(config, elements + element, PointsInfo.Lazy(this, element))
     }
 
     private fun updatedPointsInfo(element: Element): PointsInfo {
@@ -62,7 +80,7 @@ data class EuclideaContext private constructor(
                     }
             }
         }
-        return PointsInfo(updatedPoints, updatedPointSource)
+        return PointsInfo.Strict(updatedPoints, updatedPointSource)
     }
 
     fun withElements(elements: List<Element>): EuclideaContext {
