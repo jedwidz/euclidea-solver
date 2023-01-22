@@ -94,7 +94,7 @@ object EuclideaTools {
                 // Arbitrary other point on the line
                 val probe2 = intersectTwoPoints(circle1, extended).first
                 val circle2 = circleTool(probe2, point)
-                val aim = intersectTwoPoints(circle1, circle2).first
+                val aim = intersectTwoPointsOther(circle1, circle2, point)
                 return lineTool(point, aim) to listOf(extended, circle1, circle2)
             } else {
                 // Could do a 4E construction here, but that's probably not the intention
