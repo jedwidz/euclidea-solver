@@ -355,6 +355,13 @@ class ElementsByTool : EuclideaSet<Element> {
         return setFor(item).canonicalOrAdd(item)
     }
 
+    fun itemsForTool(nextTool: EuclideaTool?): List<Element> {
+        return when (nextTool) {
+            null -> items()
+            else -> delegate[nextTool]?.items() ?: listOf()
+        }
+    }
+
     override val size: Int
         get() = delegate.values.sumOf { it.size }
 }

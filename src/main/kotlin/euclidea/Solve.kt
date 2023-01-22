@@ -24,7 +24,8 @@ private data class SolveState(
     val oldPoints: Set<Point>,
     val nonNewElementCount: Int,
     val consecutiveNonNewElementCount: Int,
-    val lastAddedElements: List<Element>
+    val lastAddedElements: List<Element>,
+    val remainingToolSequence: List<EuclideaTool>?
 )
 
 private data class PendingNode(
@@ -61,6 +62,7 @@ fun solve(
     pass: ((SolveContext, Element) -> Boolean)? = null,
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
     excludeElements: ElementSet? = null,
+    toolSequence: List<EuclideaTool>? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
 
@@ -113,23 +115,32 @@ fun solve(
                 val newPoints = points.filter { it !in oldPoints }
                 val nextOldPoints = oldPoints + newPoints
 
+                val nextTool = solveState.remainingToolSequence?.first()
+
                 val newElements = mutableSetOf<Element>()
+                val skippedOtherToolNewElements = mutableSetOf<Element>()
                 fun tryAdd(e: Element?) {
                     if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e) && excludeElements?.let { e in it } != true) {
                         pendingElements += e
-                        newElements.add(e)
+                        if (nextTool !== null && nextTool !== e.sourceTool)
+                            skippedOtherToolNewElements += e
+                        else
+                            newElements += e
                     }
                 }
 
-                if (config.anyTwoPointToolEnabled) {
+                val remainingConfig =
+                    solveState.remainingToolSequence?.let { config.restrictConfig(it.toSet()) } ?: config
+
+                if (remainingConfig.anyTwoPointToolEnabled) {
                     fun visit(point1: Point, point2: Point) {
-                        if (config.lineToolEnabled)
+                        if (remainingConfig.lineToolEnabled)
                             tryAdd(lineTool(point1, point2))
-                        if (config.circleToolEnabled) {
+                        if (remainingConfig.circleToolEnabled) {
                             tryAdd(circleTool(point1, point2))
                             tryAdd(circleTool(point2, point1))
                         }
-                        if (config.perpendicularBisectorToolEnabled)
+                        if (remainingConfig.perpendicularBisectorToolEnabled)
                             tryAdd(perpendicularBisectorTool(point1, point2))
                     }
                     newPoints.forEachIndexed { i, newPoint ->
@@ -139,11 +150,11 @@ fun solve(
                     }
                 }
 
-                if (config.anyLinePointToolEnabled) {
+                if (remainingConfig.anyLinePointToolEnabled) {
                     fun visit(line: Element.Line, point: Point) {
-                        if (config.perpendicularToolEnabled)
+                        if (remainingConfig.perpendicularToolEnabled)
                             tryAdd(perpendicularTool(line, point))
-                        if (config.parallelToolEnabled)
+                        if (remainingConfig.parallelToolEnabled)
                             tryAdd(parallelTool(line, point))
                     }
 
@@ -161,14 +172,14 @@ fun solve(
                     }
                 }
 
-                if (config.anyThreePointToolEnabled) {
+                if (remainingConfig.anyThreePointToolEnabled) {
                     fun visit(point1: Point, point2: Point, point3: Point) {
-                        if (config.angleBisectorToolEnabled) {
+                        if (remainingConfig.angleBisectorToolEnabled) {
                             tryAdd(angleBisectorTool(point1, point2, point3))
                             tryAdd(angleBisectorTool(point2, point3, point1))
                             tryAdd(angleBisectorTool(point3, point1, point2))
                         }
-                        if (config.nonCollapsingCompassToolEnabled) {
+                        if (remainingConfig.nonCollapsingCompassToolEnabled) {
                             tryAdd(nonCollapsingCompassTool(point1, point2, point3))
                             tryAdd(nonCollapsingCompassTool(point2, point3, point1))
                             tryAdd(nonCollapsingCompassTool(point3, point1, point2))
@@ -228,7 +239,7 @@ fun solve(
                     }
                 }
 
-                val (keep, skippedNewElements) = maybePass(pendingElements.items())
+                val (keep, skippedNewElements) = maybePass(pendingElements.itemsForTool(nextTool))
                 val pendingList = maybePrioritize(keep)
                 // println("$depth - ${pendingList.size}")
 
@@ -259,7 +270,8 @@ fun solve(
                                 nextOldPoints,
                                 nextNonNewElementCount,
                                 nextConsecutiveNonNewElementCount,
-                                listOf(newElement)
+                                listOf(newElement),
+                                solveState.remainingToolSequence?.drop(1)
                             )
                         val lowerBound = remainingStepsLowerBound?.let { it(nextContext) }
                         if ((lowerBound == null || lowerBound <= 0) && check(nextContext))
@@ -276,13 +288,14 @@ fun solve(
                     }
                 }
                 pendingElements -= skippedNewElements
+                pendingElements -= skippedOtherToolNewElements
                 pendingElements += removedElements
                 passedElements -= newPassedElements
             }
         }
     }
     parallelSolver.fork(
-        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements),
+        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements, toolSequence),
         SolveScratch()
     )
     return parallelSolver.awaitResult()

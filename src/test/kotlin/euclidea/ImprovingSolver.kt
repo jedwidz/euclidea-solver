@@ -121,7 +121,8 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             visitPriority = visitPriority,
             pass = passWithPrefix,
             remainingStepsLowerBound = remainingStepsLowerBound,
-            excludeElements = excludeElements(params, setup)
+            excludeElements = excludeElements(params, setup),
+            toolSequence = toolSequence()
         ) { context ->
             isSolution(context) && checkSolution(context)
         }
@@ -153,6 +154,10 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         params: Params,
         setup: Setup
     ): ((SolveContext, Element) -> Int)? {
+        return null
+    }
+
+    protected open fun toolSequence(): List<EuclideaTool>? {
         return null
     }
 

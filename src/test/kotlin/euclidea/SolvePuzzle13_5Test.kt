@@ -201,21 +201,18 @@ class SolvePuzzle13_5Test {
 //            }
 //        }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+        override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 8E E-star moves hint
-            return { solveContext, element ->
-                when (solveContext.depth) {
-                    0 -> !element.isCircleFromCircle
-                    1 -> !element.isCircleFromCircle
-                    2 -> !element.isLineFromLine
-                    3 -> !element.isCircleFromCircle
-                    4 -> !element.isCircleFromCircle
-                    5 -> !element.isLineFromLine
-                    6 -> !element.isCircleFromCircle
-                    7 -> !element.isLineFromLine
-                    else -> false
-                }
-            }
+            return listOf(
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool
+            )
         }
 
         override fun referenceSolution(
