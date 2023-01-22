@@ -18,7 +18,7 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 15 min 13 sec
+        // no solution found 47 sec
         Solver().improveSolution(
             maxExtraElements = 1,
             maxDepth = 8,
@@ -180,21 +180,18 @@ class SolvePuzzle11_6Test {
             }
         }
 
-        override fun pass(params: Params, setup: Setup): ((SolveContext, Element) -> Boolean) {
+        override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 11E E-star moves hint
-            return { solveContext, element ->
-                when (solveContext.depth) {
-                    0 -> !element.isLineFromAngleBisector
-                    1 -> !element.isCircleFromCircle
-                    2 -> !element.isCircleFromCircle
-                    3 -> !element.isLineFromLine
-                    4 -> !element.isCircleFromCircle
-                    5 -> !element.isCircleFromCircle
-                    6 -> !element.isLineFromLine
-                    7 -> !element.isCircleFromCircle
-                    else -> false
-                }
-            }
+            return listOf(
+                EuclideaTool.AngleBisectorTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool
+            )
         }
 
         override fun referenceSolution(
