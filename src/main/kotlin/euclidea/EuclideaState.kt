@@ -27,26 +27,26 @@ private data class PointsInfo(
 data class EuclideaContext private constructor(
     val config: EuclideaConfig = EuclideaConfig(),
     val elements: List<Element>,
-    val points: List<Point>,
-    val pointSource: Map<Point, IntersectionSource> = mapOf()
+    private val pointsInfo: PointsInfo
 ) {
+    val points: List<Point> = pointsInfo.points
+    val pointSource: Map<Point, IntersectionSource> = pointsInfo.pointSource
+
     companion object {
         fun of(
             config: EuclideaConfig = EuclideaConfig(),
             points: List<Point>,
             elements: List<Element>
         ): EuclideaContext {
-            return EuclideaContext(config, listOf(), points).withElements(elements)
+            return EuclideaContext(config, listOf(), PointsInfo(points)).withElements(elements)
         }
     }
 
     fun withElement(element: Element): EuclideaContext {
         return if (hasElement(element))
             this
-        else {
-            val (updatedPoints, updatedPointSource) = updatedPointsInfo(element)
-            EuclideaContext(config, elements + element, updatedPoints, updatedPointSource)
-        }
+        else
+            EuclideaContext(config, elements + element, updatedPointsInfo(element))
     }
 
     private fun updatedPointsInfo(element: Element): PointsInfo {
