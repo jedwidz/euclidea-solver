@@ -3,7 +3,6 @@ package euclidea
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
-import kotlin.math.max
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_9Test {
@@ -18,8 +17,8 @@ class SolvePuzzle15_9Test {
     fun improveSolution() {
         // no solution found ? (with forkDepth = 3)
         Solver().improveSolution(
-            maxExtraElements = 7,
-            maxDepth = 7,
+            maxExtraElements = 6,
+            maxDepth = 6,
             nonNewElementLimit = 3,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -74,7 +73,7 @@ class SolvePuzzle15_9Test {
                 with(context) {
                     return Setup(circle, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(4.0),
+                            maxSqDistance = sq(5.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
@@ -99,8 +98,13 @@ class SolvePuzzle15_9Test {
             assertTrue(pointAndCircleCoincide(params.sample, solution))
             assertTrue(meetAtOnePoint(setup.circle, solution))
             return { context ->
-                context.hasElement(solution)
+//                context.hasPoint(solution.center)
+                context.elements.size >= 8 && context.elements.lastOrNull()
+                    ?.let { pointAndElementCoincide(solution.center, it) } == true
             }
+//            return { context ->
+//                context.hasElement(solution)
+//            }
         }
 
         private fun constructSolution(params: Params): Element.Circle {
@@ -151,20 +155,20 @@ class SolvePuzzle15_9Test {
             }
         }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solution = constructSolution(params)
-            val center = solution.center
-            return { context ->
-                // Assumes that solution is the last element (no extraneous elements)
-                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
-                    0
-                else {
-                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
-                    // Need two elements to locate center, then the solution circle itself
-                    max(0, 2 - onCenter) + 1
-                }
-            }
-        }
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solution = constructSolution(params)
+//            val center = solution.center
+//            return { context ->
+//                // Assumes that solution is the last element (no extraneous elements)
+//                if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+//                    0
+//                else {
+//                    val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
+//                    // Need two elements to locate center, then the solution circle itself
+//                    max(0, 2 - onCenter) + 1
+//                }
+//            }
+//        }
 
         override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 7E E-star moves hint
