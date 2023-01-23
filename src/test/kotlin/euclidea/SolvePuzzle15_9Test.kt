@@ -1,7 +1,6 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
-import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.math.max
@@ -17,7 +16,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 2 min 40 sec (with forkDepth = 3)
+        // no solution found ? (with forkDepth = 3)
         Solver().improveSolution(
             maxExtraElements = 7,
             maxDepth = 7,
@@ -137,11 +136,14 @@ class SolvePuzzle15_9Test {
                 with(setup) {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
-                        val perp = perpendicularTool(line, sample, probe = base)
-                        val foot = intersectOnePoint(perp, line)
-                        val measure = circleTool(foot, sample)
-                        val opp = intersectTwoPointsOther(measure, perp, sample)
-                        val cross = lineTool(opp, center)
+                        val perp = perpendicularTool(line, center, probe = base)
+//                         val foot = intersectOnePoint(perp, line)
+//                         val measure = circleTool(foot, sample)
+
+                        // Nope...
+                        // val perp = perpendicularTool(line, sample, probe = base)
+                        // val foot = intersectOnePoint(perp, line)
+                        // val measure = circleTool(foot, sample)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
