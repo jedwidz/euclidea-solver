@@ -203,6 +203,21 @@ class EuclideaModelTest {
     }
 
     @Test
+    fun linePointCoincideTest_cornerCase() {
+        val basePoint = Point(-2.276672312865866, 0.0)
+        val basePoint2 = Point(-2.276672573474334, 1.1102230246251565E-16)
+        val point = Point(0.6606216397636254, 0.0)
+        val line = EuclideaTools.lineTool(basePoint, basePoint2)
+
+        val line2 = EuclideaTools.lineTool(Point(0.0, 0.0), Point(1.0, 0.0))
+
+        // Ideally want these to be consistent...
+        val linesCoincide = coincides(line, line2)
+        val pointAndLineCoincide = pointAndLineCoincide(point, line)
+        assertEquals(linesCoincide, pointAndLineCoincide)
+    }
+
+    @Test
     fun circlePointCoincideTest() {
         val center = Point(0.01, 2.000)
         val radius = 1.0

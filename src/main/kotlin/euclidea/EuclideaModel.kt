@@ -347,10 +347,13 @@ fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
 }
 
 private fun linesCoincideNoLimits(line1: Element.Line, line2: Element.Line): Boolean {
-    return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
-        line1.yIntercept,
-        line2.yIntercept
-    ) && linesParallel(line1, line2)
+    // More consistent with point/line tests
+    return pointAndLineCoincideNoLimits(line1.point1, line2) && pointAndLineCoincideNoLimits(line1.point2, line2) &&
+            pointAndLineCoincideNoLimits(line2.point1, line2) && pointAndLineCoincideNoLimits(line2.point2, line2)
+    // return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
+    //        line1.yIntercept,
+    //        line2.yIntercept
+    //    ) && linesParallel(line1, line2)
 }
 
 fun linesParallel(line1: Element.Line, line2: Element.Line): Boolean {
