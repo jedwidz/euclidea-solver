@@ -367,7 +367,7 @@ class ElementsByTool : EuclideaSet<Element> {
     private fun setFor(item: Element) = delegate.getOrPut(item.sourceTool) { ElementSet() }
 
     override fun removeOne(): Element? {
-        return delegate.values.firstNotNullOf { set -> set.removeOne() }
+        return delegate.values.firstNotNullOfOrNull { set -> set.removeOne() }
     }
 
     override fun add(item: Element): Boolean {
