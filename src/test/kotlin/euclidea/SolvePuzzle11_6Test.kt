@@ -20,7 +20,7 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 22 min 31 sec
+        // no solution found 12 min 36 sec
         Solver().improveSolution(
             maxExtraElements = 2,
             maxDepth = 8,
@@ -84,7 +84,7 @@ class SolvePuzzle11_6Test {
                 with(context) {
                     return Setup(line1, line2) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(8.0),
+                            maxSqDistance = sq(6.0),
                             angleBisectorToolEnabled = true
                         ),
                         points = listOf(baseO, baseA, baseB, sample/*, probe1, probe2*/),
