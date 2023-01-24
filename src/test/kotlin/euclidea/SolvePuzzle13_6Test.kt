@@ -19,7 +19,7 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // gave up 16 min 45 sec
+        // no solution found 18 min 43 sec
         // TODO add more sample solutions, allow either V
         Solver().improveSolution(
             maxExtraElements = 3,
@@ -75,7 +75,7 @@ class SolvePuzzle13_6Test {
                 with(context) {
                     return Setup(line, bisect) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(8.0),
+                            maxSqDistance = sq(6.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
