@@ -8,9 +8,6 @@ import euclidea.EuclideaTools.perpendicularConstruction
 import kotlin.math.*
 
 interface Primitive {
-    // 'Hash metric', which must differ by less than Epsilon for coinciding items
-    // Used as a dimension for indexing
-    val hashMetric: Double
 }
 
 interface PrimitiveType<T : Primitive> {
@@ -19,7 +16,6 @@ interface PrimitiveType<T : Primitive> {
 }
 
 data class Point(val x: Double, val y: Double) : Primitive, Comparable<Point> {
-    override val hashMetric = (x + y) / 2.0
 
     override fun compareTo(other: Point): Int {
         return when (val compare = x.compareTo(other.x)) {
@@ -89,7 +85,6 @@ sealed class Element : Primitive {
         val limit2: Boolean = false,
         val source: LineSource? = null
     ) : Element(), Comparable<Line> {
-        override val hashMetric: Double
 
         val xIntercept: Double?
         val yIntercept: Double?
@@ -120,9 +115,6 @@ sealed class Element : Primitive {
             val yBounds = limits(point1.y, point2.y)
             yMin = yBounds.first
             yMax = yBounds.second
-
-            val intercept = smallerNullable(xIntercept, yIntercept)
-            hashMetric = ((intercept ?: 0.0) + xDir) / 2.0
         }
 
         override fun compareTo(other: Line): Int {
@@ -215,8 +207,6 @@ sealed class Element : Primitive {
         val sample: Point? = null,
         val source: CircleSource? = null
     ) : Element(), Comparable<Circle> {
-
-        override val hashMetric = (center.x + center.y + radius) / 3.0
 
         override fun compareTo(other: Circle): Int {
             return when (val compare = center.compareTo(other.center)) {
@@ -348,12 +338,12 @@ fun linesCoincide(line1: Element.Line, line2: Element.Line): Boolean {
 
 private fun linesCoincideNoLimits(line1: Element.Line, line2: Element.Line): Boolean {
     // More consistent with point/line tests
-    return pointAndLineCoincideNoLimits(line1.point1, line2) && pointAndLineCoincideNoLimits(line1.point2, line2) &&
-            pointAndLineCoincideNoLimits(line2.point1, line2) && pointAndLineCoincideNoLimits(line2.point2, line2)
-    // return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
-    //        line1.yIntercept,
-    //        line2.yIntercept
-    //    ) && linesParallel(line1, line2)
+//    return pointAndLineCoincideNoLimits(line1.point1, line2) && pointAndLineCoincideNoLimits(line1.point2, line2) &&
+//            pointAndLineCoincideNoLimits(line2.point1, line2) && pointAndLineCoincideNoLimits(line2.point2, line2)
+    return coincidesNullable(line1.xIntercept, line2.xIntercept) && coincidesNullable(
+        line1.yIntercept,
+        line2.yIntercept
+    ) && linesParallel(line1, line2)
 }
 
 fun linesParallel(line1: Element.Line, line2: Element.Line): Boolean {

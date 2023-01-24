@@ -41,12 +41,16 @@ abstract class IndexedSet<T : Primitive>(
 
     private inner class Entry(val item: T) : Comparable<Entry> {
         override fun compareTo(other: Entry): Int {
-            return when (val compare = item.hashMetric.compareTo(other.item.hashMetric)) {
+            return when (val compare = hashMetric(item).compareTo(hashMetric(other.item))) {
                 0 -> compareItems(item, other.item)
                 else -> compare
             }
         }
     }
+
+    // 'Hash metric', which must differ by less than Epsilon for coinciding items
+    // Used as a dimension for indexing
+    protected abstract fun hashMetric(item: T): Double
 
     protected abstract fun coincides(item1: T, item2: T): Boolean
 
@@ -63,7 +67,7 @@ abstract class IndexedSet<T : Primitive>(
         // TODO fix this for lines with base points switched
         // if (item in set) return item
 
-        val primary = item.hashMetric
+        val primary = hashMetric(item)
         val range = coincidingRange(primary)
         val subSet = set.subSet(range.first, true, range.second, true)
 
@@ -124,6 +128,10 @@ abstract class IndexedSet<T : Primitive>(
 
 class PointSet : IndexedSet<Point>(Point.Companion.PointType) {
 
+    override fun hashMetric(item: Point): Double {
+        return (item.x + item.y) / 2.0
+    }
+
     override fun compareItems(a: Point, b: Point): Int {
         return a.compareTo(b)
     }
@@ -155,6 +163,13 @@ class PointSet : IndexedSet<Point>(Point.Companion.PointType) {
 
 class LineSet : IndexedSet<Line>(Line.Companion.LineType) {
 
+    override fun hashMetric(item: Line): Double {
+        with(item) {
+            val intercept = smallerNullable(xIntercept, yIntercept)
+            return ((intercept ?: 0.0) + xDir) / 2.0
+        }
+    }
+
     override fun compareItems(a: Line, b: Line): Int {
         return a.compareTo(b)
     }
@@ -173,6 +188,12 @@ class LineSet : IndexedSet<Line>(Line.Companion.LineType) {
 }
 
 class CircleSet : IndexedSet<Circle>(Circle.Companion.CircleType) {
+
+    override fun hashMetric(item: Circle): Double {
+        with(item) {
+            return (center.x + center.y + radius) / 3.0
+        }
+    }
 
     override fun compareItems(a: Circle, b: Circle): Int {
         return a.compareTo(b)
