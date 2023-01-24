@@ -9,6 +9,7 @@ import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executors
+import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.measureTimeMillis
@@ -49,8 +50,9 @@ private data class SolveScratch(
     }
 }
 
-private val threadCount = 6  // Runtime.getRuntime().availableProcessors()
+private val forkThreadCount = 6  // Runtime.getRuntime().availableProcessors()
 private val forkDepth = 2
+private val forkQueueSize = 50
 
 fun solve(
     initialContext: EuclideaContext,
@@ -71,8 +73,11 @@ fun solve(
 
     val parallelSolver = object {
         val results = ConcurrentLinkedQueue<EuclideaContext>()
-        val executor = Executors.newFixedThreadPool(threadCount)
+
+        // Plus one is for the 'root' call, which can block while forking
+        val executor = Executors.newFixedThreadPool(forkThreadCount + 1)
         val outstandingCount = AtomicInteger()
+        var forkQueueCount = Semaphore(forkQueueSize + forkThreadCount)
 
         fun yieldResult(context: EuclideaContext) {
             results.add(context)
@@ -87,6 +92,7 @@ fun solve(
         fun fork(solveState: SolveState, solveScratch: SolveScratch) {
             val newSolveScratch = solveScratch.dupe()
             outstandingCount.incrementAndGet()
+            forkQueueCount.acquire()
             executor.submit {
                 val timeMillis = measureTimeMillis {
                     try {
@@ -95,12 +101,13 @@ fun solve(
                         println("Batch threw up... $e")
                         e.printStackTrace()
                     } finally {
+                        forkQueueCount.release()
                         val count = outstandingCount.decrementAndGet()
                         if (count == 0)
                             executor.shutdown()
                     }
                 }
-                println("Batch completed in ${timeMillis}ms")
+                println("Batch completed in ${timeMillis}ms; queued tasks ${outstandingCount.get()}")
             }
         }
 
