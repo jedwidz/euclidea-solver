@@ -7,13 +7,7 @@ import euclidea.EuclideaTools.perpendicularBisectConstruction
 import euclidea.EuclideaTools.perpendicularConstruction
 import kotlin.math.*
 
-interface Primitive {
-}
-
-interface PrimitiveType<T : Primitive> {
-    // Generates a sample primitive, with the given `hashMetric`
-    fun exampleWithHashMetric(d: Double): T
-}
+interface Primitive
 
 data class Point(val x: Double, val y: Double) : Primitive, Comparable<Point> {
 
@@ -40,12 +34,6 @@ data class Point(val x: Double, val y: Double) : Primitive, Comparable<Point> {
     }
 
     companion object {
-        object PointType : PrimitiveType<Point> {
-            override fun exampleWithHashMetric(d: Double): Point {
-                return Point(d, d)
-            }
-        }
-
         val Origin = Point(0.0, 0.0)
     }
 }
@@ -190,15 +178,6 @@ sealed class Element : Primitive {
 
         override val sourceTool: EuclideaTool
             get() = source?.tool ?: EuclideaTool.LineTool
-
-        companion object {
-            object LineType : PrimitiveType<Line> {
-                override fun exampleWithHashMetric(d: Double): Line {
-                    val scaledForHashMetric = d * 2.0
-                    return Line(Point(scaledForHashMetric, 0.0), Point(scaledForHashMetric, 1.0))
-                }
-            }
-        }
     }
 
     data class Circle(
@@ -225,14 +204,6 @@ sealed class Element : Primitive {
 
         override val sourceTool: EuclideaTool
             get() = source?.tool ?: EuclideaTool.CircleTool
-
-        companion object {
-            object CircleType : PrimitiveType<Circle> {
-                override fun exampleWithHashMetric(d: Double): Circle {
-                    return Circle(Point(d, d), d)
-                }
-            }
-        }
     }
 
     abstract operator fun minus(point: Point): Element

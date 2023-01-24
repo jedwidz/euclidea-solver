@@ -35,9 +35,7 @@ interface EuclideaSet<T> {
     val size: Int
 }
 
-abstract class IndexedSet<T : Primitive>(
-    val primitiveType: PrimitiveType<T>
-) : EuclideaSet<T> {
+abstract class IndexedSet<T : Primitive> : EuclideaSet<T> {
 
     private inner class Entry(val item: T) : Comparable<Entry> {
         override fun compareTo(other: Entry): Int {
@@ -51,6 +49,9 @@ abstract class IndexedSet<T : Primitive>(
     // 'Hash metric', which must differ by less than Epsilon for coinciding items
     // Used as a dimension for indexing
     protected abstract fun hashMetric(item: T): Double
+
+    // Generates a sample primitive, with the given `hashMetric`
+    protected abstract fun exampleWithHashMetric(d: Double): T
 
     protected abstract fun coincides(item1: T, item2: T): Boolean
 
@@ -77,8 +78,8 @@ abstract class IndexedSet<T : Primitive>(
     }
 
     private fun coincidingRange(primary: Double): Pair<Entry, Entry> {
-        return Entry(primitiveType.exampleWithHashMetric(primary - Epsilon)) to Entry(
-            primitiveType.exampleWithHashMetric(
+        return Entry(exampleWithHashMetric(primary - Epsilon)) to Entry(
+            exampleWithHashMetric(
                 primary + Epsilon
             )
         )
@@ -126,10 +127,14 @@ abstract class IndexedSet<T : Primitive>(
         get() = set.size
 }
 
-class PointSet : IndexedSet<Point>(Point.Companion.PointType) {
+class PointSet : IndexedSet<Point>() {
 
     override fun hashMetric(item: Point): Double {
         return (item.x + item.y) / 2.0
+    }
+
+    override fun exampleWithHashMetric(d: Double): Point {
+        return Point(d, d)
     }
 
     override fun compareItems(a: Point, b: Point): Int {
@@ -161,13 +166,18 @@ class PointSet : IndexedSet<Point>(Point.Companion.PointType) {
     }
 }
 
-class LineSet : IndexedSet<Line>(Line.Companion.LineType) {
+class LineSet : IndexedSet<Line>() {
 
     override fun hashMetric(item: Line): Double {
         with(item) {
             val intercept = smallerNullable(xIntercept, yIntercept)
             return ((intercept ?: 0.0) + xDir) / 2.0
         }
+    }
+
+    override fun exampleWithHashMetric(d: Double): Line {
+        val scaledForHashMetric = d * 2.0
+        return Line(Point(scaledForHashMetric, 0.0), Point(scaledForHashMetric, 1.0))
     }
 
     override fun compareItems(a: Line, b: Line): Int {
@@ -187,12 +197,16 @@ class LineSet : IndexedSet<Line>(Line.Companion.LineType) {
     }
 }
 
-class CircleSet : IndexedSet<Circle>(Circle.Companion.CircleType) {
+class CircleSet : IndexedSet<Circle>() {
 
     override fun hashMetric(item: Circle): Double {
         with(item) {
             return (center.x + center.y + radius) / 3.0
         }
+    }
+
+    override fun exampleWithHashMetric(d: Double): Circle {
+        return Circle(Point(d, d), d)
     }
 
     override fun compareItems(a: Circle, b: Circle): Int {
