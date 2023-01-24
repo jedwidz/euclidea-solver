@@ -15,7 +15,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ? (with forkDepth = 3)
+        // gave up 1 hr 22 min (with forkDepth = 2)
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = 6,
@@ -52,11 +52,11 @@ class SolvePuzzle15_9Test {
 
         override fun makeReplayParams(): Params {
             return Params(
-                center = Point(0.0, 0.701),
+                center = Point(0.0, 0.721),
                 sample1 = Point(0.312, 0.608),
                 base = Point(0.1011, 0.0),
                 dir = Point(0.9011, 0.0),
-                sample = Point(1.203, 0.564),
+                sample = Point(1.203, 0.574),
             )
         }
 
@@ -100,7 +100,12 @@ class SolvePuzzle15_9Test {
             return { context ->
 //                context.hasPoint(solution.center)
                 context.elements.size >= 8 && context.elements.lastOrNull()
-                    ?.let { pointAndElementCoincide(solution.center, it) } == true
+                    ?.let { element ->
+                        pointAndElementCoincide(solution.center, element) &&
+                                // Just checking point/line has some false positives with 'almost coincident' lines
+                                // Note this still avoids evaluating context points in most cases
+                                context.hasPoint(solution.center)
+                    } == true
             }
 //            return { context ->
 //                context.hasElement(solution)
@@ -141,8 +146,8 @@ class SolvePuzzle15_9Test {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
                         val perp = perpendicularTool(line, center, probe = base)
-//                         val foot = intersectOnePoint(perp, line)
-//                         val measure = circleTool(foot, sample)
+                        val foot = intersectOnePoint(perp, line)
+                        val measure = circleTool(foot, center)
 
                         // Nope...
                         // val perp = perpendicularTool(line, sample, probe = base)
