@@ -38,19 +38,21 @@ interface EuclideaSet<T> {
 abstract class IndexedSet<T : Primitive>(
     val primitiveType: PrimitiveType<T>
 ) : EuclideaSet<T> {
-    protected abstract fun coincides(item1: T, item2: T): Boolean
 
-    // compares on hashMetric first
-    private val hashComparator = Comparator<T> { a, b ->
-        when (val compare = a.hashMetric.compareTo(b.hashMetric)) {
-            0 -> compareItems(a, b)
-            else -> compare
+    private inner class Entry(val item: T) : Comparable<Entry> {
+        override fun compareTo(other: Entry): Int {
+            return when (val compare = item.hashMetric.compareTo(other.item.hashMetric)) {
+                0 -> compareItems(item, other.item)
+                else -> compare
+            }
         }
     }
 
+    protected abstract fun coincides(item1: T, item2: T): Boolean
+
     protected abstract fun compareItems(a: T, b: T): Int
 
-    private val set = sortedSetOf(hashComparator)
+    private val set = sortedSetOf<Entry>()
 
     override operator fun contains(item: T): Boolean {
         return canonicalImpl(item) !== null
@@ -66,17 +68,21 @@ abstract class IndexedSet<T : Primitive>(
         val subSet = set.subSet(range.first, true, range.second, true)
 
         @Suppress("UNCHECKED_CAST", "UnnecessaryVariable")
-        val res = subSet.firstOrNull { coincides(it, item) } as U?
+        val res = subSet.firstOrNull { coincides(it.item, item) }?.item as U?
         return res
     }
 
-    private fun coincidingRange(primary: Double): Pair<T, T> {
-        return primitiveType.exampleWithHashMetric(primary - Epsilon) to primitiveType.exampleWithHashMetric(primary + Epsilon)
+    private fun coincidingRange(primary: Double): Pair<Entry, Entry> {
+        return Entry(primitiveType.exampleWithHashMetric(primary - Epsilon)) to Entry(
+            primitiveType.exampleWithHashMetric(
+                primary + Epsilon
+            )
+        )
     }
 
     override fun add(item: T): Boolean {
         return when (canonicalImpl(item)) {
-            null -> set.add(item)
+            null -> set.add(Entry(item))
             else -> false
         }
     }
@@ -84,18 +90,18 @@ abstract class IndexedSet<T : Primitive>(
     override fun remove(item: T): Boolean {
         return when (canonicalImpl(item)) {
             null -> false
-            else -> set.remove(item)
+            else -> set.remove(Entry(item))
         }
     }
 
     override fun removeOne(): T? {
         val res = set.firstOrNull()
         res?.let { set.remove(it) }
-        return res
+        return res?.item
     }
 
     override fun items(): List<T> {
-        return set.toList()
+        return set.map { it.item }
     }
 
     override fun <U : T> canonicalOrNull(item: U): U? {
@@ -105,7 +111,7 @@ abstract class IndexedSet<T : Primitive>(
     override fun <U : T> canonicalOrAdd(item: U): U {
         return when (val existing = canonicalImpl(item)) {
             null -> {
-                set.add(item)
+                set.add(Entry(item))
                 item
             }
             else -> existing
