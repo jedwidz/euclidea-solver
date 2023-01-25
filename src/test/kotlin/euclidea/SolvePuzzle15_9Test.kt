@@ -15,11 +15,11 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 8 hr 58 min
+        // no solution found 9 hr 39 min
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = 6,
-            nonNewElementLimit = 3,
+            nonNewElementLimit = 4,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
@@ -73,7 +73,7 @@ class SolvePuzzle15_9Test {
                 with(context) {
                     return Setup(circle, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(8.0),
+                            maxSqDistance = sq(12.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
@@ -145,6 +145,9 @@ class SolvePuzzle15_9Test {
                 with(setup) {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
+                        // Nope...
+                        // val perp = perpendicularTool(line, sample, probe = base)
+
                         val perp = perpendicularTool(line, center, probe = base)
 
                         // Nope...
