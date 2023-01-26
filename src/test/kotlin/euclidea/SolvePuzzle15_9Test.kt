@@ -16,11 +16,11 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 3 min 59 sec
+        // partial solution found 5 hr 12 min (with Epsilon = 0.00000001, FWIW)
         Solver().improveSolution(
-            maxExtraElements = 5,
-            maxDepth = 5,
-            nonNewElementLimit = 3,
+            maxExtraElements = 6,
+            maxDepth = 6,
+//            nonNewElementLimit = 3,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
@@ -47,7 +47,7 @@ class SolvePuzzle15_9Test {
                 sample1 = Point(0.3, 0.6),
                 base = Point(0.1, 0.0),
                 dir = Point(0.9, 0.0),
-                sample = Point(1.0, 0.55),
+                sample = Point(0.8, 0.55),
             )
         }
 
@@ -57,7 +57,7 @@ class SolvePuzzle15_9Test {
                 sample1 = Point(0.312, 0.608),
                 base = Point(0.1011, 0.0),
                 dir = Point(0.9011, 0.0),
-                sample = Point(1.203, 0.574),
+                sample = Point(0.81, 0.574),
             )
         }
 
@@ -74,7 +74,7 @@ class SolvePuzzle15_9Test {
                 with(context) {
                     return Setup(circle, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(20.0),
+                            maxSqDistance = sq(25.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
@@ -104,8 +104,9 @@ class SolvePuzzle15_9Test {
             val perp = perpendicularTool(setup.line, params.center)
             val intersects = intersect(diameter1, setup.circle).points()
             val bases = intersects.map { projection(setup.line, it) }
+            val solutionPoints = intersect(solution, setup.line).points()
             val opp = intersectOnePoint(perp, diameter2)
-            val pointsOfInterest = listOf(solution.center, opp) + intersects + bases
+            val pointsOfInterest = listOf(solution.center, opp) + solutionPoints + intersects + bases
             return { context ->
 //                context.hasPoint(solution.center)
                 context.elements.lastOrNull()
