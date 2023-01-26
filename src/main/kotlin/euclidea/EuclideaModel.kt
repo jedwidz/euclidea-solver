@@ -612,7 +612,7 @@ fun mirrorAcross(line: Element.Line, point: Point): Point {
     return proj - (point - proj)
 }
 
-private fun projection(line: Element.Line, point: Point): Point {
+fun projection(line: Element.Line, point: Point): Point {
     val d = point - line.point1
     val dir = line.point2 - line.point1
     val e = dir * (1.0 / dir.distance)
