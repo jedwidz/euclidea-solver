@@ -189,7 +189,7 @@ class SolvePuzzle15_9Test {
 //        }
 
         override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 7E E-star moves hint
+            // Euclidea 7L L-star moves hint
             return listOf(
                 EuclideaTool.PerpendicularTool,
                 EuclideaTool.CircleTool,
