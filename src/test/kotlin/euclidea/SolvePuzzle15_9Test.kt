@@ -15,7 +15,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 9 hr 39 min
+        // no solution found 1 hr 43 min
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = 6,
@@ -146,9 +146,10 @@ class SolvePuzzle15_9Test {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
                         // Nope...
-                        // val perp = perpendicularTool(line, sample, probe = base)
+                        val perp = perpendicularTool(line, sample, probe = base)
 
-                        val perp = perpendicularTool(line, center, probe = base)
+                        // Nope...
+                        // val perp = perpendicularTool(line, center, probe = base)
 
                         // Nope...
                         // val perp = perpendicularTool(line, center, probe = base)
