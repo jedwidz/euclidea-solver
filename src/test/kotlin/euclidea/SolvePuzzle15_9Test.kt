@@ -15,10 +15,10 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 1 hr 43 min
+        // gave up 4 hr 42 min
         Solver().improveSolution(
-            maxExtraElements = 6,
-            maxDepth = 6,
+            maxExtraElements = 8,
+            maxDepth = 8,
             nonNewElementLimit = 4,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -76,8 +76,8 @@ class SolvePuzzle15_9Test {
                             maxSqDistance = sq(12.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            perpendicularToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
                         ),
                         // sample1, base and dir act as probes
@@ -137,41 +137,41 @@ class SolvePuzzle15_9Test {
             }
         }
 
-        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    // Guess initial steps, informed by hint
-                    @Suppress("unused") val context = object {
-                        // Nope...
-                        val perp = perpendicularTool(line, sample, probe = base)
-
-                        // Nope...
-                        // val perp = perpendicularTool(line, center, probe = base)
-
-                        // Nope...
-                        // val perp = perpendicularTool(line, center, probe = base)
-                        // val foot = intersectOnePoint(perp, line)
-                        // val meet = intersectTwoPoints(perp, circle).first
-                        // val measure = circleTool(foot, meet)
-
-                        // Nope...
-                        // val perp = perpendicularTool(line, center, probe = base)
-                        // val foot = intersectOnePoint(perp, line)
-                        // val measure = circleTool(foot, center)
-
-                        // Nope...
-                        // val perp = perpendicularTool(line, sample, probe = base)
-                        // val foot = intersectOnePoint(perp, line)
-                        // val measure = circleTool(foot, sample)
-                    }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
-                }
-            }
-        }
+//        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+//            val (setup, initialContext) = initialContext(
+//                params, namer
+//            )
+//            with(params) {
+//                with(setup) {
+//                    // Guess initial steps, informed by hint
+//                    @Suppress("unused") val context = object {
+//                        // Nope...
+//                        val perp = perpendicularTool(line, sample, probe = base)
+//
+//                        // Nope...
+//                        // val perp = perpendicularTool(line, center, probe = base)
+//
+//                        // Nope...
+//                        // val perp = perpendicularTool(line, center, probe = base)
+//                        // val foot = intersectOnePoint(perp, line)
+//                        // val meet = intersectTwoPoints(perp, circle).first
+//                        // val measure = circleTool(foot, meet)
+//
+//                        // Nope...
+//                        // val perp = perpendicularTool(line, center, probe = base)
+//                        // val foot = intersectOnePoint(perp, line)
+//                        // val measure = circleTool(foot, center)
+//
+//                        // Nope...
+//                        // val perp = perpendicularTool(line, sample, probe = base)
+//                        // val foot = intersectOnePoint(perp, line)
+//                        // val measure = circleTool(foot, sample)
+//                    }
+//                    namer.nameReflected(context)
+//                    return setup to initialContext.withElements(elementsReflected(context))
+//                }
+//            }
+//        }
 
 //        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
 //            val solution = constructSolution(params)
@@ -189,13 +189,15 @@ class SolvePuzzle15_9Test {
 //        }
 
         override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 7L L-star moves hint
+            // Euclidea 9E E-star moves hint
             return listOf(
-                EuclideaTool.PerpendicularTool,
+                EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool
             )
