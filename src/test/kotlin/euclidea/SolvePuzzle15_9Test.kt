@@ -1,6 +1,7 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
+import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
@@ -15,11 +16,11 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // ?
+        // no solution found 5 min 42 sec
         Solver().improveSolution(
-            maxExtraElements = 8,
-            maxDepth = 8,
-            nonNewElementLimit = 4,
+            maxExtraElements = 7,
+            maxDepth = 7,
+            nonNewElementLimit = 3,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
         )
@@ -97,14 +98,24 @@ class SolvePuzzle15_9Test {
             assertTrue(pointAndLineCoincide(solution.center, setup.line))
             assertTrue(pointAndCircleCoincide(params.sample, solution))
             assertTrue(meetAtOnePoint(setup.circle, solution))
+            // Look for partial solution
+            val diameter1 = lineTool(params.center, solution.center)
+            val diameter2 = lineTool(params.sample, solution.center)
+            val perp = perpendicularTool(setup.line, params.center)
+            val intersects = intersect(diameter1, setup.circle).points()
+            val bases = intersects.map { projection(setup.line, it) }
+            val opp = intersectOnePoint(perp, diameter2)
+            val pointsOfInterest = listOf(solution.center, opp) + intersects + bases
             return { context ->
 //                context.hasPoint(solution.center)
-                context.elements.size >= 8 && context.elements.lastOrNull()
+                context.elements.lastOrNull()
                     ?.let { element ->
-                        pointAndElementCoincide(solution.center, element) &&
-                                // Just checking point/line has some false positives with 'almost coincident' lines
-                                // Note this still avoids evaluating context points in most cases
-                                context.hasPoint(solution.center)
+                        pointsOfInterest.any { point ->
+                            pointAndElementCoincide(point, element) &&
+                                    // Just checking point/line has some false positives with 'almost coincident' lines
+                                    // Note this still avoids evaluating context points in most cases
+                                    context.hasPoint(point)
+                        }
                     } == true
             }
 //            return { context ->
