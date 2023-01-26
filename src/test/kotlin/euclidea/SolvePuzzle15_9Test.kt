@@ -16,10 +16,10 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 5 min 42 sec
+        // no solution found 3 min 59 sec
         Solver().improveSolution(
-            maxExtraElements = 7,
-            maxDepth = 7,
+            maxExtraElements = 5,
+            maxDepth = 5,
             nonNewElementLimit = 3,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -74,11 +74,11 @@ class SolvePuzzle15_9Test {
                 with(context) {
                     return Setup(circle, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(12.0),
+                            maxSqDistance = sq(20.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
-//                            nonCollapsingCompassToolEnabled = true,
-//                            perpendicularToolEnabled = true,
+                            nonCollapsingCompassToolEnabled = true,
+                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
                         ),
                         // sample1, base and dir act as probes
@@ -156,8 +156,9 @@ class SolvePuzzle15_9Test {
                 with(setup) {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
-                        val lens1 = circleTool(center, sample)
-                        val lens2 = circleTool(sample, center)
+                        // Nope (E)
+                        // val lens1 = circleTool(center, sample)
+                        // val lens2 = circleTool(sample, center)
 
                         // Nope...
                         // val perp = perpendicularTool(line, sample, probe = base)
@@ -203,15 +204,13 @@ class SolvePuzzle15_9Test {
 //        }
 
         override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 9E E-star moves hint
+            // Euclidea 7L L-star moves hint
             return listOf(
+                EuclideaTool.PerpendicularTool,
                 EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
+                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.NonCollapsingCompassTool,
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool
             )
