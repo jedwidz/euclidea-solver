@@ -15,7 +15,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // gave up 4 hr 42 min
+        // ?
         Solver().improveSolution(
             maxExtraElements = 8,
             maxDepth = 8,
@@ -137,41 +137,44 @@ class SolvePuzzle15_9Test {
             }
         }
 
-//        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    // Guess initial steps, informed by hint
-//                    @Suppress("unused") val context = object {
-//                        // Nope...
-//                        val perp = perpendicularTool(line, sample, probe = base)
-//
-//                        // Nope...
-//                        // val perp = perpendicularTool(line, center, probe = base)
-//
-//                        // Nope...
-//                        // val perp = perpendicularTool(line, center, probe = base)
-//                        // val foot = intersectOnePoint(perp, line)
-//                        // val meet = intersectTwoPoints(perp, circle).first
-//                        // val measure = circleTool(foot, meet)
-//
-//                        // Nope...
-//                        // val perp = perpendicularTool(line, center, probe = base)
-//                        // val foot = intersectOnePoint(perp, line)
-//                        // val measure = circleTool(foot, center)
-//
-//                        // Nope...
-//                        // val perp = perpendicularTool(line, sample, probe = base)
-//                        // val foot = intersectOnePoint(perp, line)
-//                        // val measure = circleTool(foot, sample)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Guess initial steps, informed by hint
+                    @Suppress("unused") val context = object {
+                        val lens1 = circleTool(center, sample)
+                        val lens2 = circleTool(sample, center)
+
+                        // Nope...
+                        // val perp = perpendicularTool(line, sample, probe = base)
+
+                        // Nope...
+                        // val perp = perpendicularTool(line, center, probe = base)
+
+                        // Nope...
+                        // val perp = perpendicularTool(line, center, probe = base)
+                        // val foot = intersectOnePoint(perp, line)
+                        // val meet = intersectTwoPoints(perp, circle).first
+                        // val measure = circleTool(foot, meet)
+
+                        // Nope...
+                        // val perp = perpendicularTool(line, center, probe = base)
+                        // val foot = intersectOnePoint(perp, line)
+                        // val measure = circleTool(foot, center)
+
+                        // Nope...
+                        // val perp = perpendicularTool(line, sample, probe = base)
+                        // val foot = intersectOnePoint(perp, line)
+                        // val measure = circleTool(foot, sample)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
 
 //        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
 //            val solution = constructSolution(params)
