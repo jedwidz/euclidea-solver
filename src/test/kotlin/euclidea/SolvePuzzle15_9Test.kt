@@ -17,10 +17,10 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // gave up 5 hr 26 min
+        // no solution found 3 min 2 sec
         Solver().improveSolution(
             maxExtraElements = 3,
-            maxDepth = 7,
+            maxDepth = 6,
 //            nonNewElementLimit = 3,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -159,9 +159,13 @@ class SolvePuzzle15_9Test {
                         // Nope... actually, yup...
                         val perp = perpendicularTool(line, center, probe = base)
 
-                        // Likely next element...
+                        // Likely next elements...
                         val point5 = intersectOnePoint(line, perp)
                         val circle2 = circleTool(point5, sample)
+                        val intersection = intersectTwoPoints(circle2, circle)
+                        val point7 = intersection.second
+                        val point8 = intersection.first
+                        val line3 = lineTool(point7, point8)
 
                         // Nope...
                         // val perp = perpendicularTool(line, center, probe = base)
