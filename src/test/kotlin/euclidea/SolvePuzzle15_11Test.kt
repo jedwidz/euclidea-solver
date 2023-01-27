@@ -16,7 +16,7 @@ class SolvePuzzle15_11Test {
 
     @Test
     fun improveSolution() {
-        // no solution found
+        // no solution found 48 sec
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 3,
@@ -87,7 +87,7 @@ class SolvePuzzle15_11Test {
 //                            angleBisectorToolEnabled = true,
                         ),
                         // sampleA, sampleB, base and dir act as probes
-                        points = listOf(centerA, centerB /*, base, sample1 , dir */),
+                        points = listOf(centerA, centerB, base, sampleA, sampleB, dir),
                         elements = listOf(circleA, circleB, line)
                     )
                 }
@@ -107,11 +107,13 @@ class SolvePuzzle15_11Test {
             // val pointOfInterest = solution.center
             return { context ->
                 // Suspect that this is reducible to a 15.9 solution (noting move hints are similar)
-                when (val element = context.elements.lastOrNull()) {
+                when (context.elements.lastOrNull()) {
                     is Element.Circle -> {
-                        context.points.any { point ->
-                            val subSolution = constructSolution15_9(params, setup, element, point)
-                            subSolution !== null && coincides(subSolution, solution)
+                        context.elements.filterIsInstance<Element.Circle>().any { circle ->
+                            context.points.any { point ->
+                                val subSolution = constructSolution15_9(params, setup, circle, point)
+                                subSolution !== null && coincides(subSolution, solution)
+                            }
                         }
                     }
                     is Element.Line -> false
