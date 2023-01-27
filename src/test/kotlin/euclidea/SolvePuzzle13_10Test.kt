@@ -20,7 +20,7 @@ class SolvePuzzle13_10Test {
             // solution found 25 sec
             maxExtraElements = 4,
             maxDepth = 6,
-//            nonNewElementLimit = 5,
+//            maxNonNewElements = 4,
 //            consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )

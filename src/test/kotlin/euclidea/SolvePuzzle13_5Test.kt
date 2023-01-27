@@ -22,7 +22,7 @@ class SolvePuzzle13_5Test {
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = 8,
-//            nonNewElementLimit = 5,
+//            maxNonNewElements = 3,
 //            consecutiveNonNewElementLimit = 4,
             useTargetConstruction = true
         )

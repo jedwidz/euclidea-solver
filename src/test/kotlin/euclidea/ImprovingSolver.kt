@@ -38,7 +38,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
     fun improveSolution(
         maxExtraElements: Int,
         maxDepth: Int,
-        nonNewElementLimit: Int? = null,
+        maxNonNewElements: Int? = null,
         consecutiveNonNewElementLimit: Int? = null,
         useTargetConstruction: Boolean = false
     ) {
@@ -107,7 +107,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         val solutionContext = solve(
             startingContext,
             maxDepth = maxDepth,
-            nonNewElementLimit = nonNewElementLimit,
+            maxNonNewElements = maxNonNewElements,
             consecutiveNonNewElementLimit = consecutiveNonNewElementLimit,
             visitPriority = visitPriority,
             pass = passWithPrefix,

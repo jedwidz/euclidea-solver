@@ -58,7 +58,7 @@ private val forkQueueSize = 50
 fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
-    nonNewElementLimit: Int? = null,
+    maxNonNewElements: Int? = null,
     consecutiveNonNewElementLimit: Int? = null,
     prune: ((SolveContext) -> Boolean)? = null,
     visitPriority: ((SolveContext, Element) -> Int)? = null,
@@ -275,7 +275,7 @@ fun solve(
                     val nextExtraElementCount = solveState.extraElementCount + if (isExtraElement) 1 else 0
                     val nextConsecutiveNonNewElementCount =
                         if (isNonNewElement) solveState.consecutiveNonNewElementCount + 1 else 0
-                    if ((nonNewElementLimit == null || nextNonNewElementCount < nonNewElementLimit) &&
+                    if ((maxNonNewElements == null || nextNonNewElementCount <= maxNonNewElements) &&
                         (maxExtraElements == null || nextExtraElementCount <= maxExtraElements)
                     ) {
                         val nextContext = withElement(newElement)

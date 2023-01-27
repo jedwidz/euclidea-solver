@@ -21,7 +21,7 @@ class SolvePuzzle11_8Test {
             // solution found 9 sec
             maxExtraElements = 2,
             maxDepth = 10,
-            nonNewElementLimit = 6,
+            maxNonNewElements = 5,
             consecutiveNonNewElementLimit = 3,
             useTargetConstruction = true
         )
