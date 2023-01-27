@@ -20,11 +20,11 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 12 min 36 sec
+        // no solution found 2 hr 9 min
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 8,
-            maxNonNewElements = 3,
+            maxNonNewElements = 2,
             maxConsecutiveNonNewElements = 2,
             useTargetConstruction = true
         )
@@ -84,7 +84,7 @@ class SolvePuzzle11_6Test {
                 with(context) {
                     return Setup(line1, line2) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(6.0),
+                            maxSqDistance = sq(8.0),
                             angleBisectorToolEnabled = true
                         ),
                         points = listOf(baseO, baseA, baseB, sample/*, probe1, probe2*/),
@@ -162,25 +162,25 @@ class SolvePuzzle11_6Test {
             }
         }
 
-        override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
-            val referenceSolutionContext = referenceSolution(params, Namer()).second
-
-            val referenceElements = ElementSet()
-            referenceElements += referenceSolutionContext.elements
-            referenceElements += referenceSolutionContext.constructionElementSet().items()
-
-            val solutionElements = ElementSet()
-            solutionElements += constructSolution(params)
-
-            val interestPoints = referenceSolutionContext.constructionPointSet().items()
-
-            return { _, element ->
-                val solutionScore = if (element in solutionElements) 1 else 0
-                val referenceScore = if (element in referenceElements) 1 else 0
-                val interestPointsScore = interestPoints.count { pointAndElementCoincide(it, element) }
-                solutionScore * 100 + referenceScore * 20 + interestPointsScore
-            }
-        }
+//        override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
+//            val referenceSolutionContext = referenceSolution(params, Namer()).second
+//
+//            val referenceElements = ElementSet()
+//            referenceElements += referenceSolutionContext.elements
+//            referenceElements += referenceSolutionContext.constructionElementSet().items()
+//
+//            val solutionElements = ElementSet()
+//            solutionElements += constructSolution(params)
+//
+//            val interestPoints = referenceSolutionContext.constructionPointSet().items()
+//
+//            return { _, element ->
+//                val solutionScore = if (element in solutionElements) 1 else 0
+//                val referenceScore = if (element in referenceElements) 1 else 0
+//                val interestPointsScore = interestPoints.count { pointAndElementCoincide(it, element) }
+//                solutionScore * 100 + referenceScore * 20 + interestPointsScore
+//            }
+//        }
 
         override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 11E E-star moves hint
