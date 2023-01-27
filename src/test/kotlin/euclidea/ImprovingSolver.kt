@@ -104,23 +104,15 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             !checkPrefix(solveContext.depth, element) || (pass !== null && pass(solveContext, element))
         }
 
-        fun checkExtraElements(nextElements: List<Element>): Boolean {
-            val extraElements = nextElements.count { it !in targetElementSet }
-            return extraElements <= maxExtraElements
-        }
-
         val solutionContext = solve(
             startingContext,
             maxDepth = maxDepth,
             nonNewElementLimit = nonNewElementLimit,
             consecutiveNonNewElementLimit = consecutiveNonNewElementLimit,
-            prune = { nextSolveContext ->
-                val nextElements = nextSolveContext.context.elements
-                !checkExtraElements(nextElements)
-            },
             visitPriority = visitPriority,
             pass = passWithPrefix,
             remainingStepsLowerBound = remainingStepsLowerBound,
+            extraElementConstraint = targetElementSet to maxExtraElements,
             excludeElements = excludeElements(params, setup),
             toolSequence = toolSequence()
         ) { context ->

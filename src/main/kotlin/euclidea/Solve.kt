@@ -26,7 +26,8 @@ private data class SolveState(
     val nonNewElementCount: Int,
     val consecutiveNonNewElementCount: Int,
     val lastAddedElements: List<Element>,
-    val remainingToolSequence: List<EuclideaTool>?
+    val remainingToolSequence: List<EuclideaTool>?,
+    val extraElementCount: Int
 )
 
 private data class PendingNode(
@@ -63,10 +64,14 @@ fun solve(
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
+    extraElementConstraint: Pair<ElementSet, Int>? = null,
     excludeElements: ElementSet? = null,
     toolSequence: List<EuclideaTool>? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
+
+    val knownElements = extraElementConstraint?.first
+    val maxExtraElements = extraElementConstraint?.second
 
     if (check(initialContext))
         return initialContext
@@ -266,9 +271,13 @@ fun solve(
                     if (isNonNewElement)
                         removedElements.add(newElement)
                     val nextNonNewElementCount = solveState.nonNewElementCount + (if (isNonNewElement) 1 else 0)
+                    val isExtraElement = knownElements?.let { newElement !in it } ?: false
+                    val nextExtraElementCount = solveState.extraElementCount + if (isExtraElement) 1 else 0
                     val nextConsecutiveNonNewElementCount =
                         if (isNonNewElement) solveState.consecutiveNonNewElementCount + 1 else 0
-                    if (nonNewElementLimit == null || nextNonNewElementCount < nonNewElementLimit) {
+                    if ((nonNewElementLimit == null || nextNonNewElementCount < nonNewElementLimit) &&
+                        (maxExtraElements == null || nextExtraElementCount <= maxExtraElements)
+                    ) {
                         val nextContext = withElement(newElement)
                         val nextSolveContext = SolveContext(nextContext, nextDepth)
                         val next =
@@ -278,7 +287,8 @@ fun solve(
                                 nextNonNewElementCount,
                                 nextConsecutiveNonNewElementCount,
                                 listOf(newElement),
-                                solveState.remainingToolSequence?.drop(1)
+                                solveState.remainingToolSequence?.drop(1),
+                                nextExtraElementCount
                             )
                         val lowerBound = remainingStepsLowerBound?.let { it(nextContext) }
                         if ((lowerBound == null || lowerBound <= 0) && check(nextContext))
@@ -313,7 +323,7 @@ fun solve(
         }
     }
     parallelSolver.fork(
-        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements, effectiveToolSequence),
+        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements, effectiveToolSequence, 0),
         SolveScratch()
     )
     return parallelSolver.awaitResult()
