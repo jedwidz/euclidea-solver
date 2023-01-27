@@ -2,6 +2,7 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
+import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
@@ -217,31 +218,73 @@ class SolvePuzzle15_9Test {
             )
         }
 
-//        override fun referenceSolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Sub-optimal 5L solution
-//                        val perpCenter = perpendicularTool(line, center, probe = base)
-//                        val aim1 = intersectTwoPoints(perpCenter, circle).second
-//                        val cross1 = lineTool(aim1, base)
-//                        val touch = intersectTwoPoints(cross1, circle).second
-//                        val cross2 = lineTool(touch, center)
-//                        val perpBase = perpendicularTool(line, base, probe = touch)
-//                        val solutionCenter = intersectOnePoint(perpBase, cross2)
-//                        val solution = circleTool(solutionCenter, touch)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun referenceSolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Sub-optimal 8L solution
+                        //point1_center at (0.0, 0.7)
+                        //point2_sample1 at (0.3, 0.6)
+                        //circle1_circle with center point1_center extending to point2_sample1 (radius 0.31622776601683794)
+                        //point3_base at (0.1, 0.0)
+                        //point4_dir at (0.9, 0.0)
+                        //line1_line from point3_base to point4_dir
+                        //line2 perpendicular to line1_line through point1_center
+                        val line2 = perpendicularTool(line, center)
+
+                        //point5 at intersection (1/1) of line1_line and line2 (-0.0, -0.0)
+                        val point5 = intersectOnePoint(line, line2)
+
+                        //point6_sample at (0.8, 0.55)
+                        //circle2 with center point5 extending to point6_sample (radius 0.97082439194738)
+                        val circle2 = circleTool(point5, sample)
+
+                        //point7 at intersection (1/2) of circle1_circle and circle2 (-0.19132159857588635, 0.9517857142857145)
+                        val intersection = intersectTwoPoints(circle2, circle)
+                        val point7 = intersection.second
+
+                        //point8 at intersection (2/2) of circle1_circle and circle2 (0.19132159857588635, 0.9517857142857145)
+                        val point8 = intersection.first
+
+                        //line3 from point7 to point8
+                        val line3 = lineTool(point7, point8)
+
+                        //point9 at intersection (1/1) of line2 and line3 (0.0, 0.9517857142857145)
+                        val point9 = intersectOnePoint(line3, line2)
+
+                        //circle3 with center point7 from distance between point9 and point6_sample (radius 0.895227211496658)
+                        val circle3 = nonCollapsingCompassTool(point9, sample, point7)
+
+                        //point10 at intersection (1/2) of line2 and circle3 (-2.7755575615628914E-17, 1.8263300562847062)
+                        val point10 = intersectTwoPoints(circle3, line2).first
+
+                        //circle4 with center point6_sample from distance between point9 and point10 (radius 0.8745443419989918)
+                        val circle4 = nonCollapsingCompassTool(point9, point10, sample)
+
+                        //point11 at intersection (1/2) of line3 and circle4 (0.0232142857142853, 0.9517857142857145)
+                        val point11 = intersectTwoPoints(circle4, line3).first
+
+                        //point12 at intersection (1/2) of circle1_circle and line2 (0.0, 1.016227766016838)
+                        val point12 = intersectTwoPoints(line2, circle).first
+
+                        //line4 from point11 to point12
+                        val line4 = lineTool(point11, point12)
+                        val tangentPoint = intersectTwoPoints(line4, circle).first
+                        val diameter = lineTool(center, tangentPoint)
+                        val solutionCenter = intersectOnePoint(diameter, line)
+                        val solution = circleTool(solutionCenter, sample)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
 
 //        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
 //            return listOf(this::alternateSolution)
