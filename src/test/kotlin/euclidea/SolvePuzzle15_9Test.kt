@@ -17,7 +17,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ?
+        // gave up 5 hr 26 min
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 7,
