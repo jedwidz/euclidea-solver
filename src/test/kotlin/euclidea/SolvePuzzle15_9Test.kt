@@ -17,10 +17,10 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // partial solution found 5 hr 12 min (with Epsilon = 0.00000001, FWIW)
+        // no solution found 40 min 37 sec (with Epsilon = 0.00000001, FWIW)
         Solver().improveSolution(
-            maxExtraElements = 6,
-            maxDepth = 6,
+            maxExtraElements = 2,
+            maxDepth = 7,
 //            nonNewElementLimit = 3,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -100,24 +100,15 @@ class SolvePuzzle15_9Test {
             assertTrue(pointAndCircleCoincide(params.sample, solution))
             assertTrue(meetAtOnePoint(setup.circle, solution))
             // Look for partial solution
-            val diameter1 = lineTool(params.center, solution.center)
-            val diameter2 = lineTool(params.sample, solution.center)
-            val perp = perpendicularTool(setup.line, params.center)
-            val intersects = intersect(diameter1, setup.circle).points()
-            val bases = intersects.map { projection(setup.line, it) }
-            val solutionPoints = intersect(solution, setup.line).points()
-            val opp = intersectOnePoint(perp, diameter2)
-            val pointsOfInterest = listOf(solution.center, opp) + solutionPoints + intersects + bases
+            val pointOfInterest = solution.center
             return { context ->
 //                context.hasPoint(solution.center)
                 context.elements.lastOrNull()
                     ?.let { element ->
-                        pointsOfInterest.any { point ->
-                            pointAndElementCoincide(point, element) &&
-                                    // Just checking point/line has some false positives with 'almost coincident' lines
-                                    // Note this still avoids evaluating context points in most cases
-                                    context.hasPoint(point)
-                        }
+                        pointAndElementCoincide(pointOfInterest, element) &&
+                                // Just checking point/line has some false positives with 'almost coincident' lines
+                                // Note this still avoids evaluating context points in most cases
+                                context.hasPoint(pointOfInterest)
                     } == true
             }
 //            return { context ->
@@ -236,7 +227,7 @@ class SolvePuzzle15_9Test {
                         //point4_dir at (0.9, 0.0)
                         //line1_line from point3_base to point4_dir
                         //line2 perpendicular to line1_line through point1_center
-                        val line2 = perpendicularTool(line, center)
+                        val line2 = perpendicularTool(line, center, probe = base)
 
                         //point5 at intersection (1/1) of line1_line and line2 (-0.0, -0.0)
                         val point5 = intersectOnePoint(line, line2)
@@ -278,7 +269,7 @@ class SolvePuzzle15_9Test {
                         val tangentPoint = intersectTwoPoints(line4, circle).first
                         val diameter = lineTool(center, tangentPoint)
                         val solutionCenter = intersectOnePoint(diameter, line)
-                        val solution = circleTool(solutionCenter, sample)
+//                        val solution = circleTool(solutionCenter, sample)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
