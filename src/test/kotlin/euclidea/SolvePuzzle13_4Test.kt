@@ -24,7 +24,7 @@ class SolvePuzzle13_4Test {
             maxExtraElements = 2,
             maxDepth = 8,
             maxNonNewElements = 2,
-            consecutiveNonNewElementLimit = 2,
+            maxConsecutiveNonNewElements = 1,
             useTargetConstruction = true
         )
     }

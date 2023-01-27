@@ -39,7 +39,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         maxExtraElements: Int,
         maxDepth: Int,
         maxNonNewElements: Int? = null,
-        consecutiveNonNewElementLimit: Int? = null,
+        maxConsecutiveNonNewElements: Int? = null,
         useTargetConstruction: Boolean = false
     ) {
         val namer = Namer()
@@ -108,7 +108,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             startingContext,
             maxDepth = maxDepth,
             maxNonNewElements = maxNonNewElements,
-            consecutiveNonNewElementLimit = consecutiveNonNewElementLimit,
+            maxConsecutiveNonNewElements = maxConsecutiveNonNewElements,
             visitPriority = visitPriority,
             pass = passWithPrefix,
             remainingStepsLowerBound = remainingStepsLowerBound,

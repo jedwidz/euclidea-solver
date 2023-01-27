@@ -59,7 +59,7 @@ fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
     maxNonNewElements: Int? = null,
-    consecutiveNonNewElementLimit: Int? = null,
+    maxConsecutiveNonNewElements: Int? = null,
     prune: ((SolveContext) -> Boolean)? = null,
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
@@ -221,7 +221,7 @@ fun solve(
                             val keep = mutableListOf<Element>()
                             val skippedNewElements = mutableListOf<Element>()
                             val skipNonNewElements =
-                                consecutiveNonNewElementLimit != null && solveState.consecutiveNonNewElementCount >= consecutiveNonNewElementLimit
+                                maxConsecutiveNonNewElements != null && solveState.consecutiveNonNewElementCount >= maxConsecutiveNonNewElements
                             items.forEach { element ->
                                 val skipAsNonNewElement = skipNonNewElements && element !in newElements
                                 if (skipAsNonNewElement || pass(solveContext, element)) {
