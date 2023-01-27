@@ -109,8 +109,10 @@ class SolvePuzzle15_11Test {
                 // Suspect that this is reducible to a 15.9 solution (noting move hints are similar)
                 when (val element = context.elements.lastOrNull()) {
                     is Element.Circle -> {
-                        val subSolution = constructSolution15_9(params, setup, element)
-                        subSolution !== null && coincides(subSolution, solution)
+                        context.points.any { point ->
+                            val subSolution = constructSolution15_9(params, setup, element, point)
+                            subSolution !== null && coincides(subSolution, solution)
+                        }
                     }
                     is Element.Line -> false
                     null -> false
@@ -130,11 +132,15 @@ class SolvePuzzle15_11Test {
 //            }
         }
 
-        private fun constructSolution15_9(params: Params, setup: Setup, circle: Element.Circle): Element.Circle? {
+        private fun constructSolution15_9(
+            params: Params,
+            setup: Setup,
+            circle: Element.Circle,
+            sample: Point
+        ): Element.Circle? {
             with(params) {
                 with(setup) {
                     val center = circle.center
-                    val sample = centerB
                     val bracket1 = perpendicularTool(line, center, probe = base)
                     val bracket2 = perpendicularTool(line, sample, probe = base)
                     val p1 = intersectOnePoint(line, bracket1)
@@ -153,8 +159,11 @@ class SolvePuzzle15_11Test {
                     if (param === null)
                         return null
                     val solutionCenter = p1 + d * param
-                    val solution = circleTool(solutionCenter, sample)
-                    return solution
+                    return try {
+                        circleTool(solutionCenter, sample)
+                    } catch (e: InvalidConstructionException) {
+                        null
+                    }
                 }
             }
         }
