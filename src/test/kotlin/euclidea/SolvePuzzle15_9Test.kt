@@ -17,7 +17,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 3 min 2 sec
+        // no solution found 2 hr 50 min
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 6,
@@ -204,18 +204,18 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 7L L-star moves hint
-            return listOf(
-                EuclideaTool.PerpendicularTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool
-            )
-        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 7L L-star moves hint
+//            return listOf(
+//                EuclideaTool.PerpendicularTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool
+//            )
+//        }
 
         override fun referenceSolution(
             params: Params,
