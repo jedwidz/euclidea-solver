@@ -13,10 +13,10 @@ class SolvePuzzle15_10Test {
 
     @Test
     fun improveSolution() {
-        // solution found 4 sec
+        // solution found 25 sec
         Solver().improveSolution(
-            maxExtraElements = 6,
-            maxDepth = 6,
+            maxExtraElements = 7,
+            maxDepth = 7,
             nonNewElementLimit = 2,
             consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -64,7 +64,7 @@ class SolvePuzzle15_10Test {
                     return Setup(base) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(12.0),
-                            angleBisectorToolEnabled = true
+//                            angleBisectorToolEnabled = true
                         ),
                         points = listOf(base1, base2 /*, probe*/),
                         elements = listOf(base)
@@ -122,14 +122,15 @@ class SolvePuzzle15_10Test {
 //        }
 
         override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 6L L-star moves hint
+            // Euclidea 7E E-star moves hint
             return listOf(
                 EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
-                EuclideaTool.AngleBisectorTool
+                EuclideaTool.LineTool
             )
         }
 
