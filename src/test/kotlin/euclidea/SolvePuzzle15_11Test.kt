@@ -2,7 +2,6 @@ package euclidea
 
 import euclidea.EuclideaTools.circleTool
 import euclidea.EuclideaTools.lineTool
-import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
@@ -16,7 +15,7 @@ class SolvePuzzle15_11Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 48 sec
+        // no solution found
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 3,
@@ -104,70 +103,21 @@ class SolvePuzzle15_11Test {
             assertTrue(meetAtOnePoint(setup.circleA, solution))
             assertTrue(meetAtOnePoint(setup.circleB, solution))
             // Look for partial solution
-            // val pointOfInterest = solution.center
+            val diameterB = lineTool(solution.center, params.centerB)
+            val tangentPointB = intersectTwoPoints(diameterB, setup.circleB).first
+            val pointOfInterest = tangentPointB
             return { context ->
-                // Suspect that this is reducible to a 15.9 solution (noting move hints are similar)
-                when (context.elements.lastOrNull()) {
-                    is Element.Circle -> {
-                        context.elements.filterIsInstance<Element.Circle>().any { circle ->
-                            context.points.any { point ->
-                                val subSolution = constructSolution15_9(params, setup, circle, point)
-                                subSolution !== null && coincides(subSolution, solution)
-                            }
-                        }
-                    }
-                    is Element.Line -> false
-                    null -> false
-                }
-
-//                context.hasPoint(solution.center)
-//                context.elements.lastOrNull()
-//                    ?.let { element ->
-//                        pointAndElementCoincide(pointOfInterest, element) &&
-//                                // Just checking point/line has some false positives with 'almost coincident' lines
-//                                // Note this still avoids evaluating context points in most cases
-//                                context.hasPoint(pointOfInterest)
-//                    } == true
+                context.elements.lastOrNull()
+                    ?.let { element ->
+                        pointAndElementCoincide(pointOfInterest, element) &&
+                                // Just checking point/line has some false positives with 'almost coincident' lines
+                                // Note this still avoids evaluating context points in most cases
+                                context.hasPoint(pointOfInterest)
+                    } == true
             }
 //            return { context ->
 //                context.hasElement(solution)
 //            }
-        }
-
-        private fun constructSolution15_9(
-            params: Params,
-            setup: Setup,
-            circle: Element.Circle,
-            sample: Point
-        ): Element.Circle? {
-            with(params) {
-                with(setup) {
-                    val center = circle.center
-                    val bracket1 = perpendicularTool(line, center, probe = base)
-                    val bracket2 = perpendicularTool(line, sample, probe = base)
-                    val p1 = intersectOnePoint(line, bracket1)
-                    val p2 = intersectOnePoint(line, bracket2)
-                    val d = p2 - p1
-                    val param = try {
-                        solveByBisection(0.0, 1.0) { x ->
-                            val p = p1 + d * x
-                            val d1 = (p - center).distance - circle.radius
-                            val d2 = (p - sample).distance
-                            d1 - d2
-                        }
-                    } catch (e: IllegalArgumentException) {
-                        null
-                    }
-                    if (param === null)
-                        return null
-                    val solutionCenter = p1 + d * param
-                    return try {
-                        circleTool(solutionCenter, sample)
-                    } catch (e: InvalidConstructionException) {
-                        null
-                    }
-                }
-            }
         }
 
         private fun constructSolution(params: Params, setup: Setup): Element.Circle {
@@ -221,21 +171,21 @@ class SolvePuzzle15_11Test {
 //            }
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 10L L-star moves hint
-            return listOf(
-                EuclideaTool.LineTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.PerpendicularTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool
-            )
-        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 10L L-star moves hint
+//            return listOf(
+//                EuclideaTool.LineTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.PerpendicularTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool
+//            )
+//        }
 
 //        override fun referenceSolution(
 //            params: Params,
