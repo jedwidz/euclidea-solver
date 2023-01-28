@@ -95,13 +95,12 @@ fun solve(
         }
 
         fun fork(solveState: SolveState, solveScratch: SolveScratch) {
-            val newSolveScratch = solveScratch.dupe()
             outstandingCount.incrementAndGet()
             forkQueueCount.acquire()
             executor.submit {
                 val timeMillis = measureTimeMillis {
                     try {
-                        sub(solveState, newSolveScratch)
+                        sub(solveState, solveScratch)
                     } catch (e: Throwable) {
                         println("Batch threw up... $e")
                         e.printStackTrace()
@@ -130,13 +129,10 @@ fun solve(
                 val nextTool = solveState.remainingToolSequence?.first()
 
                 val newElements = mutableSetOf<Element>()
-                val skippedOtherToolNewElements = mutableSetOf<Element>()
                 fun tryAdd(e: Element?) {
                     if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e) && excludeElements?.let { e in it } != true) {
                         pendingElements += e
-                        if (nextTool !== null && nextTool !== e.sourceTool)
-                            skippedOtherToolNewElements += e
-                        else
+                        if (nextTool === null || nextTool === e.sourceTool)
                             newElements += e
                     }
                 }
@@ -214,22 +210,19 @@ fun solve(
                     }
                 }
 
-                fun maybePass(items: List<Element>): Pair<List<Element>, List<Element>> {
+                fun maybePass(items: List<Element>): List<Element> {
                     return when (pass) {
-                        null -> items to listOf()
+                        null -> items
                         else -> {
                             val keep = mutableListOf<Element>()
-                            val skippedNewElements = mutableListOf<Element>()
                             val skipNonNewElements =
                                 maxConsecutiveNonNewElements != null && solveState.consecutiveNonNewElementCount >= maxConsecutiveNonNewElements
                             items.forEach { element ->
                                 val skipAsNonNewElement = skipNonNewElements && element !in newElements
-                                if (skipAsNonNewElement || pass(solveContext, element)) {
-                                    if (element in newElements)
-                                        skippedNewElements += element
-                                } else keep += element
+                                if (!skipAsNonNewElement && !pass(solveContext, element))
+                                    keep += element
                             }
-                            keep to skippedNewElements
+                            keep
                         }
                     }
                 }
@@ -251,12 +244,10 @@ fun solve(
                     }
                 }
 
-                val (keep, skippedNewElements) = maybePass(pendingElements.itemsForTool(nextTool))
+                val keep = maybePass(pendingElements.itemsForTool(nextTool))
                 val pendingList = maybePrioritize(keep)
                 // println("$depth - ${pendingList.size}")
 
-                val removedElements = mutableSetOf<Element>()
-                val newPassedElements = mutableSetOf<Element>()
                 for (newElement in pendingList) {
                     if (Thread.currentThread().isInterrupted)
                         return
@@ -266,10 +257,7 @@ fun solve(
                     }
                     assert(removed)
                     passedElements.add(newElement)
-                    newPassedElements.add(newElement)
                     val isNonNewElement = newElement !in newElements
-                    if (isNonNewElement)
-                        removedElements.add(newElement)
                     val nextNonNewElementCount = solveState.nonNewElementCount + (if (isNonNewElement) 1 else 0)
                     val isExtraElement = knownElements?.let { newElement !in it } ?: false
                     val nextExtraElementCount = solveState.extraElementCount + if (isExtraElement) 1 else 0
@@ -297,17 +285,14 @@ fun solve(
                             (lowerBound == null || lowerBound + nextDepth <= maxDepth) &&
                             (prune == null || !prune(nextSolveContext))
                         ) {
+                            val newSolveScratch = solveScratch.dupe()
                             if (depth == forkDepth)
-                                fork(next, solveScratch)
+                                fork(next, newSolveScratch)
                             else
-                                sub(next, solveScratch)
+                                sub(next, newSolveScratch)
                         }
                     }
                 }
-                pendingElements -= skippedNewElements
-                pendingElements -= skippedOtherToolNewElements
-                pendingElements += removedElements
-                passedElements -= newPassedElements
             }
         }
     }
