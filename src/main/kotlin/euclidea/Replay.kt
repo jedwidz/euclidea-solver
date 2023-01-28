@@ -69,7 +69,7 @@ fun replaySteps(referenceContext: EuclideaContext, replayInitialContext: Euclide
         val canonicalReferencePoint = referenceContext.canonicalPoint(referencePoint)
             ?: replayFail("Failed to find replay point for $referencePoint: no canonical reference point")
         return fromReferencePoint.getOrElse(canonicalReferencePoint) {
-            when (val intersectionSource = referenceContext.pointSource[canonicalReferencePoint]) {
+            when (val intersectionSource = referenceContext.pointSourceFor(canonicalReferencePoint)) {
                 null -> replayFail("Failed to find replay point for $canonicalReferencePoint: no reference point source")
                 else -> with(intersectionSource) {
                     val replayElement1 = replayElementFor(element1)

@@ -39,8 +39,10 @@ data class EuclideaContext private constructor(
 ) {
     val points
         get() = pointsInfo.points
-    val pointSource
-        get() = pointsInfo.pointSource
+
+    fun pointSourceFor(point: Point): IntersectionSource? {
+        return pointsInfo.pointSourceFor(point)
+    }
 
     companion object {
         fun of(
@@ -52,6 +54,14 @@ data class EuclideaContext private constructor(
         }
 
         private sealed class PointsInfo {
+
+            fun pointSourceFor(point: Point): IntersectionSource? {
+                return pointSource.getOrElse(point) {
+                    val canonicalPoint = points.firstOrNull { p -> coincides(p, point) }
+                    return canonicalPoint?.let { pointSource[it] }
+                }
+            }
+
             abstract val points: List<Point>
             abstract val pointSource: Map<Point, IntersectionSource>
 
@@ -82,7 +92,7 @@ data class EuclideaContext private constructor(
 
     private fun updatedPointsInfo(element: Element): PointsInfo {
         val updatedPoints = points.toMutableList()
-        val updatedPointSource = pointSource.toMutableMap()
+        val updatedPointSource = pointsInfo.pointSource.toMutableMap()
         for (e in elements) {
             val intersection = intersect(e, element)
             for (point in intersection.points()) {

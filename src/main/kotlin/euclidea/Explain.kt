@@ -89,7 +89,7 @@ private fun printSteps(context: EuclideaContext, namer: Namer) {
             fun explainPoint(point: Point): String {
                 return pointLabeler.label(point) { pointLabel ->
                     val coordinates = "(${point.x}, ${point.y})"
-                    when (val intersectionSource = pointSource[point]) {
+                    when (val intersectionSource = pointSourceFor(point)) {
                         null -> println("$pointLabel at $coordinates")
                         else -> {
                             val elementLabel1 = elementLabel(intersectionSource.element1)
