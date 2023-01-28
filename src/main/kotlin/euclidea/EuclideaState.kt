@@ -80,6 +80,28 @@ data class EuclideaContext private constructor(
                 override val pointSource
                     get() = delegate.pointSource
             }
+
+            companion object {
+                fun builder(parent: PointsInfo): Builder {
+                    return Builder(parent)
+                }
+
+                class Builder(parent: PointsInfo) {
+                    val updatedPoints = parent.points.toMutableList()
+                    val updatedPointSource = parent.pointSource.toMutableMap()
+
+                    fun include(point: Point, intersectionSource: IntersectionSource) {
+                        if (updatedPoints.none { p -> coincides(p, point) }) {
+                            updatedPoints += point
+                            updatedPointSource += point to intersectionSource
+                        }
+                    }
+
+                    fun build(): PointsInfo {
+                        return Strict(updatedPoints, updatedPointSource)
+                    }
+                }
+            }
         }
     }
 
@@ -91,19 +113,15 @@ data class EuclideaContext private constructor(
     }
 
     private fun updatedPointsInfo(element: Element): PointsInfo {
-        val updatedPoints = points.toMutableList()
-        val updatedPointSource = pointsInfo.pointSource.toMutableMap()
+        val builder = PointsInfo.builder(pointsInfo)
         for (e in elements) {
             val intersection = intersect(e, element)
             for (point in intersection.points()) {
                 if (point.sqDistance < config.maxSqDistance)
-                    if (updatedPoints.none { p -> coincides(p, point) }) {
-                        updatedPoints += point
-                        updatedPointSource += point to IntersectionSource(e, element, intersection)
-                    }
+                    builder.include(point, IntersectionSource(e, element, intersection))
             }
         }
-        return PointsInfo.Strict(updatedPoints, updatedPointSource)
+        return builder.build()
     }
 
     fun withElements(elements: List<Element>): EuclideaContext {
