@@ -47,7 +47,7 @@ private data class SolveScratch(
     val passedElements: ElementSet = ElementSet()
 ) {
     fun dupe(): SolveScratch {
-        return SolveScratch(ElementsByTool.copyOf(pendingElements), ElementSet.copyOf(passedElements))
+        return SolveScratch(ElementsByTool(pendingElements), ElementSet(passedElements))
     }
 }
 

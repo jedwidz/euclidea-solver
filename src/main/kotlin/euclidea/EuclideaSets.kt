@@ -35,7 +35,14 @@ interface EuclideaSet<T> {
     val size: Int
 }
 
-abstract class IndexedSet<T : Primitive> : EuclideaSet<T> {
+abstract class IndexedSet<T : Primitive> private constructor(
+    // All entries must have non-null item
+    private val set: TreeSet<IndexedSet<T>.Entry>
+) : EuclideaSet<T> {
+
+    constructor() : this(sortedSetOf())
+
+    protected constructor(copyFrom: IndexedSet<T>) : this(TreeSet(copyFrom.set))
 
     private inner class Entry(val item: T?, val hashMetric: Double) : Comparable<Entry> {
         override fun compareTo(other: Entry): Int {
@@ -67,9 +74,6 @@ abstract class IndexedSet<T : Primitive> : EuclideaSet<T> {
     protected abstract fun coincides(item1: T, item2: T): Boolean
 
     protected abstract fun compareItems(a: T, b: T): Int
-
-    // All entries must have non-null item
-    private val set = sortedSetOf<Entry>()
 
     override operator fun contains(item: T): Boolean {
         return canonicalImpl(item) !== null
@@ -170,7 +174,11 @@ class PointSet : IndexedSet<Point>() {
     }
 }
 
-class LineSet : IndexedSet<Line>() {
+class LineSet : IndexedSet<Line> {
+
+    constructor() : super()
+
+    constructor(copyFrom: LineSet) : super(copyFrom)
 
     override fun hashMetric(item: Line): Double {
         with(item) {
@@ -196,7 +204,11 @@ class LineSet : IndexedSet<Line>() {
     }
 }
 
-class CircleSet : IndexedSet<Circle>() {
+class CircleSet : IndexedSet<Circle> {
+
+    constructor() : super()
+
+    constructor(copyFrom: CircleSet) : super(copyFrom)
 
     override fun hashMetric(item: Circle): Double {
         with(item) {
@@ -213,10 +225,14 @@ class CircleSet : IndexedSet<Circle>() {
     }
 }
 
-class ElementSet : EuclideaSet<Element> {
+class ElementSet private constructor(
+    private val lineSet: LineSet,
+    private val circleSet: CircleSet
+) : EuclideaSet<Element> {
 
-    private val lineSet = LineSet()
-    private val circleSet = CircleSet()
+    constructor() : this(LineSet(), CircleSet())
+
+    constructor(set: ElementSet) : this(LineSet(set.lineSet), CircleSet(set.circleSet))
 
     override fun contains(item: Element): Boolean {
         return when (item) {
@@ -275,12 +291,6 @@ class ElementSet : EuclideaSet<Element> {
             val set = ElementSet()
             set += elements
             return set
-        }
-
-        fun copyOf(set: ElementSet): ElementSet {
-            val res = ElementSet()
-            res += set
-            return res
         }
     }
 }
@@ -350,12 +360,10 @@ class ElementsByTool : EuclideaSet<Element> {
     // TODO- circular dependency between tools source file and this one
     private val delegate = EnumMap<EuclideaTool, ElementSet>(EuclideaTool::class.java)
 
-    companion object {
-        fun copyOf(elementsByTool: ElementsByTool): ElementsByTool {
-            val res = ElementsByTool()
-            elementsByTool.delegate.mapValuesTo(res.delegate) { ElementSet.copyOf(it.value) }
-            return res
-        }
+    constructor()
+
+    constructor(elementsByTool: ElementsByTool) {
+        elementsByTool.delegate.mapValuesTo(delegate) { ElementSet(it.value) }
     }
 
     override fun contains(item: Element): Boolean {
