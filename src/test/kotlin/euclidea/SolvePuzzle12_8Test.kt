@@ -6,6 +6,7 @@ import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import kotlin.math.max
 
 class SolvePuzzle12_8Test {
     // Hypotenuse and Altitude
@@ -17,9 +18,9 @@ class SolvePuzzle12_8Test {
 
     @Test
     fun improveSolution() {
-        // ?
+        // no solution found 17 min 24 sec
         Solver().improveSolution(
-            maxExtraElements = 3,
+            maxExtraElements = 4,
             maxDepth = 9,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
@@ -134,8 +135,14 @@ class SolvePuzzle12_8Test {
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solutionElements = constructSolution(params)
+            // Assume apex is found first
+            val apex = intersectOnePoint(solutionElements[0], solutionElements[1])
             return { context ->
-                solutionElements.count { !context.hasElement(it) }
+                val onPoint = context.elements.count { pointAndElementCoincide(apex, it) }
+                // Need two elements to locate center, then the solution circle itself
+                val pointRemaining = max(0, 2 - onPoint)
+                val elementsRemaining = solutionElements.count { !context.hasElement(it) }
+                pointRemaining + elementsRemaining
             }
         }
 
