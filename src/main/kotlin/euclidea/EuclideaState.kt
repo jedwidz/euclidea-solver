@@ -55,20 +55,33 @@ data class EuclideaContext private constructor(
 
         private sealed class PointsInfo {
 
-            fun pointSourceFor(point: Point): IntersectionSource? {
-                return pointSource.getOrElse(point) {
-                    val canonicalPoint = points.firstOrNull { p -> coincides(p, point) }
-                    return canonicalPoint?.let { pointSource[it] }
-                }
-            }
-
+            abstract fun pointSourceFor(point: Point): IntersectionSource?
+            protected abstract val strict: Strict
             abstract val points: List<Point>
-            abstract val pointSource: Map<Point, IntersectionSource>
 
             data class Strict(
                 override val points: List<Point>,
-                override val pointSource: Map<Point, IntersectionSource> = mapOf()
-            ) : PointsInfo()
+                private val pointSource: Map<Point, IntersectionSource> = mapOf(),
+                private val parent: Strict? = null
+            ) : PointsInfo() {
+
+                override fun pointSourceFor(point: Point): IntersectionSource? {
+                    val canonicalPoint = points.firstOrNull { p -> coincides(p, point) }
+                    if (canonicalPoint === null)
+                        return null
+                    var curr: Strict? = this
+                    while (curr !== null) {
+                        val source = curr.pointSource[canonicalPoint]
+                        if (source !== null)
+                            return source
+                        curr = curr.parent
+                    }
+                    return null
+                }
+
+                override val strict: Strict
+                    get() = this
+            }
 
             class Lazy(
                 previousContext: EuclideaContext,
@@ -77,28 +90,33 @@ data class EuclideaContext private constructor(
                 val delegate by lazy { previousContext.updatedPointsInfo(newElement) }
                 override val points
                     get() = delegate.points
-                override val pointSource
-                    get() = delegate.pointSource
+
+                override fun pointSourceFor(point: Point): IntersectionSource? {
+                    return delegate.pointSourceFor(point)
+                }
+
+                override val strict: Strict
+                    get() = delegate
             }
 
             companion object {
                 fun builder(parent: PointsInfo): Builder {
-                    return Builder(parent)
+                    return Builder(parent.strict)
                 }
 
-                class Builder(parent: PointsInfo) {
+                class Builder(private val parent: Strict) {
                     val updatedPoints = parent.points.toMutableList()
-                    val updatedPointSource = parent.pointSource.toMutableMap()
+                    val pointSource = mutableMapOf<Point, IntersectionSource>()
 
                     fun include(point: Point, intersectionSource: IntersectionSource) {
                         if (updatedPoints.none { p -> coincides(p, point) }) {
                             updatedPoints += point
-                            updatedPointSource += point to intersectionSource
+                            pointSource += point to intersectionSource
                         }
                     }
 
-                    fun build(): PointsInfo {
-                        return Strict(updatedPoints, updatedPointSource)
+                    fun build(): Strict {
+                        return Strict(updatedPoints, pointSource, parent)
                     }
                 }
             }
@@ -112,7 +130,7 @@ data class EuclideaContext private constructor(
             EuclideaContext(config, elements + element, PointsInfo.Lazy(this, element))
     }
 
-    private fun updatedPointsInfo(element: Element): PointsInfo {
+    private fun updatedPointsInfo(element: Element): PointsInfo.Strict {
         val builder = PointsInfo.builder(pointsInfo)
         for (e in elements) {
             val intersection = intersect(e, element)
