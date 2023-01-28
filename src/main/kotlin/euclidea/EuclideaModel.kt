@@ -470,11 +470,12 @@ private fun circleLineIntersect(circle: Element.Circle, line: Element.Line): Int
 private fun circleLineIntersectNoLimits(circle: Element.Circle, line: Element.Line): Intersection {
     // Help from: https://mathworld.wolfram.com/Circle-LineIntersection.html
     val o = circle.center
-    val lineO = line - o
-    val dx = lineO.point2.x - lineO.point1.x
-    val dy = lineO.point2.y - lineO.point1.y
+    val pointO1 = line.point1 - o
+    val pointO2 = line.point2 - o
+    val dx = pointO2.x - pointO1.x
+    val dy = pointO2.y - pointO1.y
     val dr2 = sq(dx) + sq(dy)
-    val det = lineO.point1.x * lineO.point2.y - lineO.point2.x * lineO.point1.y
+    val det = pointO1.x * pointO2.y - pointO2.x * pointO1.y
     val disc = sq(circle.radius * sqrt(dr2)) - sq(det)
     return if (disc.isNaN())
         Intersection.Disjoint
