@@ -17,7 +17,7 @@ class SolvePuzzle13_10Test {
     @Test
     fun improveSolution() {
         Solver().improveSolution(
-            // solution found 28 sec
+            // solution found 18 sec
             maxExtraElements = 5,
             maxDepth = 6,
 //            maxNonNewElements = 4,
