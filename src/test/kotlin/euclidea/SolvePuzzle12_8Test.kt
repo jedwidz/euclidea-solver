@@ -6,7 +6,6 @@ import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
-import kotlin.math.max
 import kotlin.test.assertTrue
 
 class SolvePuzzle12_8Test {
@@ -19,9 +18,9 @@ class SolvePuzzle12_8Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ?
+        // no solution found 4 min
         Solver().improveSolution(
-            maxExtraElements = 6,
+            maxExtraElements = 2,
             maxDepth = 9,
             maxNonNewElements = 5,
             maxConsecutiveNonNewElements = 3,
@@ -158,17 +157,25 @@ class SolvePuzzle12_8Test {
             }
         }
 
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solution = constructSolution(params)
+//            val solutionElements = solution.elements
+//            // Assume apex is found first
+//            val apex = solution.apex
+//            return { context ->
+//                val onPoint = context.elements.count { pointAndElementCoincide(apex, it) }
+//                // Need two elements to locate center, then the solution circle itself
+//                val pointRemaining = max(0, 2 - onPoint)
+//                val elementsRemaining = solutionElements.count { !context.hasElement(it) }
+//                pointRemaining + elementsRemaining
+//            }
+//        }
+
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solution = constructSolution(params)
             val solutionElements = solution.elements
-            // Assume apex is found first
-            val apex = solution.apex
             return { context ->
-                val onPoint = context.elements.count { pointAndElementCoincide(apex, it) }
-                // Need two elements to locate center, then the solution circle itself
-                val pointRemaining = max(0, 2 - onPoint)
-                val elementsRemaining = solutionElements.count { !context.hasElement(it) }
-                pointRemaining + elementsRemaining
+                solutionElements.count { !context.hasElement(it) }
             }
         }
 
