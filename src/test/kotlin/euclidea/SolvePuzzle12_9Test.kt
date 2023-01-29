@@ -6,6 +6,7 @@ import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import org.junit.jupiter.api.Test
 import kotlin.math.max
+import kotlin.test.assertTrue
 
 class SolvePuzzle12_9Test {
     // Hypotenuse and Leg
@@ -87,12 +88,27 @@ class SolvePuzzle12_9Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             val solution = constructSolution(params)
+            val solutionElements = solution.elements
+
+            // Validate solution
+            val expectedLength = setup.leg.distance()
+            val actualLength = distance(params.baseB, solution.apex)
+            assertTrue(coincides(expectedLength, actualLength))
+
             return { context ->
-                context.hasElements(solution)
+                context.hasElements(solutionElements)
             }
         }
 
-        private fun constructSolution(params: Params): List<Element.Line> {
+        data class Solution(
+            val solutionA: Element.Line,
+            val solutionB: Element.Line,
+            val apex: Point
+        ) {
+            val elements = listOf(solutionA, solutionB)
+        }
+
+        private fun constructSolution(params: Params): Solution {
             val namer = Namer()
             val (setup, _) = initialContext(
                 params, namer
@@ -108,7 +124,7 @@ class SolvePuzzle12_9Test {
                     val solutionA = lineTool(apex, baseA)
                     val solutionB = lineTool(apex, baseB)
 
-                    return listOf(solutionA, solutionB)
+                    return Solution(solutionA, solutionB, apex)
                 }
             }
         }
@@ -131,11 +147,11 @@ class SolvePuzzle12_9Test {
 //        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutionElements = constructSolution(params)
+            val solution = constructSolution(params)
+            val solutionElements = solution.elements
             // Assume apex is found first
-            val apex = intersectOnePoint(solutionElements[0], solutionElements[1])
             return { context ->
-                val onPoint = context.elements.count { pointAndElementCoincide(apex, it) }
+                val onPoint = context.elements.count { pointAndElementCoincide(solution.apex, it) }
                 // Need two elements to locate center, then the solution circle itself
                 val pointRemaining = max(0, 2 - onPoint)
                 val elementsRemaining = solutionElements.count { !context.hasElement(it) }
