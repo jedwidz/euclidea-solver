@@ -176,6 +176,10 @@ sealed class Element : Primitive {
             else this
         }
 
+        fun distance(): Double {
+            return distance(point1, point2)
+        }
+
         override val sourceTool: EuclideaTool
             get() = source?.tool ?: EuclideaTool.LineTool
     }
