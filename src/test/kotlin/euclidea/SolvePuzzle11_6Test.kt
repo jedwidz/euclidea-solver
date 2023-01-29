@@ -21,10 +21,10 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // ?
+        // no solution found 10 min 20 sec
         Solver().improveSolution(
-            maxExtraElements = 1,
-            maxDepth = 9,
+            maxExtraElements = 2,
+            maxDepth = 7,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
             useTargetConstruction = true
@@ -56,7 +56,7 @@ class SolvePuzzle11_6Test {
                 baseO = Point(0.0, 0.0),
                 baseA = Point(1.0, 0.0),
                 baseB = Point(0.4, 0.8),
-                sample = Point(0.35, 0.5),
+                sample = Point(0.35, 0.45),
                 probe1Scale = 0.24,
                 probe2Scale = 0.135
             )
@@ -67,7 +67,7 @@ class SolvePuzzle11_6Test {
                 baseO = Point(0.0, 0.0),
                 baseA = Point(1.01, 0.0),
                 baseB = Point(0.401, 0.8005),
-                sample = Point(0.350101, 0.503),
+                sample = Point(0.350101, 0.451),
                 probe1Scale = 0.2398,
                 probe2Scale = 0.135
             )
@@ -182,40 +182,20 @@ class SolvePuzzle11_6Test {
             }
         }
 
-//        override fun visitPriority(params: Params, setup: Setup): (SolveContext, Element) -> Int {
-//            val referenceSolutionContext = referenceSolution(params, Namer()).second
-//
-//            val referenceElements = ElementSet()
-//            referenceElements += referenceSolutionContext.elements
-//            referenceElements += referenceSolutionContext.constructionElementSet().items()
-//
-//            val solutionElements = ElementSet()
-//            solutionElements += constructSolution(params)
-//
-//            val interestPoints = referenceSolutionContext.constructionPointSet().items()
-//
-//            return { _, element ->
-//                val solutionScore = if (element in solutionElements) 1 else 0
-//                val referenceScore = if (element in referenceElements) 1 else 0
-//                val interestPointsScore = interestPoints.count { pointAndElementCoincide(it, element) }
-//                solutionScore * 100 + referenceScore * 20 + interestPointsScore
-//            }
-//        }
-
-//        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 11E E-star moves hint
-//            return listOf(
-//                // Moved to setup
-//                // EuclideaTool.AngleBisectorTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool
-//            )
-//        }
+        override fun toolSequence(): List<EuclideaTool> {
+            // Euclidea 11E E-star moves hint
+            return listOf(
+                // Moved to setup
+                // EuclideaTool.AngleBisectorTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool
+            )
+        }
 
         override fun referenceSolution(
             params: Params,
@@ -248,7 +228,37 @@ class SolvePuzzle11_6Test {
         }
 
         override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-            return listOf(this::optimal6LSolution, this::optimal6LSolution2)
+            return listOf(this::suboptimal7LSolution2, this::optimal6LSolution, this::optimal6LSolution2)
+        }
+
+        fun suboptimal7LSolution2(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Sub-optimal 7L solution (other)
+                        // Moved to setup
+                        // val half = angleBisectorTool(baseA, baseO, baseB)
+                        val perp = perpendicularTool(line2, sample, probe = baseO)
+                        val touch = intersectOnePoint(perp, line2)
+                        val center1 = intersectOnePoint(perp, half)
+                        val circle1 = circleTool(center1, touch)
+                        val line = lineTool(baseO, sample)
+                        val aim1 = intersectTwoPoints(circle1, line).first // spot the difference
+                        val cross1 = lineTool(center1, aim1)
+                        val cross2 = parallelTool(cross1, sample, probe = center1)
+                        val center2 = intersectOnePoint(cross2, half)
+                        val solution = circleTool(center2, sample)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
         }
 
         fun optimal6LSolution(
