@@ -17,7 +17,7 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 2 hr 50 min
+        // no solution found 6 hr 48 min
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 6,
@@ -45,20 +45,20 @@ class SolvePuzzle15_9Test {
         override fun makeParams(): Params {
             return Params(
                 center = Point(0.0, 0.7),
-                sample1 = Point(0.3, 0.6),
+                sample1 = Point(0.4, 0.8),
                 base = Point(0.1, 0.0),
                 dir = Point(0.9, 0.0),
-                sample = Point(0.8, 0.55),
+                sample = Point(1.0, 0.3),
             )
         }
 
         override fun makeReplayParams(): Params {
             return Params(
-                center = Point(0.0, 0.721),
-                sample1 = Point(0.312, 0.608),
-                base = Point(0.1011, 0.0),
-                dir = Point(0.9011, 0.0),
-                sample = Point(0.81, 0.574),
+                center = Point(0.0, 0.7),
+                sample1 = Point(0.401, 0.804),
+                base = Point(0.1, 0.0),
+                dir = Point(0.9, 0.0),
+                sample = Point(1.01, 0.303),
             )
         }
 
@@ -157,15 +157,15 @@ class SolvePuzzle15_9Test {
                         // val perp = perpendicularTool(line, sample, probe = base)
 
                         // Nope... actually, yup...
-                        val perp = perpendicularTool(line, center, probe = base)
+//                        val perp = perpendicularTool(line, center, probe = base)
 
                         // Likely next elements...
-                        val point5 = intersectOnePoint(line, perp)
-                        val circle2 = circleTool(point5, sample)
-                        val intersection = intersectTwoPoints(circle2, circle)
-                        val point7 = intersection.second
-                        val point8 = intersection.first
-                        val line3 = lineTool(point7, point8)
+//                        val point5 = intersectOnePoint(line, perp)
+//                        val circle2 = circleTool(point5, sample)
+//                        val intersection = intersectTwoPoints(circle2, circle)
+//                        val point7 = intersection.second
+//                        val point8 = intersection.first
+//                        val line3 = lineTool(point7, point8)
 
                         // Nope...
                         // val perp = perpendicularTool(line, center, probe = base)
@@ -204,18 +204,18 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-//        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 7L L-star moves hint
-//            return listOf(
-//                EuclideaTool.PerpendicularTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.NonCollapsingCompassTool,
-//                EuclideaTool.NonCollapsingCompassTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool
-//            )
-//        }
+        override fun toolSequence(): List<EuclideaTool> {
+            // Euclidea 7L L-star moves hint
+            return listOf(
+                EuclideaTool.PerpendicularTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool
+            )
+        }
 
         override fun referenceSolution(
             params: Params,
