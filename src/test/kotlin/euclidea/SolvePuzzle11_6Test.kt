@@ -21,10 +21,10 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 12 min
+        // ?
         Solver().improveSolution(
-            maxExtraElements = 2,
-            maxDepth = 8,
+            maxExtraElements = 1,
+            maxDepth = 9,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
             useTargetConstruction = true
@@ -45,7 +45,8 @@ class SolvePuzzle11_6Test {
 
     data class Setup(
         val line1: Element.Line,
-        val line2: Element.Line
+        val line2: Element.Line,
+        val half: Element.Line
     )
 
     class Solver : ImprovingSolver<Params, Setup>() {
@@ -80,16 +81,17 @@ class SolvePuzzle11_6Test {
                 val context = object {
                     val line1 = Element.Line(baseO, baseA, limit1 = true)
                     val line2 = Element.Line(baseO, baseB, limit1 = true)
+                    val half = angleBisectorTool(baseA, baseO, baseB)
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line1, line2) to EuclideaContext.of(
+                    return Setup(line1, line2, half) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(8.0),
-                            angleBisectorToolEnabled = true
+                            maxSqDistance = sq(12.0),
+//                            angleBisectorToolEnabled = true
                         ),
                         points = listOf(baseO, baseA, baseB, sample/*, probe1, probe2*/),
-                        elements = listOf(line1, line2)
+                        elements = listOf(line1, line2, half)
                     )
                 }
             }
@@ -143,22 +145,24 @@ class SolvePuzzle11_6Test {
             }
         }
 
-        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    // Assumed partial solution, agreeing with hints
-                    @Suppress("unused") val context = object {
-                        val half = angleBisectorTool(baseA, baseO, baseB)
-                        // val perp = perpendicularTool(line2, sample, probe = baseO)
-                    }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
-                }
-            }
-        }
+//        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+//            val (setup, initialContext) = initialContext(
+//                params, namer
+//            )
+//            with(params) {
+//                with(setup) {
+//                    // Assumed partial solution, agreeing with hints
+//                    @Suppress("unused") val context = object {
+//                        // Moved to setup
+//                        // val half = angleBisectorTool(baseA, baseO, baseB)
+//
+//                        // val perp = perpendicularTool(line2, sample, probe = baseO)
+//                    }
+//                    namer.nameReflected(context)
+//                    return setup to initialContext.withElements(elementsReflected(context))
+//                }
+//            }
+//        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solutions = constructSolutions(params)
@@ -198,19 +202,20 @@ class SolvePuzzle11_6Test {
 //            }
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 11E E-star moves hint
-            return listOf(
-                EuclideaTool.AngleBisectorTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool
-            )
-        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 11E E-star moves hint
+//            return listOf(
+//                // Moved to setup
+//                // EuclideaTool.AngleBisectorTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool
+//            )
+//        }
 
         override fun referenceSolution(
             params: Params,
@@ -223,7 +228,8 @@ class SolvePuzzle11_6Test {
                 with(setup) {
                     @Suppress("unused") val context = object {
                         // Sub-optimal 7L solution
-                        val half = angleBisectorTool(baseA, baseO, baseB)
+                        // Moved to setup
+                        // val half = angleBisectorTool(baseA, baseO, baseB)
                         val perp = perpendicularTool(line2, sample, probe = baseO)
                         val touch = intersectOnePoint(perp, line2)
                         val center1 = intersectOnePoint(perp, half)
@@ -256,7 +262,8 @@ class SolvePuzzle11_6Test {
                 with(setup) {
                     @Suppress("unused") val context = object {
                         // Optimal 6L solution
-                        val half = angleBisectorTool(baseA, baseO, baseB)
+                        // Moved to setup
+                        // val half = angleBisectorTool(baseA, baseO, baseB)
                         val perp = perpendicularTool(half, sample, probe = baseO)
                         val touch1 = intersectOnePoint(perp, line1)
                         val mid = intersectOnePoint(perp, half)
@@ -286,7 +293,8 @@ class SolvePuzzle11_6Test {
                 with(setup) {
                     @Suppress("unused") val context = object {
                         // Optimal 6L solution (other)
-                        val half = angleBisectorTool(baseA, baseO, baseB)
+                        // Moved to setup
+                        // val half = angleBisectorTool(baseA, baseO, baseB)
                         val perp = perpendicularTool(half, sample, probe = baseO)
                         val touch1 = intersectOnePoint(perp, line1)
                         val mid = intersectOnePoint(perp, half)
