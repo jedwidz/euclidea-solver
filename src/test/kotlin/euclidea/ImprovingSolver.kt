@@ -77,6 +77,18 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             }
         }
 
+        fun checkOrDump(context: EuclideaContext): Boolean {
+            val res = checkSolution(context)
+            if (!res) {
+                // TODO- avoid interleaving output between threads
+                println("Solution rejected on replay...")
+                // TODO- fork namer
+                dumpSolution(context)
+                println("(end rejected solution")
+            }
+            return res
+        }
+
         assertTrue(sampleSolutionContexts.all { isSolution(it) })
 
         val prefixNamer = Namer()
@@ -116,7 +128,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             excludeElements = excludeElements(params, setup),
             toolSequence = toolSequence()
         ) { context ->
-            isSolution(context) && checkSolution(context)
+            isSolution(context) && checkOrDump(context)
         }
         dumpSolution(solutionContext, namer)
         println("Count: ${solutionContext?.elements?.size}")
