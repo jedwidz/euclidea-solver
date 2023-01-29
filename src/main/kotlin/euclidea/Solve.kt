@@ -12,6 +12,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
 
@@ -44,10 +45,11 @@ private data class PendingNode(
 
 private data class SolveScratch(
     val pendingElements: ElementsByTool = ElementsByTool(),
-    val passedElements: ElementSet = ElementSet()
+    val passedElements: ElementSet = ElementSet(),
+    val random: Random = Random(0)
 ) {
     fun dupe(): SolveScratch {
-        return SolveScratch(ElementsByTool(pendingElements), ElementSet(passedElements))
+        return SolveScratch(ElementsByTool(pendingElements), ElementSet(passedElements), Random(random.nextInt()))
     }
 }
 
@@ -118,6 +120,7 @@ fun solve(
         fun sub(solveState: SolveState, solveScratch: SolveScratch) {
             val pendingElements = solveScratch.pendingElements
             val passedElements = solveScratch.passedElements
+            val random = solveScratch.random
 
             val (solveContext, oldPoints) = solveState
             val (context, depth) = solveContext
@@ -228,14 +231,27 @@ fun solve(
                 }
 
                 fun maybePrioritize(items: List<Element>): List<Element> {
-                    return when (visitPriority) {
+                    // Prioritize known elements by default
+                    val defaultPriority: ((SolveContext, Element) -> Int)? = when {
+                        knownElements === null -> null
+                        depth > forkDepth + 1 -> null
+                        else -> {
+                            val randomRange = 0..100
+                            { _, element ->
+                                val knownComponent = if (element in knownElements) 0 else 1
+                                val randomComponent = randomRange.random(random)
+                                knownComponent * randomRange.last + randomComponent
+                            }
+                        }
+                    }
+                    return when (val effectivePriority = visitPriority ?: defaultPriority) {
                         null -> items
                         else -> {
                             // looks like sortedBy evaluates its selector more than once, so likely more efficient to 'precalc' it
                             val prioritized = items.map { element ->
                                 PendingNode(
                                     element = element,
-                                    visitPriority = visitPriority(solveContext, element),
+                                    visitPriority = effectivePriority(solveContext, element),
                                     isNew = element in newElements
                                 )
                             }.sorted()
@@ -296,6 +312,7 @@ fun solve(
             }
         }
     }
+
     val effectiveToolSequence = if (toolSequence === null) null else {
         val toolSteps = toolSequence.size
         when {
