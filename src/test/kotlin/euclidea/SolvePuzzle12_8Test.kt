@@ -7,6 +7,7 @@ import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.math.max
+import kotlin.test.assertTrue
 
 class SolvePuzzle12_8Test {
     // Hypotenuse and Altitude
@@ -18,11 +19,11 @@ class SolvePuzzle12_8Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 1 hr 45 min
+        // no solution found ?
         Solver().improveSolution(
-            maxExtraElements = 5,
+            maxExtraElements = 6,
             maxDepth = 9,
-            maxNonNewElements = 4,
+            maxNonNewElements = 5,
             maxConsecutiveNonNewElements = 3,
             useTargetConstruction = true
         )
@@ -73,7 +74,7 @@ class SolvePuzzle12_8Test {
                 with(context) {
                     return Setup(hypotenuse, altitude) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(10.0),
+                            maxSqDistance = sq(20.0),
                             nonCollapsingCompassToolEnabled = true
                         ),
                         points = listOf(baseA, baseB, baseC, baseD),
@@ -88,12 +89,27 @@ class SolvePuzzle12_8Test {
             setup: Setup
         ): (EuclideaContext) -> Boolean {
             val solution = constructSolution(params)
+            val solutionElements = solution.elements
+
+            // Validate solution
+            val expectedAltitude = setup.altitude.distance()
+            val actualAltitude = distance(projection(setup.hypotenuse, solution.apex), solution.apex)
+            assertTrue(coincides(expectedAltitude, actualAltitude))
+
             return { context ->
-                context.hasElements(solution)
+                context.hasElements(solutionElements)
             }
         }
 
-        private fun constructSolution(params: Params): List<Element.Line> {
+        data class Solution(
+            val solutionA: Element.Line,
+            val solutionB: Element.Line,
+            val apex: Point
+        ) {
+            val elements = listOf(solutionA, solutionB)
+        }
+
+        private fun constructSolution(params: Params): Solution {
             val namer = Namer()
             val (setup, _) = initialContext(
                 params, namer
@@ -111,32 +127,42 @@ class SolvePuzzle12_8Test {
                     val solutionA = lineTool(apex, baseA)
                     val solutionB = lineTool(apex, baseB)
 
-                    return listOf(solutionA, solutionB)
+                    return Solution(solutionA, solutionB, apex)
                 }
             }
         }
 
-//        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    // Assumed partial solution, agreeing with hints
-//                    @Suppress("unused") val context = object {
-//                        val half = EuclideaTools.angleBisectorTool(baseA, baseO, baseB)
-//                        // val perp = perpendicularTool(line2, sample, probe = baseO)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun solutionPrefix(params: Params, namer: Namer): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    // Assumed partial solution, agreeing with hints
+                    @Suppress("unused") val context = object {
+                        // Bisect base for starters?
+                        val circleAB = circleTool(baseA, baseB)
+                        val circleBA = circleTool(baseB, baseA)
+                        val intersectAB = intersectTwoPoints(circleAB, circleBA)
+                        val intersectAB1 = intersectAB.first
+                        val intersectAB2 = intersectAB.second
+                        val bisectAB = lineTool(intersectAB1, intersectAB2)
+                        val midAB = intersectOnePoint(bisectAB, hypotenuse)
+
+                        // Hint order is consistent with measuring from the center...
+                        val circle = nonCollapsingCompassTool(baseC, baseD, midAB)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
 
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutionElements = constructSolution(params)
+            val solution = constructSolution(params)
+            val solutionElements = solution.elements
             // Assume apex is found first
-            val apex = intersectOnePoint(solutionElements[0], solutionElements[1])
+            val apex = solution.apex
             return { context ->
                 val onPoint = context.elements.count { pointAndElementCoincide(apex, it) }
                 // Need two elements to locate center, then the solution circle itself
