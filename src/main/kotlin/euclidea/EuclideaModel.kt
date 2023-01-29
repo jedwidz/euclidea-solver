@@ -176,7 +176,7 @@ sealed class Element : Primitive {
             else this
         }
 
-        fun distance(): Double {
+        override fun distance(): Double {
             return distance(point1, point2)
         }
 
@@ -206,12 +206,17 @@ sealed class Element : Primitive {
             return Circle(center + point, radius, sample?.let { it + point })
         }
 
+        override fun distance(): Double {
+            return radius
+        }
+
         override val sourceTool: EuclideaTool
             get() = source?.tool ?: EuclideaTool.CircleTool
     }
 
     abstract operator fun minus(point: Point): Element
     abstract operator fun plus(point: Point): Element
+    abstract fun distance(): Double
 }
 
 sealed class Intersection {

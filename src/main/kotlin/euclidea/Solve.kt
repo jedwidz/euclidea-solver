@@ -57,6 +57,17 @@ private val forkThreadCount = 6  // Runtime.getRuntime().availableProcessors()
 private val forkDepth = 2
 private val forkQueueSize = 50
 
+// Don't combine points closer than this distance (somewhat unlikely to be used in a real solution, also prone to numeric instability)
+private val minSeparation = 0.01
+
+fun separated(point1: Point, point2: Point): Boolean {
+    return distance(point1, point2) >= minSeparation
+}
+
+fun separated(point1: Point, point2: Point, point3: Point): Boolean {
+    return separated(point1, point2) && separated(point2, point3) && separated(point3, point1)
+}
+
 fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
@@ -145,14 +156,16 @@ fun solve(
 
                 if (remainingConfig.anyTwoPointToolEnabled) {
                     fun visit(point1: Point, point2: Point) {
-                        if (remainingConfig.lineToolEnabled)
-                            tryAdd(lineTool(point1, point2))
-                        if (remainingConfig.circleToolEnabled) {
-                            tryAdd(circleTool(point1, point2))
-                            tryAdd(circleTool(point2, point1))
+                        if (separated(point1, point2)) {
+                            if (remainingConfig.lineToolEnabled)
+                                tryAdd(lineTool(point1, point2))
+                            if (remainingConfig.circleToolEnabled) {
+                                tryAdd(circleTool(point1, point2))
+                                tryAdd(circleTool(point2, point1))
+                            }
+                            if (remainingConfig.perpendicularBisectorToolEnabled)
+                                tryAdd(perpendicularBisectorTool(point1, point2))
                         }
-                        if (remainingConfig.perpendicularBisectorToolEnabled)
-                            tryAdd(perpendicularBisectorTool(point1, point2))
                     }
                     newPoints.forEachIndexed { i, newPoint ->
                         oldPoints.forEach { visit(newPoint, it) }
@@ -185,15 +198,17 @@ fun solve(
 
                 if (remainingConfig.anyThreePointToolEnabled) {
                     fun visit(point1: Point, point2: Point, point3: Point) {
-                        if (remainingConfig.angleBisectorToolEnabled) {
-                            tryAdd(angleBisectorTool(point1, point2, point3))
-                            tryAdd(angleBisectorTool(point2, point3, point1))
-                            tryAdd(angleBisectorTool(point3, point1, point2))
-                        }
-                        if (remainingConfig.nonCollapsingCompassToolEnabled) {
-                            tryAdd(nonCollapsingCompassTool(point1, point2, point3))
-                            tryAdd(nonCollapsingCompassTool(point2, point3, point1))
-                            tryAdd(nonCollapsingCompassTool(point3, point1, point2))
+                        if (separated(point1, point2, point3)) {
+                            if (remainingConfig.angleBisectorToolEnabled) {
+                                tryAdd(angleBisectorTool(point1, point2, point3))
+                                tryAdd(angleBisectorTool(point2, point3, point1))
+                                tryAdd(angleBisectorTool(point3, point1, point2))
+                            }
+                            if (remainingConfig.nonCollapsingCompassToolEnabled) {
+                                tryAdd(nonCollapsingCompassTool(point1, point2, point3))
+                                tryAdd(nonCollapsingCompassTool(point2, point3, point1))
+                                tryAdd(nonCollapsingCompassTool(point3, point1, point2))
+                            }
                         }
                     }
 
@@ -264,12 +279,15 @@ fun solve(
                 val pendingList = maybePrioritize(keep)
                 // println("$depth - ${pendingList.size}")
 
+                // val distances = pendingList.map { it.distance() }.sorted().take(10)
+                // println("Distances: $distances")
+
                 for (newElement in pendingList) {
                     if (Thread.currentThread().isInterrupted)
                         return
                     val removed = pendingElements.remove(newElement)
                     if (!removed) {
-                        println("Not removed)")
+                        println("Not removed")
                     }
                     assert(removed)
                     passedElements.add(newElement)
