@@ -6,8 +6,6 @@ import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import org.junit.jupiter.api.Test
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_4Test {
@@ -20,12 +18,13 @@ class SolvePuzzle15_4Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 17 min 58 sec
+        // solution found 2 sec
+        // Looking for partial solution, assuming last circle in hint measures from one of the solution points
         Solver().improveSolution(
-            maxExtraElements = 3,
-            maxDepth = 7,
-            maxNonNewElements = 4,
-            maxConsecutiveNonNewElements = 3,
+            maxExtraElements = 4,
+            maxDepth = 5,
+            maxNonNewElements = 3,
+            maxConsecutiveNonNewElements = 2,
             useTargetConstruction = true
         )
     }
@@ -100,8 +99,18 @@ class SolvePuzzle15_4Test {
                     }
                 }
             }
+            val pointsOfInterest = listOf(solution.solutionPointA, solution.solutionPointB)
             return { context ->
-                context.hasElement(solutionElement)
+                // Partial solution - either of the solution points
+                context.elements.lastOrNull()
+                    ?.let { element ->
+                        pointsOfInterest.any { pointOfInterest ->
+                            pointAndElementCoincide(pointOfInterest, element) &&
+                                    // Double-check
+                                    context.hasPoint(pointOfInterest)
+                        }
+                    } == true
+//                context.hasElement(solutionElement)
             }
         }
 
@@ -157,22 +166,22 @@ class SolvePuzzle15_4Test {
 //            }
 //        }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solution = constructSolution(params, setup)
-            val point1 = solution.solutionPointA
-            val point2 = solution.solutionPointB
-            return { context ->
-                // Assumes that solution is the last element (no extraneous elements)
-                if (context.elements.lastOrNull()?.let { coincides(it, solution.solutionLine) } == true)
-                    0
-                else {
-                    val onPoint1 = context.elements.count { pointAndElementCoincide(point1, it) }
-                    val onPoint2 = context.elements.count { pointAndElementCoincide(point2, it) }
-                    // Assume solution uses at least one of the highlighted points
-                    max(0, min(2 - onPoint1, 2 - onPoint2)) + 1
-                }
-            }
-        }
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solution = constructSolution(params, setup)
+//            val point1 = solution.solutionPointA
+//            val point2 = solution.solutionPointB
+//            return { context ->
+//                // Assumes that solution is the last element (no extraneous elements)
+//                if (context.elements.lastOrNull()?.let { coincides(it, solution.solutionLine) } == true)
+//                    0
+//                else {
+//                    val onPoint1 = context.elements.count { pointAndElementCoincide(point1, it) }
+//                    val onPoint2 = context.elements.count { pointAndElementCoincide(point2, it) }
+//                    // Assume solution uses at least one of the highlighted points
+//                    max(0, min(2 - onPoint1, 2 - onPoint2)) + 1
+//                }
+//            }
+//        }
 
         override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 7E E-star moves hint
