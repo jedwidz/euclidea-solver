@@ -47,11 +47,11 @@ private data class PendingNode(
 
 private data class SolveScratch(
     val pendingElements: ElementsByTool,
-    val passedElements: ElementSet = ElementSet(),
+    val passedElements: ElementsByTool,
     val random: Random = Random(0)
 ) {
     fun dupe(): SolveScratch {
-        return SolveScratch(ElementsByTool(pendingElements), ElementSet(passedElements), Random(random.nextInt()))
+        return SolveScratch(ElementsByTool(pendingElements), ElementsByTool(passedElements), Random(random.nextInt()))
     }
 }
 
@@ -418,7 +418,10 @@ fun solve(
             extraElementCount = 0,
             unfamiliarElementCount = 0
         ),
-        SolveScratch(pendingElements = ElementsByTool(toolsMatter))
+        SolveScratch(
+            pendingElements = ElementsByTool(toolsMatter),
+            passedElements = ElementsByTool(toolsMatter)
+        )
     )
     return parallelSolver.awaitResult()
 }
