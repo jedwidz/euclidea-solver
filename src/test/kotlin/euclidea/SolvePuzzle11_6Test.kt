@@ -21,9 +21,9 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 10 min 20 sec
+        // no solution found 8 hr 1 min
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 7,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
