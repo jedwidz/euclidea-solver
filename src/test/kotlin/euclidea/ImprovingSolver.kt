@@ -38,6 +38,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
     fun improveSolution(
         maxExtraElements: Int,
         maxDepth: Int,
+        maxUnfamiliarElements: Int? = null,
         maxNonNewElements: Int? = null,
         maxConsecutiveNonNewElements: Int? = null,
         useTargetConstruction: Boolean = false
@@ -124,7 +125,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             visitPriority = visitPriority,
             pass = passWithPrefix,
             remainingStepsLowerBound = remainingStepsLowerBound,
-            extraElementConstraint = targetElementSet to maxExtraElements,
+            extraElementConstraint = ExtraElementConstraint(targetElementSet, maxExtraElements, maxUnfamiliarElements),
             excludeElements = excludeElements(params, setup),
             toolSequence = toolSequence()
         ) { context ->

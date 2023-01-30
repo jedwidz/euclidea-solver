@@ -35,7 +35,7 @@ interface EuclideaSet<T> {
     val size: Int
 }
 
-abstract class IndexedSet<T : Primitive> private constructor(
+abstract class IndexedSet<T> private constructor(
     // All entries must have non-null item
     private val set: TreeSet<IndexedSet<T>.Entry>
 ) : EuclideaSet<T> {
@@ -354,6 +354,29 @@ class PrimitiveSet : EuclideaSet<Primitive> {
 
     override val size: Int
         get() = elementSet.size + pointSet.size
+}
+
+class DoubleSet : IndexedSet<Double>() {
+
+    override fun hashMetric(item: Double): Double {
+        return item
+    }
+
+    override fun compareItems(a: Double, b: Double): Int {
+        return a.compareTo(b)
+    }
+
+    override fun coincides(item1: Double, item2: Double): Boolean {
+        return euclidea.coincides(item1, item2)
+    }
+
+    companion object {
+        fun of(items: Collection<Double>): DoubleSet {
+            val set = DoubleSet()
+            set += items
+            return set
+        }
+    }
 }
 
 class ElementsByTool : EuclideaSet<Element> {

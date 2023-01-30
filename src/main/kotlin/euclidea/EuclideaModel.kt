@@ -83,6 +83,9 @@ sealed class Element : Primitive {
         val yMin: Double?
         val yMax: Double?
 
+        // Heading from point1 to point2, in radians in range [0,2*PI)
+        val heading: Double
+
         init {
             val dx = point2.x - point1.x
             val dy = point2.y - point1.y
@@ -103,6 +106,8 @@ sealed class Element : Primitive {
             val yBounds = limits(point1.y, point2.y)
             yMin = yBounds.first
             yMax = yBounds.second
+
+            heading = normalizeLineHeading(atan2(dy, dx))
         }
 
         override fun compareTo(other: Line): Int {
@@ -259,6 +264,10 @@ fun intersect(element1: Element, element2: Element): Intersection {
             is Element.Line -> linesIntersect(element1, element2)
         }
     }
+}
+
+fun normalizeLineHeading(heading: Double): Double {
+    return heading.mod(2 * PI)
 }
 
 fun distance(point1: Point, point2: Point): Double {

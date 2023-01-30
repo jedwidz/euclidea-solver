@@ -12,6 +12,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.PI
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
@@ -28,7 +29,8 @@ private data class SolveState(
     val consecutiveNonNewElementCount: Int,
     val lastAddedElements: List<Element>,
     val remainingToolSequence: List<EuclideaTool>?,
-    val extraElementCount: Int
+    val extraElementCount: Int,
+    val unfamiliarElementCount: Int
 )
 
 private data class PendingNode(
@@ -68,6 +70,12 @@ fun separated(point1: Point, point2: Point, point3: Point): Boolean {
     return separated(point1, point2) && separated(point2, point3) && separated(point3, point1)
 }
 
+data class ExtraElementConstraint(
+    val knownElements: ElementSet,
+    val maxExtraElements: Int,
+    val maxUnfamiliarElements: Int?
+)
+
 fun solve(
     initialContext: EuclideaContext,
     maxDepth: Int,
@@ -77,14 +85,51 @@ fun solve(
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
-    extraElementConstraint: Pair<ElementSet, Int>? = null,
+    extraElementConstraint: ExtraElementConstraint? = null,
     excludeElements: ElementSet? = null,
     toolSequence: List<EuclideaTool>? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
 
-    val knownElements = extraElementConstraint?.first
-    val maxExtraElements = extraElementConstraint?.second
+    val knownElements = extraElementConstraint?.knownElements
+    val maxExtraElements = extraElementConstraint?.maxExtraElements
+    val maxUnfamiliarElements = extraElementConstraint?.maxUnfamiliarElements
+
+    val familiarLineHeadings = DoubleSet()
+    val familiarCircleRadii = DoubleSet()
+    val familiarLineHeadingIncrements = 4
+    val familiarLineHeadingIncrement = PI * 2.0 / familiarLineHeadingIncrements
+    knownElements?.items()?.forEach { element ->
+        fun addFamiliarLineHeading(heading: Double) {
+            val normalHeading = normalizeLineHeading(heading)
+            familiarLineHeadings += normalHeading
+            // Handle wrap edge cases
+            if (coincides(normalHeading, 0.0))
+                familiarLineHeadings += normalHeading + PI * 2.0
+            if (coincides(normalHeading, PI * 2.0))
+                familiarLineHeadings += normalHeading - PI * 2.0
+        }
+        when (element) {
+            is Element.Line -> {
+                val lineHeading = element.heading
+                for (i in 0.until(familiarLineHeadingIncrements))
+                    addFamiliarLineHeading(lineHeading + i * familiarLineHeadingIncrement)
+            }
+            is Element.Circle -> {
+                val radius = element.radius
+                familiarCircleRadii += radius
+                familiarCircleRadii += 2.0 * radius
+                familiarCircleRadii += 0.5 * radius
+            }
+        }
+    }
+
+    fun isFamiliarElement(element: Element): Boolean {
+        return when (element) {
+            is Element.Line -> element.heading in familiarLineHeadings
+            is Element.Circle -> element.radius in familiarCircleRadii
+        }
+    }
 
     if (check(initialContext))
         return initialContext
@@ -295,10 +340,16 @@ fun solve(
                     val nextNonNewElementCount = solveState.nonNewElementCount + (if (isNonNewElement) 1 else 0)
                     val isExtraElement = knownElements?.let { newElement !in it } ?: false
                     val nextExtraElementCount = solveState.extraElementCount + if (isExtraElement) 1 else 0
+                    val nextUnfamiliarElementCount =
+                        solveState.unfamiliarElementCount + if (maxUnfamiliarElements !== null && !isFamiliarElement(
+                                newElement
+                            )
+                        ) 1 else 0
                     val nextConsecutiveNonNewElementCount =
                         if (isNonNewElement) solveState.consecutiveNonNewElementCount + 1 else 0
                     if ((maxNonNewElements == null || nextNonNewElementCount <= maxNonNewElements) &&
-                        (maxExtraElements == null || nextExtraElementCount <= maxExtraElements)
+                        (maxExtraElements == null || nextExtraElementCount <= maxExtraElements) &&
+                        (maxUnfamiliarElements == null || nextUnfamiliarElementCount <= maxUnfamiliarElements)
                     ) {
                         val nextContext = withElement(newElement)
                         val nextSolveContext = SolveContext(nextContext, nextDepth)
@@ -310,7 +361,8 @@ fun solve(
                                 nextConsecutiveNonNewElementCount,
                                 listOf(newElement),
                                 solveState.remainingToolSequence?.drop(1),
-                                nextExtraElementCount
+                                nextExtraElementCount,
+                                nextUnfamiliarElementCount
                             )
                         val lowerBound = remainingStepsLowerBound?.let { it(nextContext) }
                         if ((lowerBound == null || lowerBound <= 0) && check(nextContext))
@@ -343,7 +395,16 @@ fun solve(
         }
     }
     parallelSolver.fork(
-        SolveState(SolveContext(initialContext, 0), setOf(), 0, 0, initialContext.elements, effectiveToolSequence, 0),
+        SolveState(
+            solveContext = SolveContext(initialContext, 0),
+            oldPoints = setOf(),
+            nonNewElementCount = 0,
+            consecutiveNonNewElementCount = 0,
+            lastAddedElements = initialContext.elements,
+            remainingToolSequence = effectiveToolSequence,
+            extraElementCount = 0,
+            unfamiliarElementCount = 0
+        ),
         SolveScratch()
     )
     return parallelSolver.awaitResult()
