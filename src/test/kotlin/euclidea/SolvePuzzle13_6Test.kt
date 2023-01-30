@@ -19,13 +19,14 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 4 hr 53 min
+        // no solution found 45 min
         // TODO add more sample solutions, allow either V
         Solver().improveSolution(
             maxExtraElements = 4,
             maxDepth = 7,
-            maxNonNewElements = 2,
-            maxConsecutiveNonNewElements = 1,
+            maxUnfamiliarElements = 2,
+            maxNonNewElements = 4,
+            maxConsecutiveNonNewElements = 3,
             useTargetConstruction = true
         )
     }
@@ -46,18 +47,18 @@ class SolvePuzzle13_6Test {
 
         override fun makeParams(): Params {
             return Params(
-                pointA = Point(-0.2, 0.9),
+                pointA = Point(-0.2, 0.91),
                 pointB = Point(-1.0, 0.0),
-                base = Point(0.4, -1.5),
+                base = Point(0.42, -1.5),
                 dir = Point(0.0, -1.5),
             )
         }
 
         override fun makeReplayParams(): Params {
             return Params(
-                pointA = Point(-0.203, 0.9011),
+                pointA = Point(-0.203, 0.9111),
                 pointB = Point(-1.0111, 0.002),
-                base = Point(0.4022, -1.503),
+                base = Point(0.4222, -1.503),
                 dir = Point(0.0, -1.5013),
             )
         }
@@ -75,7 +76,7 @@ class SolvePuzzle13_6Test {
                 with(context) {
                     return Setup(line, bisect) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(6.0),
+                            maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
