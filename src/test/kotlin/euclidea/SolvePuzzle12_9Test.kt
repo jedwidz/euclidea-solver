@@ -5,7 +5,6 @@ import euclidea.EuclideaTools.lineTool
 import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import org.junit.jupiter.api.Test
-import kotlin.math.max
 import kotlin.test.assertTrue
 
 class SolvePuzzle12_9Test {
@@ -18,7 +17,7 @@ class SolvePuzzle12_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ?
+        // gave up
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = 9,
@@ -149,13 +148,14 @@ class SolvePuzzle12_9Test {
         override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
             val solution = constructSolution(params)
             val solutionElements = solution.elements
-            // Assume apex is found first
             return { context ->
-                val onPoint = context.elements.count { pointAndElementCoincide(solution.apex, it) }
-                // Need two elements to locate center, then the solution circle itself
-                val pointRemaining = max(0, 2 - onPoint)
                 val elementsRemaining = solutionElements.count { !context.hasElement(it) }
-                pointRemaining + elementsRemaining
+                // Note hint has the second-last element being a circle
+                when (elementsRemaining) {
+                    0 -> 0
+                    1 -> 1
+                    else -> 3
+                }
             }
         }
 
