@@ -17,12 +17,12 @@ class SolvePuzzle12_9Test {
 
     @Test
     fun improveSolution() {
-        // gave up
+        // no solution found 31 min 45 sec
         Solver().improveSolution(
-            maxExtraElements = 6,
+            maxExtraElements = 3,
             maxDepth = 9,
             maxNonNewElements = 5,
-            maxConsecutiveNonNewElements = 3,
+            maxConsecutiveNonNewElements = 4,
             useTargetConstruction = true
         )
     }
@@ -199,53 +199,45 @@ class SolvePuzzle12_9Test {
             }
         }
 
-//        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-//            return listOf(this::suboptimal11ESolution)
-//        }
-//
-//        fun suboptimal11ESolution(
-//            params: Params,
-//            namer: Namer
-//        ): Pair<Setup, EuclideaContext> {
-//            val (setup, initialContext) = initialContext(
-//                params, namer
-//            )
-//            with(params) {
-//                with(setup) {
-//                    @Suppress("unused") val context = object {
-//                        // Sub-optimal 11E solution
-//                        val circleCB = circleTool(baseC, baseB)
-//                        val circleBC = circleTool(baseB, baseC)
-//                        val intersectBC = intersectTwoPoints(circleBC, circleCB)
-//                        val intersectBC1 = intersectBC.first
-//                        val intersectBC2 = intersectBC.second
-//                        val bisectBC = lineTool(intersectBC1, intersectBC2)
-//
-//                        val circleAB = circleTool(baseA, baseB)
-//                        val circleBA = circleTool(baseB, baseA)
-//                        val intersectAB = intersectTwoPoints(circleBA, circleAB)
-//                        val intersectAB1 = intersectAB.first
-//                        val intersectAB2 = intersectAB.second
-//                        val bisectAB = lineTool(intersectAB1, intersectAB2)
-//
-//                        val center = intersectOnePoint(bisectAB, bisectBC)
-//                        val radialB = lineTool(center, baseB)
-//
-//                        val aim = intersectTwoPoints(radialB, circleCB).first
-//                        val cross = lineTool(aim, baseC)
-//                        val aimB = intersectTwoPointsOther(cross, circleCB, aim)
-//                        val solutionB = lineTool(aimB, baseB)
-//
-//                        val aimC = intersectOnePoint(solutionB, bisectBC)
-//                        val solutionC = lineTool(aimC, baseC)
-//
-//                        val aimA = intersectOnePoint(solutionB, bisectAB)
-//                        val solutionA = lineTool(aimA, baseA)
-//                    }
-//                    namer.nameReflected(context)
-//                    return setup to initialContext.withElements(elementsReflected(context))
-//                }
-//            }
-//        }
+        override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
+            return listOf(this::suboptimal10ESolution)
+        }
+
+        fun suboptimal10ESolution(
+            params: Params,
+            namer: Namer
+        ): Pair<Setup, EuclideaContext> {
+            val (setup, initialContext) = initialContext(
+                params, namer
+            )
+            with(params) {
+                with(setup) {
+                    @Suppress("unused") val context = object {
+                        // Sub-optimal 10E solution
+                        val circleBD = circleTool(baseB, baseD)
+                        val circleDB = circleTool(baseD, baseB)
+                        val intersectBD = intersectTwoPoints(circleDB, circleBD)
+                        val intersectBD1 = intersectBD.first
+                        val intersectBD2 = intersectBD.second
+                        val nccCDB1 = circleTool(intersectBD1, baseC)
+                        val nccCDB2 = circleTool(intersectBD2, baseC)
+                        val nccCDBAim = intersectTwoPointsOther(nccCDB1, nccCDB2, baseC)
+                        val nccCDB = circleTool(baseB, nccCDBAim)
+                        val cut = intersectOnePoint(nccCDB, hypotenuse)
+                        val stretch = circleTool(cut, baseB)
+                        val cut2 = intersectTwoPointsOther(stretch, hypotenuse, baseB)
+                        val twice = circleTool(baseB, cut2)
+
+                        val circleAB = circleTool(baseA, baseB)
+                        val aimB = intersectTwoPoints(circleAB, twice).first
+                        val solutionB = lineTool(baseB, aimB)
+                        val aimA = intersectTwoPoints(nccCDB, solutionB).second
+                        val solutionA = lineTool(baseA, aimA)
+                    }
+                    namer.nameReflected(context)
+                    return setup to initialContext.withElements(elementsReflected(context))
+                }
+            }
+        }
     }
 }
