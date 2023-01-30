@@ -46,7 +46,7 @@ private data class PendingNode(
 }
 
 private data class SolveScratch(
-    val pendingElements: ElementsByTool = ElementsByTool(),
+    val pendingElements: ElementsByTool,
     val passedElements: ElementSet = ElementSet(),
     val random: Random = Random(0)
 ) {
@@ -90,6 +90,7 @@ fun solve(
     toolSequence: List<EuclideaTool>? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
+    val toolsMatter = toolSequence !== null
 
     val knownElements = extraElementConstraint?.knownElements
     val maxExtraElements = extraElementConstraint?.maxExtraElements
@@ -330,7 +331,9 @@ fun solve(
                     }
                 }
 
-                val keep = maybePass(pendingElements.itemsForTool(nextTool))
+                val itemsForTools =
+                    if (toolsMatter) pendingElements.itemsForTool(nextTool!!) else pendingElements.items()
+                val keep = maybePass(itemsForTools)
                 val pendingList = maybePrioritize(keep)
                 // println("$depth - ${pendingList.size}")
 
@@ -415,7 +418,7 @@ fun solve(
             extraElementCount = 0,
             unfamiliarElementCount = 0
         ),
-        SolveScratch()
+        SolveScratch(pendingElements = ElementsByTool(toolsMatter))
     )
     return parallelSolver.awaitResult()
 }

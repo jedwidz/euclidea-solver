@@ -381,24 +381,39 @@ class DoubleSet : IndexedSet<Double>() {
 
 class ElementsByTool : EuclideaSet<Element> {
     // TODO- circular dependency between tools source file and this one
+
+    private val toolsMatter: Boolean
+
+    // Used if tools matter
     private val delegate = EnumMap<EuclideaTool, ElementSet>(EuclideaTool::class.java)
 
-    constructor()
+    // Used if tools don't matter
+    private val delegateSet: ElementSet
+
+    constructor(toolsMatter: Boolean) {
+        this.toolsMatter = toolsMatter
+        delegateSet = ElementSet()
+    }
 
     constructor(elementsByTool: ElementsByTool) {
+        toolsMatter = elementsByTool.toolsMatter
         elementsByTool.delegate.mapValuesTo(delegate) { ElementSet(it.value) }
+        delegateSet = ElementSet(elementsByTool.delegateSet)
     }
 
     override fun contains(item: Element): Boolean {
         return maybeSetFor(item)?.contains(item) ?: false
     }
 
-    private fun maybeSetFor(item: Element) = delegate[item.sourceTool]
+    private fun maybeSetFor(item: Element) = if (toolsMatter) delegate[item.sourceTool] else delegateSet
 
-    private fun setFor(item: Element) = delegate.getOrPut(item.sourceTool) { ElementSet() }
+    private fun setFor(item: Element) =
+        if (toolsMatter) delegate.getOrPut(item.sourceTool) { ElementSet() } else delegateSet
 
     override fun removeOne(): Element? {
-        return delegate.values.firstNotNullOfOrNull { set -> set.removeOne() }
+        return if (toolsMatter)
+            delegate.values.firstNotNullOfOrNull { set -> set.removeOne() }
+        else delegateSet.removeOne()
     }
 
     override fun add(item: Element): Boolean {
@@ -410,8 +425,11 @@ class ElementsByTool : EuclideaSet<Element> {
     }
 
     override fun items(): List<Element> {
-        // TODO could be inefficient
-        return delegate.values.flatMap { it.items() }
+        return if (toolsMatter) {
+            // TODO could be inefficient
+            // TODO should deduplicate
+            delegate.values.flatMap { it.items() }
+        } else delegateSet.items()
     }
 
     override fun <U : Element> canonicalOrNull(item: U): U? {
@@ -422,13 +440,14 @@ class ElementsByTool : EuclideaSet<Element> {
         return setFor(item).canonicalOrAdd(item)
     }
 
-    fun itemsForTool(nextTool: EuclideaTool?): List<Element> {
-        return when (nextTool) {
-            null -> items()
-            else -> delegate[nextTool]?.items() ?: listOf()
-        }
+    fun itemsForTool(nextTool: EuclideaTool): List<Element> {
+        if (!toolsMatter)
+            throw IllegalStateException("But you said tools don't matter")
+        return delegate[nextTool]?.items() ?: listOf()
     }
 
     override val size: Int
-        get() = delegate.values.sumOf { it.size }
+        get() = if (toolsMatter)
+            delegate.values.sumOf { it.size }
+        else delegateSet.size
 }
