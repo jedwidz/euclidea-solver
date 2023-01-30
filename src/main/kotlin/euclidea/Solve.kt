@@ -63,11 +63,11 @@ private val forkQueueSize = 50
 private val minSeparation = 0.01
 
 fun separated(point1: Point, point2: Point): Boolean {
-    return distance(point1, point2) >= minSeparation
+    return separated(distance(point1, point2))
 }
 
-fun separated(point1: Point, point2: Point, point3: Point): Boolean {
-    return separated(point1, point2) && separated(point2, point3) && separated(point3, point1)
+fun separated(distance: Double): Boolean {
+    return distance >= minSeparation
 }
 
 data class ExtraElementConstraint(
@@ -243,16 +243,26 @@ fun solve(
 
                 if (remainingConfig.anyThreePointToolEnabled) {
                     fun visit(point1: Point, point2: Point, point3: Point) {
-                        if (separated(point1, point2, point3)) {
+                        val distance12 = distance(point1, point2)
+                        val distance23 = distance(point2, point3)
+                        val distance31 = distance(point3, point1)
+                        if (separated(distance12) && separated(distance23) && separated(distance31)) {
                             if (remainingConfig.angleBisectorToolEnabled) {
                                 tryAdd(angleBisectorTool(point1, point2, point3))
                                 tryAdd(angleBisectorTool(point2, point3, point1))
                                 tryAdd(angleBisectorTool(point3, point1, point2))
                             }
                             if (remainingConfig.nonCollapsingCompassToolEnabled) {
-                                tryAdd(nonCollapsingCompassTool(point1, point2, point3))
-                                tryAdd(nonCollapsingCompassTool(point2, point3, point1))
-                                tryAdd(nonCollapsingCompassTool(point3, point1, point2))
+                                // avoids using a non-collapsing compass where a regular compass would suffice
+                                val different1 = !coincides(distance12, distance31)
+                                val different2 = !coincides(distance23, distance12)
+                                val different3 = !coincides(distance31, distance23)
+                                if (different1 && different2)
+                                    tryAdd(nonCollapsingCompassTool(point1, point2, point3))
+                                if (different2 && different3)
+                                    tryAdd(nonCollapsingCompassTool(point2, point3, point1))
+                                if (different3 && different1)
+                                    tryAdd(nonCollapsingCompassTool(point3, point1, point2))
                             }
                         }
                     }
