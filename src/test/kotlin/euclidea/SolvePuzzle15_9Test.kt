@@ -17,10 +17,10 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // suboptimal solution found 6 min 21 sec
+        // suboptimal solution found 1 hr 7 min
         Solver().improveSolution(
             maxExtraElements = 1,
-            maxDepth = 16,
+            maxDepth = 15,
             maxUnfamiliarElements = 0,
 //            maxNonNewElements = 2,
 //            maxConsecutiveNonNewElements = 1,
