@@ -403,10 +403,11 @@ fun intersectOnePoint(element1: Element, element2: Element): Point =
 
 fun intersectTwoPoints(
     element1: Element,
-    element2: Element
+    element2: Element,
+    swap: Boolean = false
 ): Pair<Point, Point> =
     when (val i = intersect(element1, element2)) {
-        is Intersection.TwoPoints -> Pair(i.point1, i.point2)
+        is Intersection.TwoPoints -> if (swap) Pair(i.point2, i.point1) else Pair(i.point1, i.point2)
         else -> error("Two intersection points expected: $i")
     }
 
