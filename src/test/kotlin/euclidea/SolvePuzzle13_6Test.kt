@@ -19,7 +19,7 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ?
+        // no solution found 40 min
         Solver().improveSolution(
             maxExtraElements = 7,
             maxDepth = 7,
@@ -83,7 +83,7 @@ class SolvePuzzle13_6Test {
 //                            angleBisectorToolEnabled = true,
                         ),
                         // base is included as a probe point
-                        points = listOf(pointA, pointB, base),
+                        points = listOf(pointA, pointB),
                         elements = listOf(line, bisect)
                     )
                 }
