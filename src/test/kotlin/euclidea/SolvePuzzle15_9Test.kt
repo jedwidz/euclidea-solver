@@ -17,11 +17,11 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 8 hr 30 min
+        // suboptimal solution found 6 min 21 sec
         Solver().improveSolution(
-            maxExtraElements = 6,
-            maxDepth = 6,
-            maxUnfamiliarElements = 3,
+            maxExtraElements = 1,
+            maxDepth = 16,
+            maxUnfamiliarElements = 0,
 //            maxNonNewElements = 2,
 //            maxConsecutiveNonNewElements = 1,
             useTargetConstruction = true
@@ -79,12 +79,12 @@ class SolvePuzzle15_9Test {
                             maxSqDistance = sq(25.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            perpendicularToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
                         ),
                         // sample1, base and dir act as probes
-                        points = listOf(center, sample /*, base, sample1 , dir */),
+                        points = listOf(center, sample, base /*, sample1 , dir */),
                         elements = listOf(circle, line)
                     )
                 }
@@ -206,18 +206,48 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 7L L-star moves hint
-            return listOf(
-                EuclideaTool.PerpendicularTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool
-            )
-        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 8E E-star moves hint
+//            return listOf(
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                // Allow some extra elements
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//            )
+//        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 7L L-star moves hint
+//            return listOf(
+//                EuclideaTool.PerpendicularTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool
+//            )
+//        }
 
         override fun referenceSolution(
             params: Params,
