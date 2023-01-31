@@ -17,9 +17,9 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 9 hr 13 min
+        // no solution found 8 hr 30 min
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 6,
             maxDepth = 6,
             maxUnfamiliarElements = 3,
 //            maxNonNewElements = 2,
@@ -104,13 +104,14 @@ class SolvePuzzle15_9Test {
             val pointOfInterest = solution.center
             return { context ->
 //                context.hasPoint(solution.center)
-                context.elements.lastOrNull()
-                    ?.let { element ->
-                        pointAndElementCoincide(pointOfInterest, element) &&
-                                // Just checking point/line has some false positives with 'almost coincident' lines
-                                // Note this still avoids evaluating context points in most cases
-                                context.hasPoint(pointOfInterest)
-                    } == true
+                // TODO just check last; workaround for hack
+//                context.elements.lastOrNull()
+                context.elements.any { element ->
+                    pointAndElementCoincide(pointOfInterest, element) &&
+                            // Just checking point/line has some false positives with 'almost coincident' lines
+                            // Note this still avoids evaluating context points in most cases
+                            context.hasPoint(pointOfInterest)
+                }
             }
 //            return { context ->
 //                context.hasElement(solution)
@@ -270,15 +271,32 @@ class SolvePuzzle15_9Test {
                         //point11 at intersection (1/2) of line3 and circle4 (0.0232142857142853, 0.9517857142857145)
                         val point11 = intersectTwoPoints(circle4, line3).first
 
-                        //point12 at intersection (1/2) of circle1_circle and line2 (0.0, 1.016227766016838)
+                        //                        //point12 at intersection (1/2) of circle1_circle and line2 (0.0, 1.016227766016838)
                         val point12 = intersectTwoPoints(line2, circle).first
 
-                        //line4 from point11 to point12
+                        //                        //line4 from point11 to point12
                         val line4 = lineTool(point11, point12)
-                        val tangentPoint = intersectTwoPoints(line4, circle).first
+                        val tangentPoints = intersectTwoPoints(line4, circle)
+                        val tangentPoint = tangentPoints.first
                         val diameter = lineTool(center, tangentPoint)
                         val solutionCenter = intersectOnePoint(diameter, line)
-//                        val solution = circleTool(solutionCenter, sample)
+                        val solution = circleTool(solutionCenter, sample)
+
+                        // Extra elements, as a hacky way to make them 'familiar'
+                        // TODO be less hacky
+                        val backToSample = lineTool(solutionCenter, sample)
+                        val crossToSample = lineTool(tangentPoint, sample)
+
+                        val point12_2 = intersectTwoPoints(line2, circle).second // spot the difference
+                        val line4_2 = lineTool(point11, point12_2)
+                        val tangentPoints_2 = intersectTwoPoints(line4_2, circle)
+                        val tangentPoint_2 = tangentPoints_2.first
+                        val diameter_2 = lineTool(center, tangentPoint_2)
+                        val solutionCenter_2 = intersectOnePoint(diameter_2, line)
+                        val solution_2 = circleTool(solutionCenter_2, sample)
+
+                        val backToSample_2 = lineTool(solutionCenter_2, sample)
+                        val crossToSample_2 = lineTool(tangentPoint_2, sample)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
