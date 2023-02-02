@@ -318,29 +318,13 @@ private class FamiliarityChecker {
     private val familiarCircleRadii = DoubleSet()
 
     constructor(initialContext: EuclideaContext, knownElements: ElementSet, fillKnownElements: Boolean) {
+
         val familiarLineHeadingIncrements = 4
         val familiarLineHeadingIncrement = PI * 2.0 / familiarLineHeadingIncrements
-        val effectiveKnownElements = if (fillKnownElements) {
-            val fillContext = initialContext.withElements(knownElements.items())
-            val filledElements = ElementSet(knownElements)
-            possibleToolApplications(
-                // Don't need ncc, parallel or perpendicular, as these are covered by basic line/circle tools for familiarity
-                EuclideaConfig(
-                    // TODO consider adding these... although angleBisectorTool generates too many possibilities
-                    // perpendicularBisectorToolEnabled = true,
-                    // angleBisectorToolEnabled = true
-                ),
-                fillContext.points,
-                setOf(),
-                fillContext.elements,
-                setOf()
-            ) { e: Element ->
-                filledElements += e
-            }
-            filledElements
-        } else knownElements
-        effectiveKnownElements.items().forEach { element ->
-            fun addFamiliarLineHeading(heading: Double) {
+
+        fun addFamiliarLineHeading(lineHeading: Double) {
+            for (i in 0.until(familiarLineHeadingIncrements)) {
+                val heading = lineHeading + i * familiarLineHeadingIncrement
                 val normalHeading = normalizeLineHeading(heading)
                 familiarLineHeadings += normalHeading
                 // Handle wrap edge cases
@@ -349,18 +333,26 @@ private class FamiliarityChecker {
                 if (coincides(normalHeading, PI * 2.0))
                     familiarLineHeadings += normalHeading - PI * 2.0
             }
+        }
+
+        fun addFamiliarCircleRadius(radius: Double) {
+            familiarCircleRadii += radius
+            familiarCircleRadii += 2.0 * radius
+            familiarCircleRadii += 0.5 * radius
+        }
+
+        if (fillKnownElements) {
+            val fillContext = initialContext.withElements(knownElements.items())
+            val fillPoints = fillContext.points
+            fillPoints.forEachPair { p1, p2 ->
+                addFamiliarCircleRadius(distance(p1, p2))
+                addFamiliarLineHeading(heading(p1, p2))
+            }
+        }
+        knownElements.items().forEach { element ->
             when (element) {
-                is Element.Line -> {
-                    val lineHeading = element.heading
-                    for (i in 0.until(familiarLineHeadingIncrements))
-                        addFamiliarLineHeading(lineHeading + i * familiarLineHeadingIncrement)
-                }
-                is Element.Circle -> {
-                    val radius = element.radius
-                    familiarCircleRadii += radius
-                    familiarCircleRadii += 2.0 * radius
-                    familiarCircleRadii += 0.5 * radius
-                }
+                is Element.Line -> addFamiliarLineHeading(element.heading)
+                is Element.Circle -> addFamiliarCircleRadius(element.radius)
             }
         }
     }
