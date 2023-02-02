@@ -17,11 +17,11 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // suboptimal solution found 1 hr 7 min
+        // gave up
         Solver().improveSolution(
-            maxExtraElements = 1,
+            maxExtraElements = 2,
             maxDepth = 15,
-            maxUnfamiliarElements = 0,
+            maxUnfamiliarElements = 1,
 //            maxNonNewElements = 2,
 //            maxConsecutiveNonNewElements = 1,
             useTargetConstruction = true
