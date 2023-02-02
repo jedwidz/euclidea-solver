@@ -17,12 +17,12 @@ class SolvePuzzle13_10Test {
     @Test
     fun improveSolution() {
         Solver().improveSolution(
-            // solution found 3 sec
+            // solution found 2 sec
             maxExtraElements = 5,
             maxDepth = 6,
             maxUnfamiliarElements = 2,
-//            maxNonNewElements = 4,
-//            maxConsecutiveNonNewElements = 2,
+            maxNonNewElements = 2,
+            maxConsecutiveNonNewElements = 2,
             useTargetConstruction = true,
             fillKnownElements = true
         )
