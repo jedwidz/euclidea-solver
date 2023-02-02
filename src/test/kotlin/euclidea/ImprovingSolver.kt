@@ -41,7 +41,8 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         maxUnfamiliarElements: Int? = null,
         maxNonNewElements: Int? = null,
         maxConsecutiveNonNewElements: Int? = null,
-        useTargetConstruction: Boolean = false
+        useTargetConstruction: Boolean = false,
+        fillKnownElements: Boolean = false
     ) {
         val namer = Namer()
         val params = makeParams()
@@ -125,7 +126,12 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             visitPriority = visitPriority,
             pass = passWithPrefix,
             remainingStepsLowerBound = remainingStepsLowerBound,
-            extraElementConstraint = ExtraElementConstraint(targetElementSet, maxExtraElements, maxUnfamiliarElements),
+            extraElementConstraint = ExtraElementConstraint(
+                targetElementSet,
+                maxExtraElements,
+                maxUnfamiliarElements,
+                fillKnownElements
+            ),
             excludeElements = excludeElements(params, setup),
             toolSequence = toolSequence()
         ) { context ->

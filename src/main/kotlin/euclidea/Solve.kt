@@ -73,7 +73,8 @@ fun separated(distance: Double): Boolean {
 data class ExtraElementConstraint(
     val knownElements: ElementSet,
     val maxExtraElements: Int,
-    val maxUnfamiliarElements: Int?
+    val maxUnfamiliarElements: Int?,
+    val fillKnownElements: Boolean = false
 )
 
 fun solve(
@@ -100,7 +101,29 @@ fun solve(
     val familiarCircleRadii = DoubleSet()
     val familiarLineHeadingIncrements = 4
     val familiarLineHeadingIncrement = PI * 2.0 / familiarLineHeadingIncrements
-    knownElements?.items()?.forEach { element ->
+    val effectiveKnownElements = when (knownElements) {
+        null -> null
+        else -> if (extraElementConstraint.fillKnownElements) {
+            val fillContext = initialContext.withElements(knownElements.items())
+            val filledElements = ElementSet(knownElements)
+            possibleToolApplications(
+                // Don't need ncc, parallel or perpendicular, as these are covered by basic line/circle tools for familiarity
+                EuclideaConfig(
+                    // TODO consider adding these... although angleBisectorTool generates too many possibilities
+//                    perpendicularBisectorToolEnabled = true,
+//                    angleBisectorToolEnabled = true
+                ),
+                fillContext.points,
+                setOf(),
+                fillContext.elements,
+                setOf()
+            ) { e: Element ->
+                filledElements += e
+            }
+            filledElements
+        } else knownElements
+    }
+    effectiveKnownElements?.items()?.forEach { element ->
         fun addFamiliarLineHeading(heading: Double) {
             val normalHeading = normalizeLineHeading(heading)
             familiarLineHeadings += normalHeading
@@ -195,8 +218,8 @@ fun solve(
                     oldPoints,
                     elements,
                     oldElements
-                ) { e: Element? ->
-                    if (e !== null && e !in pendingElements && e !in passedElements && !hasElement(e) && excludeElements?.let { e in it } != true) {
+                ) { e: Element ->
+                    if (e !in pendingElements && e !in passedElements && !hasElement(e) && excludeElements?.let { e in it } != true) {
                         pendingElements += e
                         if (nextTool === null || nextTool === e.sourceTool)
                             newElements += e
@@ -353,8 +376,12 @@ private fun possibleToolApplications(
     oldPoints: Set<Point>,
     allElements: List<Element>,
     oldElements: Set<Element>,
-    tryAdd: (Element?) -> Unit
+    handle: (Element) -> Unit
 ) {
+    fun tryAdd(element: Element?) {
+        element?.let { handle(it) }
+    }
+
     val newPoints = allPoints.filter { it !in oldPoints }
     if (config.anyTwoPointToolEnabled) {
         fun visit(point1: Point, point2: Point) {
@@ -441,4 +468,3 @@ private fun possibleToolApplications(
         }
     }
 }
-
