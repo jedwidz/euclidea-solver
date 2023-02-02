@@ -343,7 +343,7 @@ private class FamiliarityChecker {
 
         if (fillKnownElements) {
             val fillContext = initialContext.withElements(knownElements.items())
-            val fillPoints = fillContext.points
+            val fillPoints = fillContext.constructionPointSet().items()
             fillPoints.forEachPair { p1, p2 ->
                 addFamiliarCircleRadius(distance(p1, p2))
                 addFamiliarLineHeading(heading(p1, p2))
