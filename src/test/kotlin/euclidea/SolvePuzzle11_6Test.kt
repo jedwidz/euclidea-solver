@@ -21,7 +21,7 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ?
+        // no solution found - long time
         Solver().improveSolution(
             maxExtraElements = 4,
             maxDepth = 7,
@@ -202,124 +202,68 @@ class SolvePuzzle11_6Test {
             params: Params,
             namer: Namer
         ): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    @Suppress("unused") val context = object {
-                        // Sub-optimal 7L solution
-                        // Moved to setup
-                        // val half = angleBisectorTool(baseA, baseO, baseB)
-                        val perp = perpendicularTool(line2, sample, probe = baseO)
-                        val touch = intersectOnePoint(perp, line2)
-                        val center1 = intersectOnePoint(perp, half)
-                        val circle1 = circleTool(center1, touch)
-                        val line = lineTool(baseO, sample)
-                        val aim1 = intersectTwoPoints(circle1, line).second
-                        val cross1 = lineTool(center1, aim1)
-                        val cross2 = parallelTool(cross1, sample, probe = center1)
-                        val center2 = intersectOnePoint(cross2, half)
-                        val solution = circleTool(center2, sample)
-                    }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
-                }
-            }
+            return suboptimal7LSolution(false)(params, namer)
         }
 
         override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-            return listOf(this::suboptimal7LSolution2, this::optimal6LSolution, this::optimal6LSolution2)
+            return listOf(suboptimal7LSolution(true), optimal6LSolution(false), optimal6LSolution(true))
         }
 
-        fun suboptimal7LSolution2(
-            params: Params,
-            namer: Namer
-        ): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    @Suppress("unused") val context = object {
-                        // Sub-optimal 7L solution (other)
-                        // Moved to setup
-                        // val half = angleBisectorTool(baseA, baseO, baseB)
-                        val perp = perpendicularTool(line2, sample, probe = baseO)
-                        val touch = intersectOnePoint(perp, line2)
-                        val center1 = intersectOnePoint(perp, half)
-                        val circle1 = circleTool(center1, touch)
-                        val line = lineTool(baseO, sample)
-                        val aim1 = intersectTwoPoints(circle1, line).first // spot the difference
-                        val cross1 = lineTool(center1, aim1)
-                        val cross2 = parallelTool(cross1, sample, probe = center1)
-                        val center2 = intersectOnePoint(cross2, half)
-                        val solution = circleTool(center2, sample)
+        private fun suboptimal7LSolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            // Sub-optimal 7L solution (other)
+                            // Moved to setup
+                            // val half = angleBisectorTool(baseA, baseO, baseB)
+                            val perp = perpendicularTool(line2, sample, probe = baseO)
+                            val touch = intersectOnePoint(perp, line2)
+                            val center1 = intersectOnePoint(perp, half)
+                            val circle1 = circleTool(center1, touch)
+                            val line = lineTool(baseO, sample)
+                            val aim1 = intersectTwoPoints(circle1, line, other).second
+                            val cross1 = lineTool(center1, aim1)
+                            val cross2 = parallelTool(cross1, sample, probe = center1)
+                            val center2 = intersectOnePoint(cross2, half)
+                            val solution = circleTool(center2, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
                     }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }
 
-        fun optimal6LSolution(
-            params: Params,
-            namer: Namer
-        ): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    @Suppress("unused") val context = object {
-                        // Optimal 6L solution
-                        // Moved to setup
-                        // val half = angleBisectorTool(baseA, baseO, baseB)
-                        val perp = perpendicularTool(half, sample, probe = baseO)
-                        val touch1 = intersectOnePoint(perp, line1)
-                        val mid = intersectOnePoint(perp, half)
-                        val circle1 = nonCollapsingCompassTool(touch1, mid, sample)
-                        val aim1 = intersectTwoPoints(circle1, half).first
-                        val touch2 = intersectOnePoint(perp, line2)
-                        val circle2 = nonCollapsingCompassTool(aim1, mid, touch2)
-                        val ref = intersectTwoPoints(circle2, line2).first
-                        val cross = perpendicularBisectorTool(ref, sample)
-                        val center2 = intersectOnePoint(cross, half)
-                        val solution = circleTool(center2, sample)
+        private fun optimal6LSolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            // Optimal 6L solution
+                            // Moved to setup
+                            // val half = angleBisectorTool(baseA, baseO, baseB)
+                            val perp = perpendicularTool(half, sample, probe = baseO)
+                            val touch1 = intersectOnePoint(perp, line1)
+                            val mid = intersectOnePoint(perp, half)
+                            val circle1 = nonCollapsingCompassTool(touch1, mid, sample)
+                            val aim1 = intersectTwoPoints(circle1, half).first
+                            val touch2 = intersectOnePoint(perp, line2)
+                            val circle2 = nonCollapsingCompassTool(aim1, mid, touch2)
+                            val ref = intersectTwoPoints(circle2, line2, other).first
+                            val cross = perpendicularBisectorTool(ref, sample)
+                            val center2 = intersectOnePoint(cross, half)
+                            val solution = circleTool(center2, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
                     }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
-                }
-            }
-        }
-
-        fun optimal6LSolution2(
-            params: Params,
-            namer: Namer
-        ): Pair<Setup, EuclideaContext> {
-            val (setup, initialContext) = initialContext(
-                params, namer
-            )
-            with(params) {
-                with(setup) {
-                    @Suppress("unused") val context = object {
-                        // Optimal 6L solution (other)
-                        // Moved to setup
-                        // val half = angleBisectorTool(baseA, baseO, baseB)
-                        val perp = perpendicularTool(half, sample, probe = baseO)
-                        val touch1 = intersectOnePoint(perp, line1)
-                        val mid = intersectOnePoint(perp, half)
-                        val circle1 = nonCollapsingCompassTool(touch1, mid, sample)
-                        val aim1 = intersectTwoPoints(circle1, half).first
-                        val touch2 = intersectOnePoint(perp, line2)
-                        val circle2 = nonCollapsingCompassTool(aim1, mid, touch2)
-                        val ref = intersectTwoPoints(circle2, line2).second // spot the difference
-                        val cross = perpendicularBisectorTool(ref, sample)
-                        val center2 = intersectOnePoint(cross, half)
-                        val solution = circleTool(center2, sample)
-                    }
-                    namer.nameReflected(context)
-                    return setup to initialContext.withElements(elementsReflected(context))
                 }
             }
         }
