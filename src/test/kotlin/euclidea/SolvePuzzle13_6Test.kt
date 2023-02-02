@@ -19,10 +19,10 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 40 min
+        // gave up
         Solver().improveSolution(
-            maxExtraElements = 7,
-            maxDepth = 7,
+            maxExtraElements = 8,
+            maxDepth = 8,
             maxUnfamiliarElements = 2,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
@@ -178,6 +178,8 @@ class SolvePuzzle13_6Test {
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                // Maybe an extra line here, for a suboptimal solution?
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool
             )
