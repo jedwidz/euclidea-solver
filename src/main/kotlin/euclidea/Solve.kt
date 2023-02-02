@@ -97,63 +97,9 @@ fun solve(
     val maxExtraElements = extraElementConstraint?.maxExtraElements
     val maxUnfamiliarElements = extraElementConstraint?.maxUnfamiliarElements
 
-    val familiarLineHeadings = DoubleSet()
-    val familiarCircleRadii = DoubleSet()
-    val familiarLineHeadingIncrements = 4
-    val familiarLineHeadingIncrement = PI * 2.0 / familiarLineHeadingIncrements
-    val effectiveKnownElements = when (knownElements) {
-        null -> null
-        else -> if (extraElementConstraint.fillKnownElements) {
-            val fillContext = initialContext.withElements(knownElements.items())
-            val filledElements = ElementSet(knownElements)
-            possibleToolApplications(
-                // Don't need ncc, parallel or perpendicular, as these are covered by basic line/circle tools for familiarity
-                EuclideaConfig(
-                    // TODO consider adding these... although angleBisectorTool generates too many possibilities
-//                    perpendicularBisectorToolEnabled = true,
-//                    angleBisectorToolEnabled = true
-                ),
-                fillContext.points,
-                setOf(),
-                fillContext.elements,
-                setOf()
-            ) { e: Element ->
-                filledElements += e
-            }
-            filledElements
-        } else knownElements
-    }
-    effectiveKnownElements?.items()?.forEach { element ->
-        fun addFamiliarLineHeading(heading: Double) {
-            val normalHeading = normalizeLineHeading(heading)
-            familiarLineHeadings += normalHeading
-            // Handle wrap edge cases
-            if (coincides(normalHeading, 0.0))
-                familiarLineHeadings += normalHeading + PI * 2.0
-            if (coincides(normalHeading, PI * 2.0))
-                familiarLineHeadings += normalHeading - PI * 2.0
-        }
-        when (element) {
-            is Element.Line -> {
-                val lineHeading = element.heading
-                for (i in 0.until(familiarLineHeadingIncrements))
-                    addFamiliarLineHeading(lineHeading + i * familiarLineHeadingIncrement)
-            }
-            is Element.Circle -> {
-                val radius = element.radius
-                familiarCircleRadii += radius
-                familiarCircleRadii += 2.0 * radius
-                familiarCircleRadii += 0.5 * radius
-            }
-        }
-    }
-
-    fun isFamiliarElement(element: Element): Boolean {
-        return when (element) {
-            is Element.Line -> element.heading in familiarLineHeadings
-            is Element.Circle -> element.radius in familiarCircleRadii
-        }
-    }
+    val familiarityChecker =
+        if (extraElementConstraint === null || maxUnfamiliarElements === null || knownElements === null)
+            null else FamiliarityChecker(initialContext, knownElements, extraElementConstraint.fillKnownElements)
 
     if (check(initialContext))
         return initialContext
@@ -296,10 +242,7 @@ fun solve(
                     val isExtraElement = knownElements?.let { newElement !in it } ?: false
                     val nextExtraElementCount = solveState.extraElementCount + if (isExtraElement) 1 else 0
                     val nextUnfamiliarElementCount =
-                        solveState.unfamiliarElementCount + if (maxUnfamiliarElements !== null && !isFamiliarElement(
-                                newElement
-                            )
-                        ) 1 else 0
+                        solveState.unfamiliarElementCount + if (familiarityChecker?.isFamiliarElement(newElement) == false) 1 else 0
                     val nextConsecutiveNonNewElementCount =
                         if (isNonNewElement) solveState.consecutiveNonNewElementCount + 1 else 0
                     if ((maxNonNewElements == null || nextNonNewElementCount <= maxNonNewElements) &&
@@ -368,6 +311,66 @@ fun solve(
         )
     )
     return parallelSolver.awaitResult()
+}
+
+private class FamiliarityChecker {
+    private val familiarLineHeadings = DoubleSet()
+    private val familiarCircleRadii = DoubleSet()
+
+    constructor(initialContext: EuclideaContext, knownElements: ElementSet, fillKnownElements: Boolean) {
+        val familiarLineHeadingIncrements = 4
+        val familiarLineHeadingIncrement = PI * 2.0 / familiarLineHeadingIncrements
+        val effectiveKnownElements = if (fillKnownElements) {
+            val fillContext = initialContext.withElements(knownElements.items())
+            val filledElements = ElementSet(knownElements)
+            possibleToolApplications(
+                // Don't need ncc, parallel or perpendicular, as these are covered by basic line/circle tools for familiarity
+                EuclideaConfig(
+                    // TODO consider adding these... although angleBisectorTool generates too many possibilities
+                    // perpendicularBisectorToolEnabled = true,
+                    // angleBisectorToolEnabled = true
+                ),
+                fillContext.points,
+                setOf(),
+                fillContext.elements,
+                setOf()
+            ) { e: Element ->
+                filledElements += e
+            }
+            filledElements
+        } else knownElements
+        effectiveKnownElements.items().forEach { element ->
+            fun addFamiliarLineHeading(heading: Double) {
+                val normalHeading = normalizeLineHeading(heading)
+                familiarLineHeadings += normalHeading
+                // Handle wrap edge cases
+                if (coincides(normalHeading, 0.0))
+                    familiarLineHeadings += normalHeading + PI * 2.0
+                if (coincides(normalHeading, PI * 2.0))
+                    familiarLineHeadings += normalHeading - PI * 2.0
+            }
+            when (element) {
+                is Element.Line -> {
+                    val lineHeading = element.heading
+                    for (i in 0.until(familiarLineHeadingIncrements))
+                        addFamiliarLineHeading(lineHeading + i * familiarLineHeadingIncrement)
+                }
+                is Element.Circle -> {
+                    val radius = element.radius
+                    familiarCircleRadii += radius
+                    familiarCircleRadii += 2.0 * radius
+                    familiarCircleRadii += 0.5 * radius
+                }
+            }
+        }
+    }
+
+    fun isFamiliarElement(element: Element): Boolean {
+        return when (element) {
+            is Element.Line -> element.heading in familiarLineHeadings
+            is Element.Circle -> element.radius in familiarCircleRadii
+        }
+    }
 }
 
 private fun possibleToolApplications(
