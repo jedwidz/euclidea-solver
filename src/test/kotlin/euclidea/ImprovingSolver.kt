@@ -118,6 +118,13 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             !checkPrefix(solveContext.depth, element) || (pass !== null && pass(solveContext, element))
         }
 
+        val toolsSequence = when (val toolSequence = toolSequence()) {
+            null -> toolsSequence()
+            else -> when (toolsSequence()) {
+                null -> toolSequence.map { setOf(it) }
+                else -> error("Both toolSequence() and toolsSequence() are implemented")
+            }
+        }
         val solutionContext = solve(
             startingContext,
             maxDepth = maxDepth,
@@ -133,7 +140,7 @@ abstract class ImprovingSolver<Params : Any, Setup> {
                 fillKnownElements
             ),
             excludeElements = excludeElements(params, setup),
-            toolSequence = toolSequence()
+            toolsSequence = toolsSequence
         ) { context ->
             isSolution(context) && checkOrDump(context)
         }
@@ -170,6 +177,25 @@ abstract class ImprovingSolver<Params : Any, Setup> {
 
     protected open fun toolSequence(): List<EuclideaTool>? {
         return null
+    }
+
+    protected open fun toolsSequence(): List<Set<EuclideaTool>>? {
+        return null
+    }
+
+    // For convenience in `toolsSequence` implementation
+    protected fun toolsList(vararg toolsies: Any): List<Set<EuclideaTool>> {
+        return toolsies.map { tools ->
+            when (tools) {
+                is EuclideaTool -> setOf(tools)
+                is Set<*> -> {
+                    require(tools.all { it is EuclideaTool })
+                    @Suppress("UNCHECKED_CAST")
+                    tools as Set<EuclideaTool>
+                }
+                else -> error("Weak typing FTW")
+            }
+        }
     }
 
     protected open fun pass(

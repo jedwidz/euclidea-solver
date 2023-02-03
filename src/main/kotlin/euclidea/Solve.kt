@@ -28,7 +28,7 @@ private data class SolveState(
     val nonNewElementCount: Int,
     val consecutiveNonNewElementCount: Int,
     val lastAddedElements: Set<Element>,
-    val remainingToolSequence: List<EuclideaTool>?,
+    val remainingToolsSequence: List<Set<EuclideaTool>>?,
     val extraElementCount: Int,
     val unfamiliarElementCount: Int
 )
@@ -88,10 +88,10 @@ fun solve(
     remainingStepsLowerBound: ((EuclideaContext) -> Int)? = null,
     extraElementConstraint: ExtraElementConstraint? = null,
     excludeElements: ElementSet? = null,
-    toolSequence: List<EuclideaTool>? = null,
+    toolsSequence: List<Set<EuclideaTool>>? = null,
     check: (EuclideaContext) -> Boolean
 ): EuclideaContext? {
-    val toolsMatter = toolSequence !== null
+    val toolsMatter = toolsSequence !== null
 
     val knownElements = extraElementConstraint?.knownElements
     val maxExtraElements = extraElementConstraint?.maxExtraElements
@@ -152,9 +152,15 @@ fun solve(
             val (context, depth) = solveContext
             val nextDepth = depth + 1
             with(context) {
-                val nextTool = solveState.remainingToolSequence?.first()
+                val nextTools = solveState.remainingToolsSequence?.first()
                 val remainingConfig =
-                    solveState.remainingToolSequence?.let { config.restrictConfig(it.toSet()) } ?: config
+                    solveState.remainingToolsSequence?.let {
+                        config.restrictConfig(it.fold(setOf()) { acc, set ->
+                            acc.union(
+                                set
+                            )
+                        })
+                    } ?: config
                 val oldElements = elements.toSet() - solveState.lastAddedElements.toSet()
 
                 val newElements = mutableSetOf<Element>()
@@ -167,7 +173,7 @@ fun solve(
                 ) { e: Element ->
                     if (e !in pendingElements && e !in passedElements && !hasElement(e) && excludeElements?.let { e in it } != true) {
                         pendingElements += e
-                        if (nextTool === null || nextTool === e.sourceTool)
+                        if (nextTools === null || e.sourceTool in nextTools)
                             newElements += e
                     }
                 }
@@ -222,7 +228,7 @@ fun solve(
                 }
 
                 val itemsForTools =
-                    if (toolsMatter) pendingElements.itemsForTool(nextTool!!) else pendingElements.items()
+                    if (toolsMatter) nextTools!!.flatMap { pendingElements.itemsForTool(it) } else pendingElements.items()
                 val keep = maybePass(itemsForTools)
                 val pendingList = maybePrioritize(keep)
                 // println("$depth - ${pendingList.size}")
@@ -262,7 +268,7 @@ fun solve(
                                 nextNonNewElementCount,
                                 nextConsecutiveNonNewElementCount,
                                 setOf(newElement),
-                                solveState.remainingToolSequence?.drop(1),
+                                solveState.remainingToolsSequence?.drop(1),
                                 nextExtraElementCount,
                                 nextUnfamiliarElementCount
                             )
@@ -285,13 +291,13 @@ fun solve(
         }
     }
 
-    val effectiveToolSequence = if (toolSequence === null) null else {
-        val toolSteps = toolSequence.size
+    val effectiveToolsSequence = if (toolsSequence === null) null else {
+        val toolSteps = toolsSequence.size
         when {
-            toolSteps == maxDepth -> toolSequence
+            toolSteps == maxDepth -> toolsSequence
             toolSteps > maxDepth -> {
                 println("Warning - truncating tool sequence of length $toolSteps to agree with max depth of $maxDepth")
-                toolSequence.take(maxDepth)
+                toolsSequence.take(maxDepth)
             }
             else -> error("Tool sequence of length $toolSteps less than max depth of $maxDepth")
         }
@@ -303,7 +309,7 @@ fun solve(
             nonNewElementCount = 0,
             consecutiveNonNewElementCount = 0,
             lastAddedElements = initialContext.elements.toSet(),
-            remainingToolSequence = effectiveToolSequence,
+            remainingToolsSequence = effectiveToolsSequence,
             extraElementCount = 0,
             unfamiliarElementCount = 0
         ),
