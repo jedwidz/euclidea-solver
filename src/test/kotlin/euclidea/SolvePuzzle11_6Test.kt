@@ -21,11 +21,11 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found
+        // no solution found ?
         Solver().improveSolution(
-            maxExtraElements = 4,
-            maxDepth = 7,
-            maxUnfamiliarElements = 1,
+            maxExtraElements = 0,
+            maxDepth = 13,
+            maxUnfamiliarElements = 0,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
             useTargetConstruction = true,
@@ -57,7 +57,7 @@ class SolvePuzzle11_6Test {
             return Params(
                 baseO = Point(0.0, 0.0),
                 baseA = Point(1.0, 0.0),
-                baseB = Point(0.4, 0.8),
+                baseB = Point(0.41, 0.8),
                 sample = Point(0.35, 0.45),
                 probe1Scale = 0.24,
                 probe2Scale = 0.135
@@ -68,7 +68,7 @@ class SolvePuzzle11_6Test {
             return Params(
                 baseO = Point(0.0, 0.0),
                 baseA = Point(1.01, 0.0),
-                baseB = Point(0.401, 0.8005),
+                baseB = Point(0.411, 0.8005),
                 sample = Point(0.350101, 0.451),
                 probe1Scale = 0.2398,
                 probe2Scale = 0.135
@@ -184,20 +184,20 @@ class SolvePuzzle11_6Test {
             }
         }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 11E E-star moves hint
-            return listOf(
-                // Moved to setup
-                // EuclideaTool.AngleBisectorTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool
-            )
-        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 11E E-star moves hint
+//            return listOf(
+//                // Moved to setup
+//                // EuclideaTool.AngleBisectorTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool
+//            )
+//        }
 
         override fun referenceSolution(
             params: Params,
