@@ -24,7 +24,7 @@ class SolvePuzzle11_6Test {
         // no solution found ?
         Solver().improveSolution(
             maxExtraElements = 0,
-            maxDepth = 13,
+            maxDepth = 12,
             maxUnfamiliarElements = 0,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
@@ -110,7 +110,17 @@ class SolvePuzzle11_6Test {
                 listOf(setup.line1, setup.line2).forEach { line -> intersectOnePoint(line, solution) }
             }
             return { context ->
-                solutions.any { solution -> context.hasElement(solution) }
+                // solutions.any { solution -> context.hasElement(solution) }
+                // Just look for center of a solution
+                context.elements.size > 1 && context.elements.last().let { element ->
+                    solutions.any { solution ->
+                        val pointOfInterest = solution.center
+                        pointAndElementCoincide(pointOfInterest, element) &&
+                                // Just checking point/line has some false positives with 'almost coincident' lines
+                                // Note this still avoids evaluating context points in most cases
+                                context.hasPoint(pointOfInterest)
+                    }
+                }
             }
         }
 
@@ -179,7 +189,9 @@ class SolvePuzzle11_6Test {
                     val onCenter =
                         centers.maxOf { center -> context.elements.count { pointAndElementCoincide(center, it) } }
                     // Need two elements to locate center, then the solution circle itself
-                    max(0, 2 - onCenter) + 1
+                    // max(0, 2 - onCenter) + 1
+                    // Just look for center of a solution
+                    max(0, 2 - onCenter)
                 }
             }
         }
@@ -230,7 +242,8 @@ class SolvePuzzle11_6Test {
                             val cross1 = lineTool(center1, aim1)
                             val cross2 = parallelTool(cross1, sample, probe = center1)
                             val center2 = intersectOnePoint(cross2, half)
-                            val solution = circleTool(center2, sample)
+                            // Just look for center of a solution
+                            // val solution = circleTool(center2, sample)
                         }
                         namer.nameReflected(context)
                         setup to initialContext.withElements(elementsReflected(context))
@@ -260,7 +273,8 @@ class SolvePuzzle11_6Test {
                             val ref = intersectTwoPoints(circle2, line2, other).first
                             val cross = perpendicularBisectorTool(ref, sample)
                             val center2 = intersectOnePoint(cross, half)
-                            val solution = circleTool(center2, sample)
+                            // Just look for center of a solution
+                            // val solution = circleTool(center2, sample)
                         }
                         namer.nameReflected(context)
                         setup to initialContext.withElements(elementsReflected(context))
