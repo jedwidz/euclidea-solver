@@ -219,7 +219,13 @@ class SolvePuzzle11_6Test {
         }
 
         override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
-            return listOf(suboptimal7LSolution(true), optimal6LSolution(false), optimal6LSolution(true))
+            return listOf(
+                suboptimal7LSolution(true),
+                optimal6LSolution(false),
+                optimal6LSolution(true),
+                suboptimal14ESolution(false),
+                suboptimal14ESolution(true),
+            )
         }
 
         private fun suboptimal7LSolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
@@ -273,6 +279,83 @@ class SolvePuzzle11_6Test {
                             val ref = intersectTwoPoints(circle2, line2, other).first
                             val cross = perpendicularBisectorTool(ref, sample)
                             val center2 = intersectOnePoint(cross, half)
+                            // Just look for center of a solution
+                            // val solution = circleTool(center2, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
+                    }
+                }
+            }
+        }
+
+        private fun suboptimal14ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            //Given point (0) point1_baseO at (0.0, 0.0)
+                            //Given point (1) point2_baseA at (1.0, 0.0)
+                            //line1_line1 from point1_baseO to point2_baseA
+                            //Given point (2) point3_baseB at (0.41, 0.8)
+                            //line2_line2 from point1_baseO to point3_baseB
+                            //line3_half bisecting angle from point2_baseA through point1_baseO to point3_baseB
+                            // Moved to setup
+                            // val half = angleBisectorTool(baseA, baseO, baseB)
+
+                            //Given point (3) point4_sample at (0.35, 0.45)
+                            //circle1 with center point1_baseO extending to point4_sample (radius 0.570087712549569)
+                            val c1 = circleTool(baseO, sample)
+
+                            //line4 from point1_baseO to point3_baseB
+                            val l4 = lineTool(baseO, baseB)
+
+                            //point5 at intersection (1/2) of circle1 and line4 (-0.26001175570503304, -0.5073400111317717)
+                            val p5 = intersectTwoPoints(c1, l4).first
+
+                            //circle2 with center point5 extending to point4_sample (radius 1.1351714579798586)
+                            val c2 = circleTool(p5, sample)
+
+                            //line5_line from point1_baseO to point4_sample
+                            val line = lineTool(baseO, sample)
+
+                            //point6 at intersection (1/2) of circle1 and circle2 (0.1609144907808447, 0.5469063234748173)
+                            val p6 = intersectTwoPoints(c1, c2).first
+
+                            //line6_perp from point6 to point4_sample
+                            val perp = lineTool(p6, sample)
+
+                            //point7_center1 at intersection (1/1) of line3_half and line6_perp (0.5601017395692335, 0.3423228584707677)
+                            val center1 = intersectOnePoint(half, perp)
+
+                            //circle3 with center point7_center1 extending to point4_sample (radius 0.23608707668554063)
+                            val c3 = circleTool(center1, sample)
+
+                            //point8_touch at intersection (1/1) of line2_line2 and line6_perp (0.255457245390422, 0.49845316173740883)
+                            val touch = intersectOnePoint(line2, perp)
+
+                            //circle4_circle1 with center point7_center1 extending to point8_touch (radius 0.34232285847076765)
+                            val circle1 = circleTool(center1, touch)
+
+                            //point9_aim1 at intersection (1/2) of line5_line and circle4_circle1 (0.22244416876862572, 0.2859996455596617)
+                            val aim1 = intersectTwoPoints(line, circle1, other).first
+
+                            //point10 at intersection (2/2) of line6_perp and circle3 (0.7702034791384669, 0.23464571694153535)
+                            val p10 = intersectTwoPoints(perp, c3).second
+
+                            //circle5 with center point9_aim1 extending to point10 (radius 0.5501613291402437)
+                            val c5 = circleTool(aim1, p10)
+
+                            //point11 at intersection (1/2) of circle3 and circle5 (0.7238783087268739, 0.5123650390404045)
+                            val p11 = intersectTwoPoints(c3, c5, other).first
+
+                            //line7_cross2 from point11 to point4_sample
+                            val cross2 = lineTool(p11, sample)
+
+                            val center2 = intersectOnePoint(cross2, half)
                             // Just look for center of a solution
                             // val solution = circleTool(center2, sample)
                         }
