@@ -197,7 +197,7 @@ fun solve(
                         else -> {
                             val randomRange = 0..100
                             { _, element ->
-                                val knownComponent = if (element in knownElements) 0 else 1
+                                val knownComponent = if (element in knownElements) 1 else 0
                                 val familiarComponent =
                                     if (familiarityChecker?.isFamiliarElement(element) == true) 1 else 0
                                 val randomComponent = randomRange.random(random)
