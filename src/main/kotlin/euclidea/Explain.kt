@@ -91,7 +91,8 @@ private fun printSteps(context: EuclideaContext, namer: Namer) {
                     val coordinates = "(${point.x}, ${point.y})"
                     when (val intersectionSource = pointSourceFor(point)) {
                         null -> println("$pointLabel at $coordinates")
-                        else -> {
+                        is PointSource.Given -> println("Given point (${intersectionSource.index}) $pointLabel at $coordinates")
+                        is PointSource.IntersectionSource -> {
                             val elementLabel1 = elementLabel(intersectionSource.element1)
                             val elementLabel2 = elementLabel(intersectionSource.element2)
                             val points = intersectionSource.intersection.points()

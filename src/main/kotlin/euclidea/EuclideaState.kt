@@ -1,5 +1,7 @@
 package euclidea
 
+import euclidea.PointSource.IntersectionSource
+
 data class EuclideaConfig(
     val lineToolEnabled: Boolean = true,
     val circleToolEnabled: Boolean = true,
@@ -29,7 +31,11 @@ data class EuclideaConfig(
     }
 }
 
-data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection)
+sealed class PointSource {
+    data class Given(val index: Int) : PointSource()
+    data class IntersectionSource(val element1: Element, val element2: Element, val intersection: Intersection) :
+        PointSource()
+}
 
 // Should use `EuclideaContext.of` rather than primary constructor, in order to include intersection points of initial elements.
 data class EuclideaContext private constructor(
@@ -40,7 +46,7 @@ data class EuclideaContext private constructor(
     val points
         get() = pointsInfo.points
 
-    fun pointSourceFor(point: Point): IntersectionSource? {
+    fun pointSourceFor(point: Point): PointSource? {
         return pointsInfo.pointSourceFor(point)
     }
 
@@ -50,22 +56,22 @@ data class EuclideaContext private constructor(
             points: List<Point>,
             elements: List<Element>
         ): EuclideaContext {
-            return EuclideaContext(config, listOf(), PointsInfo.Strict(points)).withElements(elements)
+            return EuclideaContext(config, listOf(), PointsInfo.given(points)).withElements(elements)
         }
 
         private sealed class PointsInfo {
 
-            abstract fun pointSourceFor(point: Point): IntersectionSource?
+            abstract fun pointSourceFor(point: Point): PointSource?
             protected abstract val strict: Strict
             abstract val points: List<Point>
 
-            data class Strict(
+            data class Strict internal constructor(
                 override val points: List<Point>,
-                private val pointSource: Map<Point, IntersectionSource> = mapOf(),
-                private val parent: Strict? = null
+                private val pointSource: Map<Point, PointSource>,
+                private val parent: Strict?
             ) : PointsInfo() {
 
-                override fun pointSourceFor(point: Point): IntersectionSource? {
+                override fun pointSourceFor(point: Point): PointSource? {
                     val canonicalPoint = points.firstOrNull { p -> coincides(p, point) }
                     if (canonicalPoint === null)
                         return null
@@ -91,7 +97,7 @@ data class EuclideaContext private constructor(
                 override val points
                     get() = delegate.points
 
-                override fun pointSourceFor(point: Point): IntersectionSource? {
+                override fun pointSourceFor(point: Point): PointSource? {
                     return delegate.pointSourceFor(point)
                 }
 
@@ -104,9 +110,17 @@ data class EuclideaContext private constructor(
                     return Builder(parent.strict)
                 }
 
+                fun given(points: List<Point>): PointsInfo {
+                    return Strict(
+                        points = points,
+                        pointSource = points.mapIndexed { index, point -> point to PointSource.Given(index) }.toMap(),
+                        parent = null
+                    )
+                }
+
                 class Builder(private val parent: Strict) {
                     val updatedPoints = parent.points.toMutableList()
-                    val pointSource = mutableMapOf<Point, IntersectionSource>()
+                    val pointSource = mutableMapOf<Point, PointSource>()
 
                     fun include(point: Point, intersectionSource: IntersectionSource) {
                         if (updatedPoints.none { p -> coincides(p, point) }) {
