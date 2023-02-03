@@ -190,7 +190,7 @@ fun solve(
                 }
 
                 fun maybePrioritize(items: List<Element>): List<Element> {
-                    // Prioritize known elements by default
+                    // Prioritize known elements by default, then familiar elements
                     val defaultPriority: ((SolveContext, Element) -> Int)? = when {
                         knownElements === null -> null
                         depth > forkDepth + 1 -> null
@@ -198,8 +198,10 @@ fun solve(
                             val randomRange = 0..100
                             { _, element ->
                                 val knownComponent = if (element in knownElements) 0 else 1
+                                val familiarComponent =
+                                    if (familiarityChecker?.isFamiliarElement(element) == true) 1 else 0
                                 val randomComponent = randomRange.random(random)
-                                knownComponent * randomRange.last + randomComponent
+                                (knownComponent * 2 + familiarComponent) * randomRange.last + randomComponent
                             }
                         }
                     }
