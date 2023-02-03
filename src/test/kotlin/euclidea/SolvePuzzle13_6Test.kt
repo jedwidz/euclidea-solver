@@ -7,7 +7,6 @@ import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularBisectorTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
-import kotlin.math.max
 
 class SolvePuzzle13_6Test {
     // Circle Through Two Points and Tangent to Line
@@ -22,7 +21,7 @@ class SolvePuzzle13_6Test {
         // ?
         Solver().improveSolution(
             maxExtraElements = 5,
-            maxDepth = 7,
+            maxDepth = 6,
             maxUnfamiliarElements = 2,
             maxNonNewElements = 3,
             maxConsecutiveNonNewElements = 2,
@@ -47,19 +46,19 @@ class SolvePuzzle13_6Test {
 
         override fun makeParams(): Params {
             return Params(
-                pointA = Point(-0.2, 0.91),
+                pointA = Point(-0.21, 0.89),
                 pointB = Point(-1.0, 0.0),
                 base = Point(0.42, -1.5),
-                dir = Point(0.0, -1.5),
+                dir = Point(0.0, -1.51),
             )
         }
 
         override fun makeReplayParams(): Params {
             return Params(
-                pointA = Point(-0.203, 0.9111),
+                pointA = Point(-0.213, 0.9111),
                 pointB = Point(-1.0111, 0.002),
                 base = Point(0.4222, -1.503),
-                dir = Point(0.0, -1.5013),
+                dir = Point(0.0, -1.5113),
             )
         }
 
@@ -84,7 +83,8 @@ class SolvePuzzle13_6Test {
 //                            angleBisectorToolEnabled = true,
                         ),
                         // base is included as a probe point
-                        points = listOf(pointA, pointB),
+                        // TODO 'hide' base?
+                        points = listOf(pointA, pointB, base),
                         elements = listOf(line, bisect)
                     )
                 }
@@ -97,7 +97,19 @@ class SolvePuzzle13_6Test {
         ): (EuclideaContext) -> Boolean {
             val solutions = constructSolutions(params)
             return { context ->
-                solutions.any { context.hasElement(it) }
+                // solutions.any { context.hasElement(it) }
+                //                context.elements.lastOrNull()
+                // Just look for center of a solution
+                context.elements.size > 1 && context.elements.last().let { element ->
+                    solutions.any { solution ->
+                        val pointOfInterest = solution.center
+                        pointAndElementCoincide(pointOfInterest, element) &&
+                                // Just checking point/line has some false positives with 'almost coincident' lines
+                                // Note this still avoids evaluating context points in most cases
+                                context.hasPoint(pointOfInterest)
+                    }
+                }
+
             }
         }
 
@@ -152,22 +164,23 @@ class SolvePuzzle13_6Test {
 //            }
 //        }
 
-        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
-            val solutions = constructSolutions(params)
-            return { context ->
-                solutions.minOf { solution ->
-                    val center = solution.center
-                    // Assumes that solution is the last element (no extraneous elements)
-                    if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
-                        0
-                    else {
-                        val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
-                        // Need two elements to locate center, then the solution circle itself
-                        max(0, 2 - onCenter) + 1
-                    }
-                }
-            }
-        }
+        // Just look for center of a solution - nothing to check here
+//        override fun remainingStepsLowerBound(params: Params, setup: Setup): (EuclideaContext) -> Int {
+//            val solutions = constructSolutions(params)
+//            return { context ->
+//                solutions.minOf { solution ->
+//                    val center = solution.center
+//                    // Assumes that solution is the last element (no extraneous elements)
+//                    if (context.elements.lastOrNull()?.let { coincides(it, solution) } == true)
+//                        0
+//                    else {
+//                        val onCenter = context.elements.count { pointAndElementCoincide(center, it) }
+//                        // Need two elements to locate center, then the solution circle itself
+//                        max(0, 2 - onCenter) + 1
+//                    }
+//                }
+//            }
+//        }
 
         override fun toolSequence(): List<EuclideaTool> {
             // Euclidea 10E E-star moves hint
@@ -180,6 +193,7 @@ class SolvePuzzle13_6Test {
                 EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
+                // This is skipped, just look for center of a solution
                 EuclideaTool.CircleTool
             )
         }
@@ -220,7 +234,8 @@ class SolvePuzzle13_6Test {
                             val cross1 = lineTool(center1, aim1)
                             val cross2 = parallelTool(cross1, pointB, probe = center1)
                             val center2 = intersectOnePoint(cross2, bisect)
-                            val solution = circleTool(center2, pointB)
+                            // Just look for center of a solution
+                            // val solution = circleTool(center2, pointB)
                         }
                         namer.nameReflected(context)
                         setup to initialContext.withElements(elementsReflected(context))
@@ -249,7 +264,8 @@ class SolvePuzzle13_6Test {
                             val cross1 = lineTool(center1, aim1)
                             val cross2 = parallelTool(cross1, pointB, probe = center1)
                             val center2 = intersectOnePoint(cross2, bisect)
-                            val solution = circleTool(center2, pointB)
+                            // Just look for center of a solution
+                            // val solution = circleTool(center2, pointB)
                         }
                         namer.nameReflected(context)
                         setup to initialContext.withElements(elementsReflected(context))
@@ -277,7 +293,8 @@ class SolvePuzzle13_6Test {
                             val ground = intersectTwoPoints(circle2, line, other).second
                             val perp = perpendicularTool(line, ground, probe = midAB)
                             val center = intersectOnePoint(perp, bisect)
-                            val solution = circleTool(center, ground)
+                            // Just look for center of a solution
+                            // val solution = circleTool(center, ground)
                         }
                         namer.nameReflected(context)
                         setup to initialContext.withElements(elementsReflected(context))
