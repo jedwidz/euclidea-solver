@@ -18,7 +18,7 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // ?
+        // no solution found
         Solver().improveSolution(
             maxExtraElements = 5,
             maxDepth = 6,
