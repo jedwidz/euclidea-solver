@@ -24,10 +24,10 @@ class SolvePuzzle11_6Test {
         // no solution found ?
         Solver().improveSolution(
             maxExtraElements = 0,
-            maxDepth = 12,
+            maxDepth = 10,
             maxUnfamiliarElements = 0,
             maxNonNewElements = 4,
-            maxConsecutiveNonNewElements = 3,
+            maxConsecutiveNonNewElements = 2,
             useTargetConstruction = true,
             fillKnownElements = true
         )
