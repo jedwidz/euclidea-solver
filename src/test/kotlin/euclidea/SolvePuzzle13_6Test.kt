@@ -21,11 +21,11 @@ class SolvePuzzle13_6Test {
     fun improveSolution() {
         // ?
         Solver().improveSolution(
-            maxExtraElements = 8,
-            maxDepth = 8,
-            maxUnfamiliarElements = 1,
-            maxNonNewElements = 4,
-            maxConsecutiveNonNewElements = 3,
+            maxExtraElements = 5,
+            maxDepth = 7,
+            maxUnfamiliarElements = 2,
+            maxNonNewElements = 3,
+            maxConsecutiveNonNewElements = 2,
             useTargetConstruction = true,
             fillKnownElements = true
         )
@@ -179,8 +179,6 @@ class SolvePuzzle13_6Test {
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                // Maybe an extra line here, for a suboptimal solution?
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool
             )
