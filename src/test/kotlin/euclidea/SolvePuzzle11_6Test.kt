@@ -23,7 +23,7 @@ class SolvePuzzle11_6Test {
     fun improveSolution() {
         // improve suboptimal solution not found
         Solver().improveSolution(
-            maxExtraElements = 1,
+            maxExtraElements = 2,
             maxDepth = 7,
             maxUnfamiliarElements = 1,
             maxNonNewElements = 4,
@@ -196,20 +196,20 @@ class SolvePuzzle11_6Test {
             }
         }
 
-//        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 11E E-star moves hint
-//            return listOf(
-//                // Moved to setup
-//                // EuclideaTool.AngleBisectorTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool
-//            )
-//        }
+        override fun toolSequence(): List<EuclideaTool> {
+            // Euclidea 11E E-star moves hint
+            return listOf(
+                // Moved to setup
+                // EuclideaTool.AngleBisectorTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool
+            )
+        }
 
         override fun referenceSolution(
             params: Params,
