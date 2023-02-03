@@ -19,14 +19,15 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // gave up
+        // ?
         Solver().improveSolution(
             maxExtraElements = 8,
             maxDepth = 8,
-            maxUnfamiliarElements = 2,
+            maxUnfamiliarElements = 1,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
-            useTargetConstruction = true
+            useTargetConstruction = true,
+            fillKnownElements = true
         )
     }
 
