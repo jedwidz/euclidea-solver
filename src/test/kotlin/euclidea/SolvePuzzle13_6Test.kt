@@ -18,11 +18,11 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found
+        // improved suboptimal solution found 34 sec
         Solver().improveSolution(
-            maxExtraElements = 5,
-            maxDepth = 6,
-            maxUnfamiliarElements = 2,
+            maxExtraElements = 1,
+            maxDepth = 8,
+            maxUnfamiliarElements = 0,
             maxNonNewElements = 3,
             maxConsecutiveNonNewElements = 2,
             useTargetConstruction = true,
@@ -182,21 +182,21 @@ class SolvePuzzle13_6Test {
 //            }
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 10E E-star moves hint
-            return listOf(
-                // Moved to setup
-                // EuclideaTool.PerpendicularBisectorTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                // This is skipped, just look for center of a solution
-                EuclideaTool.CircleTool
-            )
-        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 10E E-star moves hint
+//            return listOf(
+//                // Moved to setup
+//                // EuclideaTool.PerpendicularBisectorTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                // This is skipped, just look for center of a solution
+//                EuclideaTool.CircleTool
+//            )
+//        }
 
         override fun referenceSolution(
             params: Params,
