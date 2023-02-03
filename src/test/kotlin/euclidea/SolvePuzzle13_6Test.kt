@@ -182,21 +182,23 @@ class SolvePuzzle13_6Test {
 //            }
 //        }
 
-//        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 10E E-star moves hint
-//            return listOf(
-//                // Moved to setup
-//                // EuclideaTool.PerpendicularBisectorTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                // This is skipped, just look for center of a solution
-//                EuclideaTool.CircleTool
-//            )
-//        }
+        override fun toolsSequence(): List<Set<EuclideaTool>> {
+            // Euclidea 10E E-star moves hint
+            return toolsList(
+                // Moved to setup
+                // EuclideaTool.PerpendicularBisectorTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                // // This is skipped, just look for center of a solution
+                // EuclideaTool.CircleTool
+                // Extra for suboptimal solution
+                setOf(EuclideaTool.CircleTool, EuclideaTool.LineTool),
+            )
+        }
 
         override fun referenceSolution(
             params: Params,
