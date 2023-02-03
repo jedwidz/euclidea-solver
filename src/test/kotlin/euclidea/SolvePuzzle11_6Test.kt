@@ -21,10 +21,10 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found ?
+        // improve suboptimal solution found
         Solver().improveSolution(
-            maxExtraElements = 0,
-            maxDepth = 10,
+            maxExtraElements = 1,
+            maxDepth = 9,
             maxUnfamiliarElements = 0,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 2,
