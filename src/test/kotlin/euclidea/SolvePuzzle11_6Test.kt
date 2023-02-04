@@ -196,9 +196,9 @@ class SolvePuzzle11_6Test {
             }
         }
 
-        override fun toolSequence(): List<EuclideaTool> {
+        override fun toolsSequence(): List<Set<EuclideaTool>> {
             // Euclidea 11E E-star moves hint
-            return listOf(
+            return toolsList(
                 // Moved to setup
                 // EuclideaTool.AngleBisectorTool,
                 EuclideaTool.CircleTool,
@@ -207,7 +207,10 @@ class SolvePuzzle11_6Test {
                 EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
-                EuclideaTool.CircleTool
+                // This is skipped, just look for center of a solution
+                // EuclideaTool.CircleTool
+                // Extra for suboptimal solution
+                setOf(EuclideaTool.CircleTool, EuclideaTool.LineTool),
             )
         }
 
