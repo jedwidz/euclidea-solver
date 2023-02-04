@@ -18,13 +18,15 @@ class SolvePuzzle13_5Test {
 
     @Test
     fun improveSolution() {
-        // solution found 20 sec
+        // solution found 28 sec
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = 8,
             maxUnfamiliarElements = 4,
             maxNonNewElements = 1,
             // maxConsecutiveNonNewElements = 1,
+            maxSameLineHeadings = 2,
+            maxSameCircleRadii = 2,
             useTargetConstruction = true,
             fillKnownElements = true
         )
