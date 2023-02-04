@@ -18,13 +18,15 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // improved suboptimal solution not found
+        // improved suboptimal solution ?
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 7,
-            maxUnfamiliarElements = 1,
+            maxUnfamiliarElements = 2,
             maxNonNewElements = 3,
             maxConsecutiveNonNewElements = 2,
+            maxLinesPerHeading = 2,
+            maxCirclesPerRadius = 2,
             useTargetConstruction = true,
             fillKnownElements = true
         )
@@ -75,7 +77,7 @@ class SolvePuzzle13_6Test {
                 with(context) {
                     return Setup(line, bisect) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(16.0),
+                            maxSqDistance = sq(20.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
