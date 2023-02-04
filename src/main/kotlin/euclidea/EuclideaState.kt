@@ -113,7 +113,8 @@ data class EuclideaContext private constructor(
                 fun given(points: List<Point>): PointsInfo {
                     return Strict(
                         points = points,
-                        pointSource = points.mapIndexed { index, point -> point to PointSource.Given(index) }.toMap(),
+                        pointSource = points.mapIndexed { index, point -> point to PointSource.Given(index + 1) }
+                            .toMap(),
                         parent = null
                     )
                 }
