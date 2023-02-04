@@ -21,10 +21,11 @@ class SolvePuzzle15_9Test {
         Solver().improveSolution(
             maxExtraElements = 2,
             maxDepth = 15,
-            maxUnfamiliarElements = 1,
+            maxUnfamiliarElements = 0,
 //            maxNonNewElements = 2,
 //            maxConsecutiveNonNewElements = 1,
-            useTargetConstruction = true
+            useTargetConstruction = true,
+            fillKnownElements = true
         )
     }
 
