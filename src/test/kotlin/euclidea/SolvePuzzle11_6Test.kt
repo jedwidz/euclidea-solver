@@ -21,9 +21,9 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // improved suboptimal solution not found
+        // improved suboptimal solution ?
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 3,
             maxDepth = 7,
             maxUnfamiliarElements = 1,
             maxNonNewElements = 4,
@@ -58,9 +58,8 @@ class SolvePuzzle11_6Test {
         override fun makeParams(): Params {
             return Params(
                 baseO = Point(0.0, 0.0),
-                baseA = Point(1.0, 0.0),
+                baseA = Point(1.0, 0.4),
                 baseB = Point(0.61, 1.2),
-                // Close to B-line
                 sample = Point(0.43, 0.78),
                 probe1Scale = 0.24,
                 probe2Scale = 0.135
@@ -70,7 +69,7 @@ class SolvePuzzle11_6Test {
         override fun makeReplayParams(): Params {
             return Params(
                 baseO = Point(0.0, 0.0),
-                baseA = Point(1.01, 0.0),
+                baseA = Point(1.01, 0.4034),
                 baseB = Point(0.611, 1.2005),
                 sample = Point(0.430101, 0.781),
                 probe1Scale = 0.2398,
