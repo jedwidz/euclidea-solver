@@ -82,6 +82,8 @@ fun solve(
     maxDepth: Int,
     maxNonNewElements: Int? = null,
     maxConsecutiveNonNewElements: Int? = null,
+    maxSameLineHeadings: Int? = null,
+    maxSameCircleRadii: Int? = null,
     prune: ((SolveContext) -> Boolean)? = null,
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
@@ -161,8 +163,12 @@ fun solve(
                             )
                         })
                     } ?: config
+                val overFamiliarityChecker = OverFamiliarityChecker(
+                    elements,
+                    maxSameLineHeadings = maxSameLineHeadings,
+                    maxSameCircleRadii = maxSameCircleRadii
+                )
                 val oldElements = elements.toSet() - solveState.lastAddedElements.toSet()
-
                 val newElements = mutableSetOf<Element>()
                 possibleToolApplications(
                     remainingConfig,
@@ -171,7 +177,12 @@ fun solve(
                     elements,
                     oldElements
                 ) { e: Element ->
-                    if (e !in pendingElements && e !in passedElements && !hasElement(e) && excludeElements?.let { e in it } != true) {
+                    if (e !in pendingElements &&
+                        e !in passedElements &&
+                        !hasElement(e) &&
+                        excludeElements?.let { e in it } != true &&
+                        !overFamiliarityChecker.isOverlyFamiliarElement(e)
+                    ) {
                         pendingElements += e
                         if (nextTools === null || e.sourceTool in nextTools)
                             newElements += e
@@ -370,6 +381,46 @@ private class FamiliarityChecker {
             is Element.Line -> element.heading in familiarLineHeadings
             is Element.Circle -> element.radius in familiarCircleRadii
         }
+    }
+}
+
+private class DoubleCounter {
+    private val values = DoubleSet()
+    private val countByValue = mutableMapOf<Double, Int>()
+
+    fun increment(value: Double) {
+        val canonicalValue = values.canonicalOrAdd(value)
+        countByValue.merge(canonicalValue, 1) { a, b -> a + b }
+    }
+
+    fun get(value: Double): Int {
+        val canonicalValue = values.canonicalOrNull(value)
+        return canonicalValue?.let { countByValue[it] } ?: 0
+    }
+}
+
+private class OverFamiliarityChecker(
+    existingElements: List<Element>,
+    private val maxSameLineHeadings: Int?,
+    private val maxSameCircleRadii: Int?,
+) {
+    private val lineHeadingsCounter = maxSameLineHeadings?.let { DoubleCounter() }
+    private val circleRadiiCounter = maxSameCircleRadii?.let { DoubleCounter() }
+
+    init {
+        existingElements.forEach { element ->
+            when (element) {
+                is Element.Line -> lineHeadingsCounter?.increment(element.heading)
+                is Element.Circle -> circleRadiiCounter?.increment(element.radius)
+            }
+        }
+    }
+
+    fun isOverlyFamiliarElement(element: Element): Boolean {
+        return when (element) {
+            is Element.Line -> lineHeadingsCounter?.let { it.get(element.heading) >= maxSameLineHeadings!! }
+            is Element.Circle -> circleRadiiCounter?.let { it.get(element.radius) >= maxSameCircleRadii!! }
+        } ?: false
     }
 }
 

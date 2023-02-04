@@ -41,6 +41,8 @@ abstract class ImprovingSolver<Params : Any, Setup> {
         maxUnfamiliarElements: Int? = null,
         maxNonNewElements: Int? = null,
         maxConsecutiveNonNewElements: Int? = null,
+        maxSameLineHeadings: Int? = null,
+        maxSameCircleRadii: Int? = null,
         useTargetConstruction: Boolean = false,
         fillKnownElements: Boolean = false
     ) {
@@ -130,6 +132,8 @@ abstract class ImprovingSolver<Params : Any, Setup> {
             maxDepth = maxDepth,
             maxNonNewElements = maxNonNewElements,
             maxConsecutiveNonNewElements = maxConsecutiveNonNewElements,
+            maxSameLineHeadings = maxSameLineHeadings,
+            maxSameCircleRadii = maxSameCircleRadii,
             visitPriority = visitPriority,
             pass = passWithPrefix,
             remainingStepsLowerBound = remainingStepsLowerBound,
