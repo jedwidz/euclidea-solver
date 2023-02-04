@@ -82,8 +82,8 @@ fun solve(
     maxDepth: Int,
     maxNonNewElements: Int? = null,
     maxConsecutiveNonNewElements: Int? = null,
-    maxSameLineHeadings: Int? = null,
-    maxSameCircleRadii: Int? = null,
+    maxLinesPerHeading: Int? = null,
+    maxCirclesPerRadius: Int? = null,
     prune: ((SolveContext) -> Boolean)? = null,
     visitPriority: ((SolveContext, Element) -> Int)? = null,
     pass: ((SolveContext, Element) -> Boolean)? = null,
@@ -165,8 +165,8 @@ fun solve(
                     } ?: config
                 val overFamiliarityChecker = OverFamiliarityChecker(
                     elements,
-                    maxSameLineHeadings = maxSameLineHeadings,
-                    maxSameCircleRadii = maxSameCircleRadii
+                    maxLinesPerHeading = maxLinesPerHeading,
+                    maxCirclesPerRadius = maxCirclesPerRadius
                 )
                 val oldElements = elements.toSet() - solveState.lastAddedElements.toSet()
                 val newElements = mutableSetOf<Element>()
@@ -401,11 +401,11 @@ private class DoubleCounter {
 
 private class OverFamiliarityChecker(
     existingElements: List<Element>,
-    private val maxSameLineHeadings: Int?,
-    private val maxSameCircleRadii: Int?,
+    private val maxLinesPerHeading: Int?,
+    private val maxCirclesPerRadius: Int?,
 ) {
-    private val lineHeadingsCounter = maxSameLineHeadings?.let { DoubleCounter() }
-    private val circleRadiiCounter = maxSameCircleRadii?.let { DoubleCounter() }
+    private val lineHeadingsCounter = maxLinesPerHeading?.let { DoubleCounter() }
+    private val circleRadiiCounter = maxCirclesPerRadius?.let { DoubleCounter() }
 
     init {
         existingElements.forEach { element ->
@@ -418,8 +418,8 @@ private class OverFamiliarityChecker(
 
     fun isOverlyFamiliarElement(element: Element): Boolean {
         return when (element) {
-            is Element.Line -> lineHeadingsCounter?.let { it.get(element.heading) >= maxSameLineHeadings!! }
-            is Element.Circle -> circleRadiiCounter?.let { it.get(element.radius) >= maxSameCircleRadii!! }
+            is Element.Line -> lineHeadingsCounter?.let { it.get(element.heading) >= maxLinesPerHeading!! }
+            is Element.Circle -> circleRadiiCounter?.let { it.get(element.radius) >= maxCirclesPerRadius!! }
         } ?: false
     }
 }

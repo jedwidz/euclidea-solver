@@ -25,8 +25,8 @@ class SolvePuzzle13_5Test {
             maxUnfamiliarElements = 4,
             maxNonNewElements = 1,
             // maxConsecutiveNonNewElements = 1,
-            maxSameLineHeadings = 2,
-            maxSameCircleRadii = 2,
+            maxLinesPerHeading = 2,
+            maxCirclesPerRadius = 2,
             useTargetConstruction = true,
             fillKnownElements = true
         )
