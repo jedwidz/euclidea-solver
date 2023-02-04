@@ -298,6 +298,11 @@ class SolvePuzzle13_6Test {
                             val circle2 = nonCollapsingCompassTool(ref, midAB, inline)
                             val ground = intersectTwoPoints(circle2, line, other).second
                             val perp = perpendicularTool(line, ground, probe = midAB)
+
+                            // Alternatively to `perp`, can bisect with the given points - mentioned here for familiarity
+                            val bisectGroundA = perpendicularBisectorTool(ground, pointA)
+                            val bisectGroundB = perpendicularBisectorTool(ground, pointB)
+
                             val center = intersectOnePoint(perp, bisect)
                             // Just look for center of a solution
                             // val solution = circleTool(center, ground)
