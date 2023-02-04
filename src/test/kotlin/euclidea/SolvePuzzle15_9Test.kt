@@ -18,12 +18,12 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // ?
+        // no solution found 26 min 48 sec
         Solver().improveSolution(
-            maxExtraElements = 0,
-            maxDepth = 15,
-            maxUnfamiliarElements = 0,
-            maxNonNewElements = 4,
+            maxExtraElements = 8,
+            maxDepth = 8,
+            maxUnfamiliarElements = 3,
+            maxNonNewElements = 3,
             maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
@@ -220,20 +220,20 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-//        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 8E E-star moves hint
-//            return listOf(
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool,
-//            )
-//        }
+        override fun toolSequence(): List<EuclideaTool> {
+            // Euclidea 8E E-star moves hint
+            return listOf(
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+            )
+        }
 
 //        override fun toolSequence(): List<EuclideaTool> {
 //            // Euclidea 7L L-star moves hint
