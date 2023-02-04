@@ -21,13 +21,15 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // improve suboptimal solution not found
+        // improved suboptimal solution not found
         Solver().improveSolution(
             maxExtraElements = 2,
             maxDepth = 7,
             maxUnfamiliarElements = 1,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 2,
+            maxLinesPerHeading = 2,
+            maxCirclesPerRadius = 2,
             useTargetConstruction = true,
             fillKnownElements = true
         )
@@ -57,8 +59,9 @@ class SolvePuzzle11_6Test {
             return Params(
                 baseO = Point(0.0, 0.0),
                 baseA = Point(1.0, 0.0),
-                baseB = Point(0.41, 0.8),
-                sample = Point(0.35, 0.45),
+                baseB = Point(0.61, 1.2),
+                // Close to B-line
+                sample = Point(0.43, 0.78),
                 probe1Scale = 0.24,
                 probe2Scale = 0.135
             )
@@ -68,8 +71,8 @@ class SolvePuzzle11_6Test {
             return Params(
                 baseO = Point(0.0, 0.0),
                 baseA = Point(1.01, 0.0),
-                baseB = Point(0.411, 0.8005),
-                sample = Point(0.350101, 0.451),
+                baseB = Point(0.611, 1.2005),
+                sample = Point(0.430101, 0.781),
                 probe1Scale = 0.2398,
                 probe2Scale = 0.135
             )
@@ -84,16 +87,18 @@ class SolvePuzzle11_6Test {
                     val line1 = Element.Line(baseO, baseA, limit1 = true)
                     val line2 = Element.Line(baseO, baseB, limit1 = true)
                     val half = angleBisectorTool(baseA, baseO, baseB)
+                    val probeLine = lineTool(probe1, probe2)
+                    // val halfProbe = intersectOnePoint(probeLine,half)
                 }
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(line1, line2, half) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(15.0),
+                            maxSqDistance = sq(100.0),
 //                            angleBisectorToolEnabled = true
                         ),
-                        points = listOf(baseO, baseA, baseB, sample/*, probe1, probe2*/),
-                        elements = listOf(line1, line2, half)
+                        points = listOf(baseO, sample /* baseA, baseB, sample, halfProbe, probe1, probe2*/),
+                        elements = listOf(line1, line2, half, probeLine)
                     )
                 }
             }
