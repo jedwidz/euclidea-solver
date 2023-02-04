@@ -227,7 +227,9 @@ private fun printSteps(context: EuclideaContext, namer: Namer) {
             fun explain() {
                 explainSteps()
                 println()
-                reportCoincidences()
+                // Disabled for now as slow and noisy
+                // TODO- do something with this
+                // reportCoincidences()
             }
         }.explain()
     }
