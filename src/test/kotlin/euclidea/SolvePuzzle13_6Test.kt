@@ -18,11 +18,11 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // improved suboptimal solution ?
+        // improved suboptimal solution not found 11 min 50 sec
         Solver().improveSolution(
-            maxExtraElements = 3,
-            maxDepth = 7,
-            maxUnfamiliarElements = 2,
+            maxExtraElements = 6,
+            maxDepth = 6,
+            maxUnfamiliarElements = 1,
             maxNonNewElements = 3,
             maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
