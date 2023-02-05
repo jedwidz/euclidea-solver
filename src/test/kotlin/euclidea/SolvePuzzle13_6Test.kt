@@ -18,17 +18,17 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 39 min
+        // no solution found 1 hr
         Solver().improveSolution(
-            maxExtraElements = 5,
+            maxExtraElements = 4,
             maxDepth = 5,
-            maxUnfamiliarElements = 3,
+            maxUnfamiliarElements = 4,
             maxNonNewElements = 1,
             // maxConsecutiveNonNewElements = 1,
             maxLinesPerHeading = 1,
             maxCirclesPerRadius = 1,
-            useTargetConstruction = true,
-            fillKnownElements = true
+            useTargetConstruction = false,
+            fillKnownElements = false
         )
     }
 
@@ -81,7 +81,7 @@ class SolvePuzzle13_6Test {
                 with(context) {
                     return Setup(line, bisect) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(10.0),
+                            maxSqDistance = sq(100.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
