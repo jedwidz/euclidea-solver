@@ -45,23 +45,23 @@ class SolvePuzzle15_11Test {
 
         override fun makeParams(): Params {
             return Params(
-                centerA = Point(0.0, 0.72),
+                centerA = Point(0.0, 0.74),
                 sampleA = Point(0.31, 0.6),
-                base = Point(0.1, 0.0),
-                dir = Point(0.85, 0.0),
-                centerB = Point(0.9, 0.65),
-                sampleB = Point(0.8, 0.55),
+                base = Point(0.11, 0.0),
+                dir = Point(0.832, 0.0),
+                centerB = Point(0.89, 0.61),
+                sampleB = Point(0.71, 0.55),
             )
         }
 
         override fun makeReplayParams(): Params {
             return Params(
-                centerA = Point(0.0, 0.72),
+                centerA = Point(0.0, 0.74),
                 sampleA = Point(0.31, 0.6),
-                base = Point(0.1, 0.0),
-                dir = Point(0.85, 0.0),
-                centerB = Point(0.9, 0.65),
-                sampleB = Point(0.8, 0.55),
+                base = Point(0.11, 0.0),
+                dir = Point(0.83, 0.0),
+                centerB = Point(0.89, 0.61),
+                sampleB = Point(0.7, 0.55),
             )
         }
 
