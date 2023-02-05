@@ -18,15 +18,15 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // improved suboptimal solution not found 11 hr 17 min
+        // no solution found 39 min
         Solver().improveSolution(
-            maxExtraElements = 6,
-            maxDepth = 6,
+            maxExtraElements = 5,
+            maxDepth = 5,
             maxUnfamiliarElements = 3,
-            maxNonNewElements = 3,
-            maxConsecutiveNonNewElements = 2,
-            maxLinesPerHeading = 2,
-            maxCirclesPerRadius = 2,
+            maxNonNewElements = 1,
+            // maxConsecutiveNonNewElements = 1,
+            maxLinesPerHeading = 1,
+            maxCirclesPerRadius = 1,
             useTargetConstruction = true,
             fillKnownElements = true
         )
@@ -37,6 +37,7 @@ class SolvePuzzle13_6Test {
         val pointB: Point,
         val base: Point,
         val dir: Point,
+        val probe: Point
     )
 
     data class Setup(
@@ -52,6 +53,7 @@ class SolvePuzzle13_6Test {
                 pointB = Point(-1.0, 0.0),
                 base = Point(0.42, -1.5),
                 dir = Point(0.0, -1.51),
+                probe = Point(-0.12, 0.43),
             )
         }
 
@@ -61,6 +63,7 @@ class SolvePuzzle13_6Test {
                 pointB = Point(-1.0111, 0.002),
                 base = Point(0.4222, -1.503),
                 dir = Point(0.0, -1.5113),
+                probe = Point(-0.1201, 0.4331),
             )
         }
 
@@ -72,12 +75,13 @@ class SolvePuzzle13_6Test {
                 val context = object {
                     val line = Element.Line(base, dir)
                     val bisect = perpendicularBisectorTool(pointA, pointB)
+                    val probeLine = lineTool(base, probe)
                 }
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(line, bisect) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(20.0),
+                            maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
@@ -87,7 +91,7 @@ class SolvePuzzle13_6Test {
                         // base is included as a probe point
                         // TODO 'hide' base?
                         points = listOf(pointA, pointB, base),
-                        elements = listOf(line, bisect)
+                        elements = listOf(line, bisect, probeLine)
                     )
                 }
             }
@@ -197,8 +201,6 @@ class SolvePuzzle13_6Test {
                 EuclideaTool.LineTool,
                 // // This is skipped, just look for center of a solution
                 // EuclideaTool.CircleTool
-                // Extra for suboptimal solution
-                setOf(EuclideaTool.CircleTool, EuclideaTool.LineTool),
             )
         }
 
