@@ -44,7 +44,7 @@ class Namer {
 }
 
 fun dumpSolution(solutionContext: EuclideaContext?, namer: Namer = Namer()) {
-    // println(solutionContext)
+    println(solutionContext)
     solutionContext?.let { printSteps(it, namer) }
 }
 

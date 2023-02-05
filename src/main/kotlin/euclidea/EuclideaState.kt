@@ -103,6 +103,10 @@ data class EuclideaContext private constructor(
 
                 override val strict: Strict
                     get() = delegate
+
+                override fun toString(): String {
+                    return delegate.toString()
+                }
             }
 
             companion object {
