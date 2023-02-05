@@ -134,15 +134,12 @@ class SolvePuzzle15_9Test {
             with(params) {
                 with(setup) {
                     fun impl(other: Boolean): Element.Circle {
-                        val bracket1 = perpendicularTool(line, center, probe = base)
-                        val bracket2 = perpendicularTool(line, sample, probe = base)
-                        val p1 = intersectOnePoint(line, bracket1)
-                        val p2 = intersectOnePoint(line, bracket2)
+                        val p1 = projection(line, center)
+                        val p2 = projection(line, sample)
                         val d = p2 - p1
                         // One solution either side of 'center'... guess an outer bound
                         val sign = if (other) -1 else 1
-                        val bound = sign * 10.0
-                        val param = solveByBisection(0.0, bound) { x ->
+                        val param = solveByExpansionAndBisection(0.0) { x ->
                             val p = p1 + d * x
                             val d1 = (p - center).distance - sign * circle.radius
                             val d2 = (p - sample).distance
