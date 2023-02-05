@@ -1,8 +1,6 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
-import euclidea.EuclideaTools.lineTool
-import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
@@ -16,7 +14,7 @@ class SolvePuzzle15_11Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 48 sec
+        // no solution found ?
         Solver().improveSolution(
             maxExtraElements = 3,
             maxDepth = 3,
@@ -98,24 +96,33 @@ class SolvePuzzle15_11Test {
             params: Params,
             setup: Setup
         ): (EuclideaContext) -> Boolean {
-            val solution = constructSolution(params, setup)
+            val solutions = constructSolution(params, setup)
             // Validate solution
-            assertTrue(pointAndLineCoincide(solution.center, setup.line))
-            assertTrue(meetAtOnePoint(setup.circleA, solution))
-            assertTrue(meetAtOnePoint(setup.circleB, solution))
+            solutions.forEach { solution ->
+                assertTrue(pointAndLineCoincide(solution.center, setup.line))
+                assertTrue(meetAtOnePoint(setup.circleA, solution))
+                assertTrue(meetAtOnePoint(setup.circleB, solution))
+            }
             // Look for partial solution
             // val pointOfInterest = solution.center
             return { context ->
                 // Suspect that this is reducible to a 15.9 solution (noting move hints are similar)
-                when (context.elements.lastOrNull()) {
+                if (context.elements.size < 6) false
+                else when (context.elements.lastOrNull()) {
                     is Element.Circle -> {
-                        context.elements.filterIsInstance<Element.Circle>().any { circle ->
-                            context.points.any { point ->
-                                val subSolution = constructSolution15_9(params, setup, circle, point)
-                                val looksGood = subSolution !== null && coincides(subSolution, solution)
-                                if (looksGood)
-                                    println("Looks good: $circle --- $point --- $subSolution")
-                                looksGood
+                        context.elements.filterIsInstance<Element.Line>().any { line ->
+                            context.elements.filterIsInstance<Element.Circle>().any { circle ->
+                                context.points.any { point ->
+                                    val subSolutions = constructSolution15_9(params, setup, line, circle, point)
+                                    subSolutions.any { subSolution ->
+                                        solutions.any { solution ->
+                                            val looksGood = coincides(subSolution, solution)
+                                            if (looksGood)
+                                                println("Looks good: $circle --- $point --- $subSolution")
+                                            looksGood
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -140,56 +147,79 @@ class SolvePuzzle15_11Test {
         private fun constructSolution15_9(
             params: Params,
             setup: Setup,
+            line: Element.Line,
             circle: Element.Circle,
             sample: Point
-        ): Element.Circle? {
+        ): List<Element.Circle> {
             with(params) {
                 with(setup) {
-                    val center = circle.center
-                    val bracket1 = perpendicularTool(line, center, probe = base)
-                    val bracket2 = perpendicularTool(line, sample, probe = base)
-                    val p1 = intersectOnePoint(line, bracket1)
-                    val p2 = intersectOnePoint(line, bracket2)
-                    val d = p2 - p1
-                    val param = try {
-                        solveByBisection(0.0, 1.0) { x ->
-                            val p = p1 + d * x
-                            val d1 = (p - center).distance - circle.radius
-                            val d2 = (p - sample).distance
-                            d1 - d2
+                    fun impl(other: Boolean): Element.Circle? {
+                        val center = circle.center
+                        val p1 = projection(line, center)
+                        val p2 = projection(line, sample)
+                        val d = p2 - p1
+                        // One solution either side of 'center'... guess an outer bound
+                        val sign = if (other) -1 else 1
+                        val bound = sign * 100.0
+                        return try {
+                            val param = solveByBisection(0.0, bound) { x ->
+                                val p = p1 + d * x
+                                val d1 = (p - center).distance - sign * circle.radius
+                                val d2 = (p - sample).distance
+                                d1 - d2
+                            }
+                            val solutionCenter = p1 + d * param
+                            circleTool(solutionCenter, sample)
+                        } catch (e: IllegalArgumentException) {
+                            null
+                        } catch (e: InvalidConstructionException) {
+                            null
                         }
-                    } catch (e: IllegalArgumentException) {
-                        null
                     }
-                    if (param === null)
-                        return null
-                    val solutionCenter = p1 + d * param
-                    return try {
-                        circleTool(solutionCenter, sample)
-                    } catch (e: InvalidConstructionException) {
-                        null
-                    }
+                    return listOfNotNull(impl(false), impl(true))
                 }
             }
         }
 
-        private fun constructSolution(params: Params, setup: Setup): Element.Circle {
+        private fun constructSolution(params: Params, setup: Setup): List<Element.Circle> {
             with(params) {
                 with(setup) {
-                    val p1 = projection(line, centerA)
-                    val p2 = projection(line, centerB)
-                    val d = p2 - p1
-                    val param = solveByBisection(0.0, 1.0) { x ->
-                        val p = p1 + d * x
-                        val d1 = (p - centerA).distance - circleA.radius
-                        val d2 = (p - centerB).distance - circleB.radius
-                        d1 - d2
+                    val solutions = CircleSet()
+                    val bools = listOf(false, true)
+                    // TODO this is a bit rough... mightn't always get all the solutions?
+                    // Maybe should do 'grid search' to find solutions?
+                    for (otherA in bools) {
+                        for (otherB in bools) {
+                            for (side in bools) {
+                                for (choice in bools) {
+                                    val p1 = projection(line, centerA)
+                                    val p2 = projection(line, centerB)
+                                    val d = p2 - p1
+                                    // One solution either side of 'center'... guess an outer bound
+                                    val signA = if (otherA) -1 else 1
+                                    val signB = if (otherB) -1 else 1
+                                    val bound = (if (side) signA else signB) * 100.0
+                                    try {
+                                        val param = solveByBisection(0.0, bound) { x ->
+                                            val p = p1 + d * x
+                                            val d1 = (p - centerA).distance - signA * circleA.radius
+                                            val d2 = (p - centerB).distance - signB * circleB.radius
+                                            d1 - d2
+                                        }
+                                        val solutionCenter = p1 + d * param
+                                        val distanceA = (solutionCenter - centerA).distance - signA * circleA.radius
+                                        val sample =
+                                            intersectOnePoint(Element.Circle(solutionCenter, distanceA), circleA)
+                                        val solution = circleTool(solutionCenter, sample)
+                                        solutions += solution
+                                    } catch (e: Exception) {
+                                        // ignore
+                                    }
+                                }
+                            }
+                        }
                     }
-                    val solutionCenter = p1 + d * param
-                    val diameterA = lineTool(centerA, solutionCenter)
-                    val sample = intersectTwoPoints(diameterA, circleA).second
-                    val solution = circleTool(solutionCenter, sample)
-                    return solution
+                    return solutions.items()
                 }
             }
         }
