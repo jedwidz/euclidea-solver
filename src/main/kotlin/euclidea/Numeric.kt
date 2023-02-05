@@ -27,3 +27,27 @@ fun solveByBisection(o1: Double, o2: Double, f: (Double) -> Double): Double {
             x2 = m
     }
 }
+
+fun solveByExpansionAndBisection(o: Double, f: (Double) -> Double): Double {
+    val (o1, o2) = expandRange(o, f)
+    return solveByBisection(o1, o2, f)
+}
+
+fun expandRange(o: Double, f: (Double) -> Double): Pair<Double, Double> {
+    var d = Epsilon
+    while (true) {
+        val x1 = o - d
+        val x2 = o + d
+        val so1 = sign(f(x1))
+        val so2 = sign(f(x2))
+        if (so1 == 0.0)
+            return x1 to x1
+        if (so2 == 0.0)
+            return x2 to x2
+        if (so1 != so2)
+            return x1 to x2
+        d *= 2
+        if (d.isInfinite())
+            error("Failed to bracket solution, sign is asymptotically $so1")
+    }
+}
