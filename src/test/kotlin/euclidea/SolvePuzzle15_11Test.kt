@@ -158,11 +158,9 @@ class SolvePuzzle15_11Test {
                         val p1 = projection(line, center)
                         val p2 = projection(line, sample)
                         val d = p2 - p1
-                        // One solution either side of 'center'... guess an outer bound
                         val sign = if (other) -1 else 1
-                        val bound = sign * 100.0
                         return try {
-                            val param = solveByBisection(0.0, bound) { x ->
+                            val param = solveByExpansionAndBisection(0.0) { x ->
                                 val p = p1 + d * x
                                 val d1 = (p - center).distance - sign * circle.radius
                                 val d2 = (p - sample).distance
@@ -170,9 +168,10 @@ class SolvePuzzle15_11Test {
                             }
                             val solutionCenter = p1 + d * param
                             circleTool(solutionCenter, sample)
-                        } catch (e: IllegalArgumentException) {
-                            null
-                        } catch (e: InvalidConstructionException) {
+                        } catch (e: Exception) {
+                            // Get quite a lot of these...
+                            // TODO- try to avoid common cases up-front
+                            // println("Ignored exception constructing 15.9 solution: $e")
                             null
                         }
                     }
@@ -186,36 +185,28 @@ class SolvePuzzle15_11Test {
                 with(setup) {
                     val solutions = CircleSet()
                     val bools = listOf(false, true)
-                    // TODO this is a bit rough... mightn't always get all the solutions?
-                    // Maybe should do 'grid search' to find solutions?
                     for (otherA in bools) {
                         for (otherB in bools) {
-                            for (side in bools) {
-                                for (choice in bools) {
-                                    val p1 = projection(line, centerA)
-                                    val p2 = projection(line, centerB)
-                                    val d = p2 - p1
-                                    // One solution either side of 'center'... guess an outer bound
-                                    val signA = if (otherA) -1 else 1
-                                    val signB = if (otherB) -1 else 1
-                                    val bound = (if (side) signA else signB) * 100.0
-                                    try {
-                                        val param = solveByBisection(0.0, bound) { x ->
-                                            val p = p1 + d * x
-                                            val d1 = (p - centerA).distance - signA * circleA.radius
-                                            val d2 = (p - centerB).distance - signB * circleB.radius
-                                            d1 - d2
-                                        }
-                                        val solutionCenter = p1 + d * param
-                                        val distanceA = (solutionCenter - centerA).distance - signA * circleA.radius
-                                        val sample =
-                                            intersectOnePoint(Element.Circle(solutionCenter, distanceA), circleA)
-                                        val solution = circleTool(solutionCenter, sample)
-                                        solutions += solution
-                                    } catch (e: Exception) {
-                                        // ignore
-                                    }
+                            val p1 = projection(line, centerA)
+                            val p2 = projection(line, centerB)
+                            val d = p2 - p1
+                            val signA = if (otherA) -1 else 1
+                            val signB = if (otherB) -1 else 1
+                            try {
+                                val param = solveByExpansionAndBisection(0.0) { x ->
+                                    val p = p1 + d * x
+                                    val d1 = (p - centerA).distance - signA * circleA.radius
+                                    val d2 = (p - centerB).distance - signB * circleB.radius
+                                    d1 - d2
                                 }
+                                val solutionCenter = p1 + d * param
+                                val distanceA = (solutionCenter - centerA).distance - signA * circleA.radius
+                                val sample =
+                                    intersectOnePoint(Element.Circle(solutionCenter, distanceA), circleA)
+                                val solution = circleTool(solutionCenter, sample)
+                                solutions += solution
+                            } catch (e: Exception) {
+                                // ignore
                             }
                         }
                     }
