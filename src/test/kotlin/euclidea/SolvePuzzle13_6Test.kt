@@ -18,17 +18,17 @@ class SolvePuzzle13_6Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 1 hr
+        // solution found 5 hr 47 min
         Solver().improveSolution(
             maxExtraElements = 4,
-            maxDepth = 5,
-            maxUnfamiliarElements = 4,
+            maxDepth = 6,
+            // maxUnfamiliarElements = 4,
             maxNonNewElements = 1,
             // maxConsecutiveNonNewElements = 1,
             maxLinesPerHeading = 1,
             maxCirclesPerRadius = 1,
             useTargetConstruction = false,
-            fillKnownElements = false
+            // fillKnownElements = false
         )
     }
 
@@ -43,6 +43,7 @@ class SolvePuzzle13_6Test {
     data class Setup(
         val line: Element.Line,
         val bisect: Element.Line,
+        val bisectProbe: Point,
     )
 
     class Solver : ImprovingSolver<Params, Setup>() {
@@ -76,12 +77,13 @@ class SolvePuzzle13_6Test {
                     val line = Element.Line(base, dir)
                     val bisect = perpendicularBisectorTool(pointA, pointB)
                     val probeLine = lineTool(base, probe)
+                    val bisectProbe = intersectOnePoint(probeLine, bisect)
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line, bisect) to EuclideaContext.of(
+                    return Setup(line, bisect, bisectProbe) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(100.0),
+                            maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
@@ -90,8 +92,8 @@ class SolvePuzzle13_6Test {
                         ),
                         // base is included as a probe point
                         // TODO 'hide' base?
-                        points = listOf(pointA, pointB, base),
-                        elements = listOf(line, bisect, probeLine)
+                        points = listOf(pointA, pointB, base, bisectProbe),
+                        elements = listOf(line, bisect /* probeLine, */)
                     )
                 }
             }
