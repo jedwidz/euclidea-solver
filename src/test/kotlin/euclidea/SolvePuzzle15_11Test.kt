@@ -1,8 +1,8 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
-import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_11Test {
@@ -48,23 +48,23 @@ class SolvePuzzle15_11Test {
 
         override fun makeParams(): Params {
             return Params(
-                centerA = Point(0.0, 0.74),
-                sampleA = Point(0.31, 0.6),
+                centerA = Point(0.0, 0.8),
+                sampleA = Point(0.1, 0.13),
                 base = Point(0.11, 0.0),
                 dir = Point(0.832, 0.0),
-                centerB = Point(0.89, 0.61),
-                sampleB = Point(0.71, 0.55),
+                centerB = Point(0.6, 0.22),
+                sampleB = Point(0.612, 0.12),
             )
         }
 
         override fun makeReplayParams(): Params {
             return Params(
-                centerA = Point(0.0, 0.74),
-                sampleA = Point(0.31, 0.6),
-                base = Point(0.11, 0.0),
-                dir = Point(0.83, 0.0),
-                centerB = Point(0.89, 0.61),
-                sampleB = Point(0.7, 0.55),
+                centerA = Point(0.0, 0.8),
+                sampleA = Point(0.1012, 0.131),
+                base = Point(0.112, 0.003),
+                dir = Point(0.834, 0.0),
+                centerB = Point(0.606, 0.223),
+                sampleB = Point(0.612, 0.1201),
             )
         }
 
@@ -77,13 +77,13 @@ class SolvePuzzle15_11Test {
                     val circleA = circleTool(centerA, sampleA)
                     val circleB = circleTool(centerB, sampleB)
                     val line = Element.Line(base, dir)
-                    val probeLine = lineTool(sampleA, sampleB)
+                    // val probeLine = lineTool(sampleA, sampleB)
                 }
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(circleA, circleB, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-//                            maxSqDistance = sq(25.0),
+                            maxSqDistance = sq(10.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
@@ -91,8 +91,8 @@ class SolvePuzzle15_11Test {
 //                            angleBisectorToolEnabled = true,
                         ),
                         // sampleA, sampleB, base and dir act as probes
-                        points = listOf(centerA, centerB, base, sampleA, sampleB, dir),
-                        elements = listOf(circleA, circleB, line, probeLine)
+                        points = listOf(centerA, centerB /*base, sampleA, sampleB, dir*/),
+                        elements = listOf(circleA, circleB, line /*probeLine*/)
                     )
                 }
             }
@@ -104,6 +104,7 @@ class SolvePuzzle15_11Test {
         ): (EuclideaContext) -> Boolean {
             val solutions = constructSolution(params, setup)
             // Validate solution
+            assertFalse(solutions.isEmpty())
             solutions.forEach { solution ->
                 assertTrue(pointAndLineCoincide(solution.center, setup.line))
                 assertTrue(meetAtOnePoint(setup.circleA, solution))
@@ -121,7 +122,13 @@ class SolvePuzzle15_11Test {
                         context.elements.filterIsInstance<Element.Line>().any { line ->
                             context.elements.filterIsInstance<Element.Circle>().any { circle ->
                                 context.points.any { point ->
-                                    val subSolutions = constructSolution15_9(params, setup, line, circle, point)
+                                    val subSolutions =
+                                        constructSolution15_9(params, setup, line, circle, point).map { circle ->
+                                            Element.Circle(
+                                                circle.center,
+                                                distance(circle.center, params.centerA) - setup.circleA.radius
+                                            )
+                                        }
                                     subSolutions.any { subSolution ->
                                         solutions.any { solution ->
                                             val looksGood = coincides(subSolution, solution)
@@ -212,7 +219,12 @@ class SolvePuzzle15_11Test {
                                 val sample =
                                     intersectOnePoint(Element.Circle(solutionCenter, distanceA), circleA)
                                 val solution = circleTool(solutionCenter, sample)
-                                solutions += solution
+                                // Genuine solutions only...
+                                // TODO according to puzzle instructions, both tangent points should be on the same side of the circles
+                                if (meetAtOnePoint(setup.circleA, solution) &&
+                                    meetAtOnePoint(setup.circleB, solution)
+                                )
+                                    solutions += solution
                             } catch (e: Exception) {
                                 // ignore
                             }
@@ -230,7 +242,15 @@ class SolvePuzzle15_11Test {
 //            with(params) {
 //                with(setup) {
 //                    @Suppress("unused") val context = object {
-//                        // val perp = perpendicularTool(line, sample, probe = base)
+//                        // oh come on now...
+//                        val lineAB = lineTool(centerA, centerB)
+//                        val onB = intersectTwoPoints(lineAB,circleB).first
+//                        val onA = intersectTwoPoints(lineAB,circleA).first
+//                        val measure = nonCollapsingCompassTool(onB, centerB, onA)
+//                        // Want to shrink the radius here
+//                        // TODO improve solution selection to make that clear and robust
+//                        val newSampleA = intersectTwoPoints(measure, lineAB).first
+//                        val newA = circleTool(centerA, newSampleA)
 //                    }
 //                    namer.nameReflected(context)
 //                    return setup to initialContext.withElements(elementsReflected(context))
