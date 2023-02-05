@@ -1,6 +1,7 @@
 package euclidea
 
 import euclidea.EuclideaTools.circleTool
+import euclidea.EuclideaTools.lineTool
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
@@ -12,12 +13,16 @@ class SolvePuzzle15_11Test {
         Solver().checkReferenceSolution()
     }
 
+    companion object {
+        private const val maxDepth = 3
+    }
+
     @Test
     fun improveSolution() {
         // no solution found ?
         Solver().improveSolution(
             maxExtraElements = 3,
-            maxDepth = 3,
+            maxDepth = maxDepth,
 //            nonNewElementLimit = 3,
 //            consecutiveNonNewElementLimit = 2,
             useTargetConstruction = true
@@ -72,12 +77,13 @@ class SolvePuzzle15_11Test {
                     val circleA = circleTool(centerA, sampleA)
                     val circleB = circleTool(centerB, sampleB)
                     val line = Element.Line(base, dir)
+                    val probeLine = lineTool(sampleA, sampleB)
                 }
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(circleA, circleB, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(25.0),
+//                            maxSqDistance = sq(25.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
                             nonCollapsingCompassToolEnabled = true,
@@ -86,7 +92,7 @@ class SolvePuzzle15_11Test {
                         ),
                         // sampleA, sampleB, base and dir act as probes
                         points = listOf(centerA, centerB, base, sampleA, sampleB, dir),
-                        elements = listOf(circleA, circleB, line)
+                        elements = listOf(circleA, circleB, line, probeLine)
                     )
                 }
             }
@@ -105,9 +111,11 @@ class SolvePuzzle15_11Test {
             }
             // Look for partial solution
             // val pointOfInterest = solution.center
+            val initialElementCount = initialContext(params, Namer()).second.elements.size
+            val targetDepth = initialElementCount + maxDepth
             return { context ->
                 // Suspect that this is reducible to a 15.9 solution (noting move hints are similar)
-                if (context.elements.size < 6) false
+                if (context.elements.size < targetDepth) false
                 else when (context.elements.lastOrNull()) {
                     is Element.Circle -> {
                         context.elements.filterIsInstance<Element.Line>().any { line ->
