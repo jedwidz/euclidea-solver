@@ -6,6 +6,7 @@ import euclidea.EuclideaTools.nonCollapsingCompassTool
 import euclidea.EuclideaTools.parallelTool
 import euclidea.EuclideaTools.perpendicularTool
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SolvePuzzle15_9Test {
@@ -18,13 +19,13 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // no solution found 26 min 48 sec
+        // no solution found ?
         Solver().improveSolution(
-            maxExtraElements = 8,
-            maxDepth = 8,
-            maxUnfamiliarElements = 3,
-            maxNonNewElements = 3,
-            maxConsecutiveNonNewElements = 2,
+            maxExtraElements = 5,
+            maxDepth = 6,
+            maxUnfamiliarElements = 5,
+            maxNonNewElements = 1,
+//            maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
             useTargetConstruction = true,
@@ -37,7 +38,7 @@ class SolvePuzzle15_9Test {
         val sample1: Point,
         val base: Point,
         val dir: Point,
-        val sample: Point
+        val sample: Point,
     )
 
     data class Setup(
@@ -49,21 +50,21 @@ class SolvePuzzle15_9Test {
 
         override fun makeParams(): Params {
             return Params(
-                center = Point(0.0, 0.7),
-                sample1 = Point(0.4, 0.8),
-                base = Point(0.1, 0.0),
-                dir = Point(0.9, 0.0),
-                sample = Point(1.0, 0.3),
+                center = Point(0.0, 0.8),
+                sample1 = Point(0.1, 0.13),
+                base = Point(0.11, 0.0),
+                dir = Point(0.832, 0.0),
+                sample = Point(0.6, 0.22),
             )
         }
 
         override fun makeReplayParams(): Params {
             return Params(
-                center = Point(0.0, 0.7),
-                sample1 = Point(0.401, 0.804),
-                base = Point(0.1, 0.0),
-                dir = Point(0.9, 0.0),
-                sample = Point(1.01, 0.303),
+                center = Point(0.0, 0.8),
+                sample1 = Point(0.1012, 0.131),
+                base = Point(0.112, 0.003),
+                dir = Point(0.834, 0.0),
+                sample = Point(0.606, 0.223),
             )
         }
 
@@ -75,21 +76,22 @@ class SolvePuzzle15_9Test {
                 val context = object {
                     val circle = circleTool(center, sample1)
                     val line = Element.Line(base, dir)
+                    val probeLine = lineTool(base, sample1)
                 }
                 namer.nameReflected(context)
                 with(context) {
                     return Setup(circle, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(25.0),
+                            maxSqDistance = sq(20.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
-//                            nonCollapsingCompassToolEnabled = true,
-//                            perpendicularToolEnabled = true,
+                            nonCollapsingCompassToolEnabled = true,
+                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
                         ),
                         // sample1, base and dir act as probes
-                        points = listOf(center, sample, base /*, sample1 , dir */),
-                        elements = listOf(circle, line)
+                        points = listOf(center, sample /* base, sample1 , dir */),
+                        elements = listOf(circle, line, probeLine)
                     )
                 }
             }
@@ -101,6 +103,7 @@ class SolvePuzzle15_9Test {
         ): (EuclideaContext) -> Boolean {
             val solutions = constructSolutions(params)
             // Validate solutions
+            assertFalse(solutions.isEmpty())
             solutions.forEach { solution ->
                 assertTrue(pointAndLineCoincide(solution.center, setup.line))
                 assertTrue(pointAndCircleCoincide(params.sample, solution))
@@ -137,7 +140,6 @@ class SolvePuzzle15_9Test {
                         val p1 = projection(line, center)
                         val p2 = projection(line, sample)
                         val d = p2 - p1
-                        // One solution either side of 'center'... guess an outer bound
                         val sign = if (other) -1 else 1
                         val param = solveByExpansionAndBisection(0.0) { x ->
                             val p = p1 + d * x
@@ -149,7 +151,11 @@ class SolvePuzzle15_9Test {
                         val solution = circleTool(solutionCenter, sample)
                         return solution
                     }
-                    return listOf(impl(false), impl(true))
+                    return listOf(impl(false), impl(true)).filter { solution ->
+                        // Genuine solutions only...
+                        pointAndCircleCoincide(params.sample, solution) &&
+                                meetAtOnePoint(setup.circle, solution)
+                    }
                 }
             }
         }
@@ -170,7 +176,7 @@ class SolvePuzzle15_9Test {
                         // val perp = perpendicularTool(line, sample, probe = base)
 
                         // Nope... actually, yup...
-//                        val perp = perpendicularTool(line, center, probe = base)
+                        val perp = perpendicularTool(line, center, probe = base)
 
                         // Likely next elements...
 //                        val point5 = intersectOnePoint(line, perp)
@@ -217,33 +223,35 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 8E E-star moves hint
-            return listOf(
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.CircleTool,
-            )
-        }
-
 //        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 7L L-star moves hint
+//            // Euclidea 8E E-star moves hint
 //            return listOf(
-//                EuclideaTool.PerpendicularTool,
+//                EuclideaTool.CircleTool,
 //                EuclideaTool.CircleTool,
 //                EuclideaTool.LineTool,
-//                EuclideaTool.NonCollapsingCompassTool,
-//                EuclideaTool.NonCollapsingCompassTool,
 //                EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                // This is skipped, just look for center of a solution
+//                // EuclideaTool.CircleTool
 //            )
 //        }
+
+        override fun toolSequence(): List<EuclideaTool> {
+            // Euclidea 7L L-star moves hint
+            return listOf(
+                EuclideaTool.PerpendicularTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.NonCollapsingCompassTool,
+                EuclideaTool.LineTool,
+                // This is skipped, just look for center of a solution
+                // EuclideaTool.CircleTool
+            )
+        }
 
         override fun referenceSolution(
             params: Params,
@@ -320,15 +328,16 @@ class SolvePuzzle15_9Test {
             }
         }
 
+        // TODO fix other solution...
         override fun additionalReferenceSolutions(): List<(Params, Namer) -> Pair<Setup, EuclideaContext?>> {
             return listOf(
-                suboptimal8LSolution(true),
+//                suboptimal8LSolution(true),
                 suboptimal17ESolution(false),
-                suboptimal17ESolution(true),
+//                suboptimal17ESolution(true),
                 suboptimal9L17ESolution(false),
-                suboptimal9L17ESolution(true),
+//                suboptimal9L17ESolution(true),
                 suboptimal16L16ESolution(false),
-                suboptimal16L16ESolution(true),
+//                suboptimal16L16ESolution(true),
             )
         }
 
