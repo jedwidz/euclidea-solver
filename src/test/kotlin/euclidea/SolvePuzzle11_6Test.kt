@@ -21,17 +21,17 @@ class SolvePuzzle11_6Test {
 
     @Test
     fun improveSolution() {
-        // improved suboptimal solution ?
+        // solution found 1 day 6 hr
         Solver().improveSolution(
-            maxExtraElements = 3,
-            maxDepth = 7,
-            maxUnfamiliarElements = 1,
-            maxNonNewElements = 4,
-            maxConsecutiveNonNewElements = 2,
-            maxLinesPerHeading = 2,
-            maxCirclesPerRadius = 2,
-            useTargetConstruction = true,
-            fillKnownElements = true
+            maxExtraElements = 4,
+            maxDepth = 6,
+            maxUnfamiliarElements = 4,
+            maxNonNewElements = 1,
+            // maxConsecutiveNonNewElements = 1,
+            maxLinesPerHeading = 1,
+            maxCirclesPerRadius = 1,
+            // useTargetConstruction = true,
+            // fillKnownElements = true
         )
     }
 
@@ -50,7 +50,8 @@ class SolvePuzzle11_6Test {
     data class Setup(
         val line1: Element.Line,
         val line2: Element.Line,
-        val half: Element.Line
+        val half: Element.Line,
+        val halfProbe: Point,
     )
 
     class Solver : ImprovingSolver<Params, Setup>() {
@@ -87,17 +88,17 @@ class SolvePuzzle11_6Test {
                     val line2 = Element.Line(baseO, baseB, limit1 = true)
                     val half = angleBisectorTool(baseA, baseO, baseB)
                     val probeLine = lineTool(probe1, probe2)
-                    // val halfProbe = intersectOnePoint(probeLine,half)
+                    val halfProbe = intersectOnePoint(probeLine, half)
                 }
                 namer.nameReflected(context)
                 with(context) {
-                    return Setup(line1, line2, half) to EuclideaContext.of(
+                    return Setup(line1, line2, half, halfProbe) to EuclideaContext.of(
                         config = EuclideaConfig(
                             maxSqDistance = sq(100.0),
 //                            angleBisectorToolEnabled = true
                         ),
-                        points = listOf(baseO, sample /* baseA, baseB, sample, halfProbe, probe1, probe2*/),
-                        elements = listOf(line1, line2, half, probeLine)
+                        points = listOf(baseO, sample, baseA, baseB, halfProbe /* probe1, probe2, */),
+                        elements = listOf(line1, line2, half /* probeLine, */)
                     )
                 }
             }
@@ -213,8 +214,6 @@ class SolvePuzzle11_6Test {
                 EuclideaTool.LineTool,
                 // This is skipped, just look for center of a solution
                 // EuclideaTool.CircleTool
-                // Extra for suboptimal solution
-                setOf(EuclideaTool.CircleTool, EuclideaTool.LineTool),
             )
         }
 
