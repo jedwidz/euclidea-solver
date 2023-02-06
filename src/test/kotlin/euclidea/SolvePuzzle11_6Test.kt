@@ -233,6 +233,8 @@ class SolvePuzzle11_6Test {
                 suboptimal14ESolution(true),
                 suboptimal13ESolution(false),
                 suboptimal13ESolution(true),
+                optimal11ESolution(false),
+                optimal11ESolution(true),
             )
         }
 
@@ -289,6 +291,38 @@ class SolvePuzzle11_6Test {
                             val center2 = intersectOnePoint(cross, half)
                             // Just look for center of a solution
                             // val solution = circleTool(center2, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
+                    }
+                }
+            }
+        }
+
+        private fun optimal11ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            // Moved to setup
+                            // val half = angleBisectorTool(baseA, baseO, baseB)
+                            val probeCircle = circleTool(halfProbe, baseO)
+                            val sampleCenter = intersectTwoPointsOther(probeCircle, half, baseO)
+                            val sampleTangentPoint = intersectTwoPointsOther(probeCircle, line2, baseO)
+                            val sampleCircle = circleTool(sampleCenter, sampleTangentPoint)
+                            val lineOS = lineTool(baseO, sample)
+                            val sampleSample = intersectTwoPoints(lineOS, sampleCircle, other).second
+                            val parCircleSample = circleTool(sampleSample, sample)
+                            val parAim1 = intersectTwoPointsOther(parCircleSample, lineOS, sample)
+                            val parCircleCenter = circleTool(sampleCenter, parAim1)
+                            val parAim2 = intersectTwoPointsOther(parCircleCenter, parCircleSample, parAim1)
+                            val cross = lineTool(parAim2, sample)
+                            val solutionCenter = intersectOnePoint(cross, half)
+                            // Just look for center of a solution
+                            // val solution = circleTool(solutionCenter, sample)
                         }
                         namer.nameReflected(context)
                         setup to initialContext.withElements(elementsReflected(context))
