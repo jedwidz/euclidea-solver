@@ -18,16 +18,16 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 13
+        const val maxDepth = 12
     }
 
     @Test
     fun improveSolution() {
-        // solution found
+        // improved solution found 1 min 15 sec
         Solver().improveSolution(
-            maxExtraElements = 0,
+            maxExtraElements = 2,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 0,
+            maxUnfamiliarElements = 1,
             maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
