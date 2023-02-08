@@ -18,16 +18,16 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 10
+        const val maxDepth = 9
     }
 
     @Test
     fun improveSolution() {
-        // improved solution found 53 sec
+        // improved solution found 33 sec
         Solver().improveSolution(
-            maxExtraElements = 0,
+            maxExtraElements = 2,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 0,
+            maxUnfamiliarElements = 2,
             maxNonNewElements = 3,
             maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
@@ -568,10 +568,8 @@ class SolvePuzzle15_9Test {
 
                             val circleFH = circleTool(foot, hub)
                             val circleHF = circleTool(hub, foot)
-                            val lensHF = intersectTwoPoints(circleFH, circleHF)
-                            val lensHF1 = lensHF.first
-                            val lensHF2 = lensHF.second
-                            val circleToOpp = circleTool(lensHF2, sampleOpp)
+                            val lensHF1 = intersectTwoPoints(circleFH, circleHF).first
+                            val circleToOpp = circleTool(lensHF1, sampleOpp)
                             val up = intersectTwoPoints(perpSample, circleToOpp).second
                             val circleFromUp = circleTool(up, lensHF1)
                             val circleSH = circleTool(sample, hub)
