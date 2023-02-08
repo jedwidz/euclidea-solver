@@ -360,7 +360,71 @@ class SolvePuzzle15_9Test {
 //                suboptimal9L17ESolution(true),
                 suboptimal16L16ESolution(false),
 //                suboptimal16L16ESolution(true),
+                optimal7LSolution(false),
+                optimal7LSolution(true),
             )
+        }
+
+        private fun optimal7LSolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            //Given point (1) point1_center at (0.0, 0.5)
+                            //circle1_circle with center point1_center extending to point2_sample1 (radius 0.383275357934736)
+                            //point4_dir at (0.832, 0.0)
+                            //line1_line from point3_base to point4_dir
+                            //line2_probeLine from point3_base to point2_sample1
+                            //point3_base at intersection (0/1) of line1_line and line2_probeLine (0.11, 0.0)
+                            //point2_sample1 at intersection (1/2) of circle1_circle and line2_probeLine (0.1, 0.13)
+                            //Given point (2) point5_sample at (0.6, 0.22)
+
+                            //line3 perpendicular to line1_line through point5_sample
+                            val line3 = perpendicularTool(line, sample, probe = base)
+
+                            //point6_base at intersection (1/1) of line1_line and line2_probeLine (0.11, -0.0)
+                            //circle2 with center point6_base extending to point5_sample (radius 0.5371219600798314)
+                            val circle2 = circleTool(base, sample)
+
+                            //point7 at intersection (1/2) of circle1_circle and circle2 (-0.33095499091390224, 0.3066899019989415)
+                            //point8 at intersection (2/2) of circle1_circle and circle2 (0.38152729156250964, 0.46343600414375213)
+                            val intersection = intersectTwoPoints(circle2, circle)
+                            val point7 = intersection.first
+                            val point8 = intersection.second
+
+                            //line4 from point7 to point8
+                            val line4 = lineTool(point7, point8)
+
+                            //point9 at intersection (1/1) of line1_line and line3 (0.6, -0.0)
+                            // Already called that 'foot'
+                            val foot = intersectOnePoint(line3, line)
+
+                            //point10 at intersection (1/1) of line3 and line4 (0.6, 0.5115)
+                            val point10 = intersectOnePoint(line3, line4)
+
+                            //circle3 with center point5_sample from distance between point9 and point10 (radius 0.5115)
+                            val circle3 = nonCollapsingCompassTool(foot, point10, sample)
+
+                            //point11 at intersection (1/2) of line1_line and circle3 (0.13822922353184802, 2.7755575615628914E-17)
+                            val point11 = intersectTwoPoints(line, circle3).first
+
+                            //circle4 with center point10 from distance between point11 and point9 (radius 0.46177077646815196)
+                            val circle4 = nonCollapsingCompassTool(point11, foot, point10)
+
+                            val tangentPoints = intersectTwoPoints(circle4, circle, other)
+                            val tangentPoint = tangentPoints.first
+                            val diameter = lineTool(center, tangentPoint)
+                            val solutionCenter = intersectOnePoint(diameter, line)
+                            // val solution = circleTool(solutionCenter, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
+                    }
+                }
+            }
         }
 
         private fun suboptimal17ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
