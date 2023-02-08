@@ -18,18 +18,18 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 8
+        const val maxDepth = 7
     }
 
     @Test
     fun improveSolution() {
         // improved solution found ?
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 4,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 2,
-            maxNonNewElements = 3,
-            maxConsecutiveNonNewElements = 2,
+            maxUnfamiliarElements = 4,
+            maxNonNewElements = 4,
+            maxConsecutiveNonNewElements = 3,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
             useTargetConstruction = true,
@@ -86,7 +86,7 @@ class SolvePuzzle15_9Test {
                 with(context) {
                     return Setup(circle, line) to EuclideaContext.of(
                         config = EuclideaConfig(
-                            maxSqDistance = sq(20.0),
+//                            maxSqDistance = sq(20.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
 //                            nonCollapsingCompassToolEnabled = true,
@@ -190,6 +190,11 @@ class SolvePuzzle15_9Test {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
                         // Likely start for E solution
+                        val circleBS = circleTool(base, sample)
+                        val baseOpp = intersectTwoPoints(circleBS, line).first
+                        val circleBSOpp = circleTool(baseOpp, sample)
+                        val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
+                        val perpSample = lineTool(sampleOpp, sample)
 //                        val perpCircle1 = circleTool(dir, sample)
 //                        val perpCircle2 = circleTool(base, sample)
 //                        val perpIntersect = intersectTwoPoints(perpCircle1, perpCircle2)
@@ -257,21 +262,21 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-//        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 9E E-star moves hint
-//            return listOf(
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
-//                // This is skipped, just look for center of a solution
-//                // EuclideaTool.CircleTool
-//            )
-//        }
+        override fun toolSequence(): List<EuclideaTool> {
+            // Euclidea 9E E-star moves hint
+            return listOf(
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
+                // This is skipped, just look for center of a solution
+                // EuclideaTool.CircleTool
+            )
+        }
 
 //        override fun toolSequence(): List<EuclideaTool> {
 //            // Euclidea 7L L-star moves hint
