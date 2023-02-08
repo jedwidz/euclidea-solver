@@ -374,6 +374,8 @@ class SolvePuzzle15_9Test {
 //                suboptimal16L16ESolution(true),
                 optimal7LSolution(false),
                 optimal7LSolution(true),
+                suboptimal15ESolution(false),
+                suboptimal15ESolution(true),
             )
         }
 
@@ -427,6 +429,109 @@ class SolvePuzzle15_9Test {
                             val circle4 = nonCollapsingCompassTool(point11, foot, point10)
 
                             val tangentPoints = intersectTwoPoints(circle4, circle, other)
+                            val tangentPoint = tangentPoints.first
+                            val diameter = lineTool(center, tangentPoint)
+                            val solutionCenter = intersectOnePoint(diameter, line)
+                            // val solution = circleTool(solutionCenter, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
+                    }
+                }
+            }
+        }
+
+        private fun suboptimal15ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            //Given point (1) point1_center at (0.0, 0.5)
+                            //point2_sample1 at (0.1, 0.13)
+                            //circle1_circle with center point1_center extending to point2_sample1 (radius 0.383275357934736)
+                            //Given point (3) point3_base at (0.11, 0.0)
+                            //Given point (4) point4_dir at (0.832, 0.0)
+                            //line1_line from point3_base to point4_dir
+                            //Given point (2) point5_sample at (0.6, 0.22)
+                            //circle2_circle2 with center point3_base extending to point5_sample (radius 0.5371219600798314)
+                            val circleBS = circleTool(base, sample)
+
+                            //point6 at intersection (1/2) of line1_line and circle2_circle2 (-0.4271219600798314, 0.0)
+                            val p6 = intersectTwoPoints(circleBS, line).first
+
+                            //circle3 with center point6 extending to point5_sample (radius 1.050418735970677)
+                            val c3 = circleTool(p6, sample)
+
+                            //point7 at intersection (2/2) of circle2_circle2 and circle3 (0.6, -0.2200000000000001)
+                            val p7 = intersectTwoPoints(circleBS, c3).second
+
+                            //line2_line3 from point7 to point5_sample
+                            val perpSample = lineTool(p7, sample)
+
+                            //point8_foot at intersection (1/1) of line1_line and line2_line3 (0.6000000000000001, -0.0)
+                            val foot = intersectOnePoint(perpSample, line)
+
+                            //circle4 with center point5_sample extending to point8_foot (radius 0.22)
+                            val c4 = circleTool(sample, foot)
+
+                            //point9_point8 at intersection (1/2) of circle1_circle and circle2_circle2 (-0.33095499091390224, 0.3066899019989415)
+                            //point10_point7 at intersection (2/2) of circle1_circle and circle2_circle2 (0.38152729156250964, 0.46343600414375213)
+                            val lens = intersectTwoPoints(circleBS, circle)
+                            val p9 = lens.first
+                            val p10 = lens.second
+
+                            //line3_line4 from point9_point8 to point10_point7
+                            val link = lineTool(p9, p10)
+
+                            //circle5 with center point8_foot extending to point5_sample (radius 0.22)
+                            val c5 = circleTool(foot, sample)
+
+                            //point11 at intersection (1/2) of circle4 and circle5 (0.40947441116742356, 0.1099999999999999)
+                            val p11 = intersectTwoPoints(c4, c5).first
+
+                            //point12_point10 at intersection (1/1) of line2_line3 and line3_line4 (0.6, 0.5115)
+                            val hub = intersectOnePoint(link, perpSample)
+
+                            //circle6 with center point11 extending to point12_point10 (radius 0.4444122523063468)
+                            val c6 = circleTool(p11, hub)
+
+                            //circle7 with center point8_foot extending to point12_point10 (radius 0.5115)
+                            val c7 = circleTool(foot, hub)
+
+                            //point13 at intersection (1/2) of line2_line3 and circle6 (0.6, -0.2915000000000002)
+                            val p13 = intersectTwoPoints(c6, perpSample).first
+
+                            //circle8_circle3 with center point5_sample extending to point13 (radius 0.5115000000000002)
+                            val c8 = circleTool(sample, p13)
+
+                            //circle9 with center point12_point10 extending to point8_foot (radius 0.5115)
+                            val c9 = circleTool(hub, foot)
+
+                            //point14 at intersection (2/2) of circle7 and circle9 (0.1570280059642597, 0.25574999999999987)
+                            val p14 = intersectTwoPoints(c7, c9).second
+
+                            //point15_point11 at intersection (1/2) of line1_line and circle8_circle3 (0.1382292235318478, 2.7755575615628914E-17)
+                            val p15 = intersectTwoPoints(line, c8).first
+
+                            //circle10 with center point14 extending to point15_point11 (radius 0.25643996708965056)
+                            val c10 = circleTool(p14, p15)
+
+                            //point16 at intersection (1/2) of circle7 and circle9 (1.0429719940357405, 0.2557500000000001)
+                            val p16 = intersectTwoPoints(c7, c9).first
+
+                            //circle11 with center point16 extending to point15_point11 (radius 0.9401954814181247)
+                            val c11 = circleTool(p16, p15)
+
+                            //point17_point11 at intersection (2/2) of circle10 and circle11 (0.13822922353184774, 0.5114999999999996)
+                            val p17 = intersectTwoPoints(c10, c11).second
+
+                            //circle12_circle4 with center point12_point10 extending to point17_point11 (radius 0.46177077646815223)
+                            val c12 = circleTool(hub, p17)
+
+                            val tangentPoints = intersectTwoPoints(c12, circle, other)
                             val tangentPoint = tangentPoints.first
                             val diameter = lineTool(center, tangentPoint)
                             val solutionCenter = intersectOnePoint(diameter, line)
