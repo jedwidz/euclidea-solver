@@ -376,6 +376,7 @@ class SolvePuzzle15_9Test {
                 optimal7LSolution(true),
                 suboptimal15ESolution(false),
                 suboptimal15ESolution(true),
+                suboptimal13ESolution(false),
             )
         }
 
@@ -532,6 +533,53 @@ class SolvePuzzle15_9Test {
                             val c12 = circleTool(hub, p17)
 
                             val tangentPoints = intersectTwoPoints(c12, circle, other)
+                            val tangentPoint = tangentPoints.first
+                            val diameter = lineTool(center, tangentPoint)
+                            val solutionCenter = intersectOnePoint(diameter, line)
+                            // val solution = circleTool(solutionCenter, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
+                    }
+                }
+            }
+        }
+
+        private fun suboptimal13ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            val circleBS = circleTool(base, sample)
+                            val baseOpp = intersectTwoPoints(circleBS, line).first
+                            val circleBSOpp = circleTool(baseOpp, sample)
+                            val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
+                            val perpSample = lineTool(sampleOpp, sample)
+                            val foot = intersectOnePoint(perpSample, line)
+                            val lens = intersectTwoPoints(circleBS, circle)
+                            val p9 = lens.first
+                            val p10 = lens.second
+                            val link = lineTool(p9, p10)
+                            val hub = intersectOnePoint(link, perpSample)
+
+                            val circleSF = circleTool(sample, foot)
+                            val circleFS = circleTool(foot, sample)
+                            val lensSF = intersectTwoPoints(circleSF, circleFS)
+                            val lensSF1 = lensSF.first
+                            val lensSF2 = lensSF.second
+                            val circleToHub1 = circleTool(lensSF1, hub)
+                            val circleToHub2 = circleTool(sample, hub)
+                            val down = intersectTwoPoints(circleToHub1, perpSample).first
+                            val circleSampleDown = circleTool(sample, down)
+                            val up = intersectTwoPoints(perpSample, circleSampleDown).second
+                            val circleFromUp = circleTool(up, lensSF2)
+                            val aim = intersectTwoPoints(circleToHub2, circleFromUp).first
+                            val circleKey = circleTool(hub, aim)
+
+                            val tangentPoints = intersectTwoPoints(circleKey, circle, other)
                             val tangentPoint = tangentPoints.first
                             val diameter = lineTool(center, tangentPoint)
                             val solutionCenter = intersectOnePoint(diameter, line)
