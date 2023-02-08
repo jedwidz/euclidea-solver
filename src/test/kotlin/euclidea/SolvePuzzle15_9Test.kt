@@ -25,10 +25,10 @@ class SolvePuzzle15_9Test {
     fun improveSolution() {
         // improved solution found 53 sec
         Solver().improveSolution(
-            maxExtraElements = 2,
+            maxExtraElements = 0,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 1,
-            maxNonNewElements = 4,
+            maxUnfamiliarElements = 0,
+            maxNonNewElements = 3,
             maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
@@ -376,8 +376,8 @@ class SolvePuzzle15_9Test {
                 optimal7LSolution(true),
                 suboptimal15ESolution(false),
                 suboptimal15ESolution(true),
-                suboptimal13ESolution(false),
-                suboptimal13ESolution(true),
+                suboptimal12ESolution(false),
+                suboptimal12ESolution(true),
             )
         }
 
@@ -546,7 +546,7 @@ class SolvePuzzle15_9Test {
             }
         }
 
-        private fun suboptimal13ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+        private fun suboptimal12ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
             return { params, namer ->
                 val (setup, initialContext) = initialContext(
                     params, namer
@@ -561,23 +561,21 @@ class SolvePuzzle15_9Test {
                             val perpSample = lineTool(sampleOpp, sample)
                             val foot = intersectOnePoint(perpSample, line)
                             val lens = intersectTwoPoints(circleBS, circle)
-                            val p9 = lens.first
-                            val p10 = lens.second
-                            val link = lineTool(p9, p10)
+                            val lens1 = lens.first
+                            val lens2 = lens.second
+                            val link = lineTool(lens1, lens2)
                             val hub = intersectOnePoint(link, perpSample)
 
-                            val circleSF = circleTool(sample, foot)
-                            val circleFS = circleTool(foot, sample)
-                            val lensSF = intersectTwoPoints(circleSF, circleFS)
-                            val lensSF1 = lensSF.first
-                            val lensSF2 = lensSF.second
-                            val circleToHub1 = circleTool(lensSF1, hub)
-                            val circleToHub2 = circleTool(sample, hub)
-                            val down = intersectTwoPoints(circleToHub1, perpSample).first
-                            val circleSampleDown = circleTool(sample, down)
-                            val up = intersectTwoPoints(perpSample, circleSampleDown).second
-                            val circleFromUp = circleTool(up, lensSF2)
-                            val aim = intersectTwoPoints(circleToHub2, circleFromUp).first
+                            val circleFH = circleTool(foot, hub)
+                            val circleHF = circleTool(hub, foot)
+                            val lensHF = intersectTwoPoints(circleFH, circleHF)
+                            val lensHF1 = lensHF.first
+                            val lensHF2 = lensHF.second
+                            val circleToOpp = circleTool(lensHF2, sampleOpp)
+                            val up = intersectTwoPoints(perpSample, circleToOpp).second
+                            val circleFromUp = circleTool(up, lensHF1)
+                            val circleSH = circleTool(sample, hub)
+                            val aim = intersectTwoPoints(circleSH, circleFromUp).first
                             val circleKey = circleTool(hub, aim)
 
                             val tangentPoints = intersectTwoPoints(circleKey, circle, other)
