@@ -17,14 +17,18 @@ class SolvePuzzle15_9Test {
         Solver().checkReferenceSolution()
     }
 
+    companion object {
+        const val maxDepth = 5
+    }
+
     @Test
     fun improveSolution() {
-        // no solution found ?
+        // solution found yaaah 2 hr 45 min
         Solver().improveSolution(
-            maxExtraElements = 5,
-            maxDepth = 6,
-            maxUnfamiliarElements = 5,
-            maxNonNewElements = 1,
+            maxExtraElements = 4,
+            maxDepth = maxDepth,
+            maxUnfamiliarElements = 4,
+            maxNonNewElements = 2,
 //            maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
@@ -50,7 +54,7 @@ class SolvePuzzle15_9Test {
 
         override fun makeParams(): Params {
             return Params(
-                center = Point(0.0, 0.8),
+                center = Point(0.0, 0.5),
                 sample1 = Point(0.1, 0.13),
                 base = Point(0.11, 0.0),
                 dir = Point(0.832, 0.0),
@@ -60,11 +64,11 @@ class SolvePuzzle15_9Test {
 
         override fun makeReplayParams(): Params {
             return Params(
-                center = Point(0.0, 0.8),
-                sample1 = Point(0.1012, 0.131),
+                center = Point(0.0, 0.5),
+                sample1 = Point(0.1362, 0.134),
                 base = Point(0.112, 0.003),
                 dir = Point(0.834, 0.0),
-                sample = Point(0.606, 0.223),
+                sample = Point(0.676, 0.223),
             )
         }
 
@@ -110,20 +114,37 @@ class SolvePuzzle15_9Test {
                 assertTrue(meetAtOnePoint(setup.circle, solution))
             }
             // Look for partial solution
-            val pointsOfInterest = solutions.map { it.center }
+            val linesOfInterest = solutions.flatMap { solution ->
+                listOf(
+                    lineTool(params.center, solution.center),
+                    lineTool(params.sample, solution.center),
+                    perpendicularTool(setup.line, solution.center),
+                )
+            }
+            val ignorePoints = listOf(params.center, params.sample)
+            val initialElementCount = initialContext(params, Namer()).second.elements.size
+            val targetDepth = initialElementCount + maxDepth
             return { context ->
-//                context.hasPoint(solution.center)
-                if (context.elements.size <= 3)
-                    false
+                if (context.elements.size < targetDepth) false
                 else {
-                    val element = context.elements.last()
-                    pointsOfInterest.any { pointOfInterest ->
-                        pointAndElementCoincide(pointOfInterest, element) &&
-                                // Just checking point/line has some false positives with 'almost coincident' lines
-                                // Note this still avoids evaluating context points in most cases
-                                context.hasPoint(pointOfInterest)
+                    context.points.any { point ->
+                        !ignorePoints.any { coincides(it, point) } &&
+                                linesOfInterest.any { lineOfInterest ->
+                                    val howzat = pointAndElementCoincide(point, lineOfInterest)
+                                    if (howzat) {
+                                        println(
+                                            "Howzat?\nlineOfInterest: $lineOfInterest\npoint: $point\nsource: ${
+                                                context.pointSourceFor(
+                                                    point
+                                                )
+                                            }"
+                                        )
+                                    }
+                                    howzat
+                                }
                     }
                 }
+//                context.hasPoint(solution.center)
 //            return { context ->
 //                context.hasElement(solution)
             }
@@ -173,10 +194,11 @@ class SolvePuzzle15_9Test {
                         // val lens2 = circleTool(sample, center)
 
                         // Nope...
-                        // val perp = perpendicularTool(line, sample, probe = base)
+                        // Trying this again...
+                        val perp = perpendicularTool(line, sample, probe = base)
 
                         // Nope... actually, yup...
-                        val perp = perpendicularTool(line, center, probe = base)
+                        // val perp = perpendicularTool(line, center, probe = base)
 
                         // Likely next elements...
 //                        val point5 = intersectOnePoint(line, perp)
@@ -224,7 +246,7 @@ class SolvePuzzle15_9Test {
 //        }
 
 //        override fun toolSequence(): List<EuclideaTool> {
-//            // Euclidea 8E E-star moves hint
+//            // Euclidea 9E E-star moves hint
 //            return listOf(
 //                EuclideaTool.CircleTool,
 //                EuclideaTool.CircleTool,
