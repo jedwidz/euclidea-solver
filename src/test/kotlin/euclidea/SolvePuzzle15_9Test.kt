@@ -18,18 +18,18 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 5
+        const val maxDepth = 13
     }
 
     @Test
     fun improveSolution() {
-        // solution found yaaah 2 hr 45 min
+        // solution found
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 0,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 4,
-            maxNonNewElements = 2,
-//            maxConsecutiveNonNewElements = 2,
+            maxUnfamiliarElements = 0,
+            maxNonNewElements = 4,
+            maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
             useTargetConstruction = true,
@@ -89,13 +89,13 @@ class SolvePuzzle15_9Test {
                             maxSqDistance = sq(20.0),
 //                            parallelToolEnabled = true,
 //                            perpendicularBisectorToolEnabled = true,
-                            nonCollapsingCompassToolEnabled = true,
-                            perpendicularToolEnabled = true,
+//                            nonCollapsingCompassToolEnabled = true,
+//                            perpendicularToolEnabled = true,
 //                            angleBisectorToolEnabled = true,
                         ),
                         // sample1, base and dir act as probes
-                        points = listOf(center, sample /* base, sample1 , dir */),
-                        elements = listOf(circle, line, probeLine)
+                        points = listOf(center, sample, base /* dir, sample1 */),
+                        elements = listOf(circle, line /* probeLine */)
                     )
                 }
             }
@@ -189,13 +189,25 @@ class SolvePuzzle15_9Test {
                 with(setup) {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
+                        // Likely start for E solution
+//                        val perpCircle1 = circleTool(dir, sample)
+//                        val perpCircle2 = circleTool(base, sample)
+//                        val perpIntersect = intersectTwoPoints(perpCircle1, perpCircle2)
+//                        val perpIntersect1 = perpIntersect.first
+//                        val perpIntersect2 = perpIntersect.second
+//                        val perp = lineTool(perpIntersect1, perpIntersect2)
+//                        val intersection = intersectTwoPoints(perpCircle2, circle)
+//                        val point7 = intersection.first
+//                        val point8 = intersection.second
+//                        val line4 = lineTool(point7, point8)
+
                         // Nope (E)
                         // val lens1 = circleTool(center, sample)
                         // val lens2 = circleTool(sample, center)
 
                         // Nope...
                         // Trying this again...
-                        val perp = perpendicularTool(line, sample, probe = base)
+                        // val perp = perpendicularTool(line, sample, probe = base)
 
                         // Nope... actually, yup...
                         // val perp = perpendicularTool(line, center, probe = base)
@@ -261,19 +273,19 @@ class SolvePuzzle15_9Test {
 //            )
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 7L L-star moves hint
-            return listOf(
-                EuclideaTool.PerpendicularTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.NonCollapsingCompassTool,
-                EuclideaTool.LineTool,
-                // This is skipped, just look for center of a solution
-                // EuclideaTool.CircleTool
-            )
-        }
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 7L L-star moves hint
+//            return listOf(
+//                EuclideaTool.PerpendicularTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.NonCollapsingCompassTool,
+//                EuclideaTool.LineTool,
+//                // This is skipped, just look for center of a solution
+//                // EuclideaTool.CircleTool
+//            )
+//        }
 
         override fun referenceSolution(
             params: Params,
