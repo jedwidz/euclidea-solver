@@ -18,19 +18,19 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 7
+        const val maxDepth = 9
     }
 
     @Test
     fun improveSolution() {
         // improved solution found ?
         Solver().improveSolution(
-            maxExtraElements = 6,
+            maxExtraElements = 7,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 3,
-            maxNonNewElements = 3,
+            maxUnfamiliarElements = 4,
+            maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 2,
-            maxLinesPerHeading = 2,
+            maxLinesPerHeading = 3,
             maxCirclesPerRadius = 2,
             useTargetConstruction = true,
             fillKnownElements = true
@@ -189,7 +189,20 @@ class SolvePuzzle15_9Test {
                 with(setup) {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
-                        // Likely start for E solution
+                        // Likely start for suboptimal 'line-heavy' E solution
+                        val circleBS = circleTool(base, sample)
+                        val baseOpp = intersectTwoPoints(circleBS, line).first
+                        val circleBSOpp = circleTool(baseOpp, sample)
+                        val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
+                        val perpSample = lineTool(sampleOpp, sample)
+                        val foot = intersectOnePoint(perpSample, line)
+                        val lens = intersectTwoPoints(circleBS, circle)
+                        val lens1 = lens.first
+                        val lens2 = lens.second
+                        val link = lineTool(lens1, lens2)
+
+                        // val hub = intersectOnePoint(link, perpSample)
+                        val circleFS = circleTool(foot, sample)
 
                         // Nope?
 //                        val circleBS = circleTool(base, sample)
@@ -277,6 +290,13 @@ class SolvePuzzle15_9Test {
                 EuclideaTool.CircleTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
+
+                // Temporary extra steps, to find a 'line-heavy' suboptimal solution
+                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+
                 EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
