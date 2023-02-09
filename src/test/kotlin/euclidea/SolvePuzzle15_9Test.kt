@@ -27,7 +27,7 @@ class SolvePuzzle15_9Test {
         Solver().improveSolution(
             maxExtraElements = 6,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 0,
+            maxUnfamiliarElements = 2,
             maxNonNewElements = 5,
             maxConsecutiveNonNewElements = 3,
             maxLinesPerHeading = 2,
@@ -255,7 +255,7 @@ class SolvePuzzle15_9Test {
 //                EuclideaTool.CircleTool,
 //                EuclideaTool.LineTool,
                 setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
-                setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
+                EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
                 setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
                 // This is skipped, just look for center of a solution
