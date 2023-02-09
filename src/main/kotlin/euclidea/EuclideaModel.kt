@@ -363,6 +363,10 @@ fun coincidesRough(num1: Double, num2: Double): Boolean {
     return abs(num2 - num1) < EpsilonRough
 }
 
+fun coincidesRough(point1: Point, point2: Point): Boolean {
+    return coincidesRough(point1.x, point2.x) && coincidesRough(point1.y, point2.y)
+}
+
 fun pointAndLineCoincide(point: Point, line: Element.Line): Boolean {
     return pointAndLineCoincideNoLimits(point, line) && line.withinLimits(point)
 }
