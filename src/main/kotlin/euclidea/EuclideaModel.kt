@@ -352,7 +352,7 @@ fun coincides(point1: Point, point2: Point): Boolean {
     return coincides(point1.x, point2.x) && coincides(point1.y, point2.y)
 }
 
-const val Epsilon = 0.00000000001
+const val Epsilon = 0.0000000001
 private const val EpsilonRough = Epsilon * 100000
 
 fun coincides(num1: Double, num2: Double): Boolean {
