@@ -23,13 +23,13 @@ class SolvePuzzle15_9Test {
 
     @Test
     fun improveSolution() {
-        // improved solution found ?
+        // no improved solution found 3 min 24 sec
         Solver().improveSolution(
-            maxExtraElements = 7,
+            maxExtraElements = 4,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 4,
-            maxNonNewElements = 4,
-            maxConsecutiveNonNewElements = 2,
+            maxUnfamiliarElements = 3,
+            maxNonNewElements = 5,
+            maxConsecutiveNonNewElements = 3,
             maxLinesPerHeading = 3,
             maxCirclesPerRadius = 2,
             useTargetConstruction = true,
@@ -128,7 +128,9 @@ class SolvePuzzle15_9Test {
                 if (context.elements.size < targetDepth) false
                 else {
                     context.points.any { point ->
-                        !ignorePoints.any { coincides(it, point) } &&
+                        // Using 'rough' check on points, due to false positives where point/line coincides but point/point doesn't
+                        // TODO Can this be improved?
+                        !ignorePoints.any { coincidesRough(it, point) } &&
                                 linesOfInterest.any { lineOfInterest ->
                                     val howzat = pointAndElementCoincide(point, lineOfInterest)
                                     if (howzat) {
