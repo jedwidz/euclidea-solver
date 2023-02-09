@@ -25,11 +25,11 @@ class SolvePuzzle15_9Test {
     fun improveSolution() {
         // improved solution found ?
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 6,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 4,
-            maxNonNewElements = 4,
-            maxConsecutiveNonNewElements = 3,
+            maxUnfamiliarElements = 3,
+            maxNonNewElements = 3,
+            maxConsecutiveNonNewElements = 2,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
             useTargetConstruction = true,
@@ -190,11 +190,20 @@ class SolvePuzzle15_9Test {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
                         // Likely start for E solution
-                        val circleBS = circleTool(base, sample)
-                        val baseOpp = intersectTwoPoints(circleBS, line).first
-                        val circleBSOpp = circleTool(baseOpp, sample)
-                        val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
-                        val perpSample = lineTool(sampleOpp, sample)
+
+                        // Nope?
+//                        val circleBS = circleTool(base, sample)
+//                        val baseOpp = intersectTwoPoints(circleBS, line).first
+//                        val circleBSOpp = circleTool(baseOpp, sample)
+//                        val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
+//                        val perpSample = lineTool(sampleOpp, sample)
+
+//                        val circleBC = circleTool(base, center)
+//                        val centerOpp = intersectTwoPoints(circleBC, line).first
+//                        val circleBCOpp = circleTool(centerOpp, center)
+//                        val opp = intersectTwoPoints(circleBC, circleBCOpp).second
+//                        val perp = lineTool(opp, center)
+
 //                        val perpCircle1 = circleTool(dir, sample)
 //                        val perpCircle2 = circleTool(base, sample)
 //                        val perpIntersect = intersectTwoPoints(perpCircle1, perpCircle2)
