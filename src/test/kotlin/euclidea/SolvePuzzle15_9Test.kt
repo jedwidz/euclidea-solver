@@ -18,16 +18,16 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 9
+        const val maxDepth = 10
     }
 
     @Test
     fun improveSolution() {
-        // no improved solution found 15 min 41 sec
+        // ?
         Solver().improveSolution(
-            maxExtraElements = 4,
+            maxExtraElements = 5,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 4,
+            maxUnfamiliarElements = 5,
             maxNonNewElements = 5,
             maxConsecutiveNonNewElements = 3,
             maxLinesPerHeading = 3,
@@ -296,7 +296,7 @@ class SolvePuzzle15_9Test {
                 // Temporary extra steps, to find a 'line-heavy' suboptimal solution
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
 //                EuclideaTool.LineTool,
 
                 EuclideaTool.LineTool,
