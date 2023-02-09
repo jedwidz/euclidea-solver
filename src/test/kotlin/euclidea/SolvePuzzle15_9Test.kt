@@ -25,7 +25,7 @@ class SolvePuzzle15_9Test {
     fun improveSolution() {
         // ?
         Solver().improveSolution(
-            maxExtraElements = 0,
+            maxExtraElements = 10,
             maxDepth = maxDepth,
             maxUnfamiliarElements = 0,
             maxNonNewElements = 3,
@@ -254,7 +254,7 @@ class SolvePuzzle15_9Test {
 //                EuclideaTool.CircleTool,
 //                EuclideaTool.CircleTool,
 //                EuclideaTool.LineTool,
-                setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
+                EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
                 setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
