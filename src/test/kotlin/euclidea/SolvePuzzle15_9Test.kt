@@ -18,19 +18,19 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 11
+        const val maxDepth = 9
     }
 
     @Test
     fun improveSolution() {
         // ?
         Solver().improveSolution(
-            maxExtraElements = 6,
+            maxExtraElements = 0,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 3,
-            maxNonNewElements = 5,
+            maxUnfamiliarElements = 0,
+            maxNonNewElements = 4,
             maxConsecutiveNonNewElements = 3,
-            maxLinesPerHeading = 3,
+            maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
             useTargetConstruction = true,
             fillKnownElements = true
@@ -191,79 +191,34 @@ class SolvePuzzle15_9Test {
                 with(setup) {
                     // Guess initial steps, informed by hint
                     @Suppress("unused") val context = object {
-                        // Likely start for suboptimal 'line-heavy' E solution
                         val circleBS = circleTool(base, sample)
                         val baseOpp = intersectTwoPoints(circleBS, line).first
-                        val circleBSOpp = circleTool(baseOpp, sample)
-                        val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
-                        val perpSample = lineTool(sampleOpp, sample)
-                        val foot = intersectOnePoint(perpSample, line)
+
                         val lens = intersectTwoPoints(circleBS, circle)
                         val lens1 = lens.first
                         val lens2 = lens.second
                         val link = lineTool(lens1, lens2)
 
-                        // val hub = intersectOnePoint(link, perpSample)
+                        val circleBSOpp = circleTool(baseOpp, sample)
+                        val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
+                        val perpSample = lineTool(sampleOpp, sample)
+                        val foot = intersectOnePoint(perpSample, line)
+                        val hub = intersectOnePoint(link, perpSample)
+
                         val circleFS = circleTool(foot, sample)
+                        val circleSF = circleTool(sample, foot)
+                        val circleSH = circleTool(sample, hub)
+                        val hubOpp = intersectTwoPointsOther(perpSample, circleSH, hub)
+                        val side = intersectTwoPoints(line, circleFS).first
+                        val circleHubOppSide = circleTool(hubOpp, side)
+                        val aim = intersectTwoPoints(circleSF, circleHubOppSide).first
+                        val circleKey = circleTool(hub, aim)
 
-                        // Nope?
-//                        val circleBS = circleTool(base, sample)
-//                        val baseOpp = intersectTwoPoints(circleBS, line).first
-//                        val circleBSOpp = circleTool(baseOpp, sample)
-//                        val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
-//                        val perpSample = lineTool(sampleOpp, sample)
-
-//                        val circleBC = circleTool(base, center)
-//                        val centerOpp = intersectTwoPoints(circleBC, line).first
-//                        val circleBCOpp = circleTool(centerOpp, center)
-//                        val opp = intersectTwoPoints(circleBC, circleBCOpp).second
-//                        val perp = lineTool(opp, center)
-
-//                        val perpCircle1 = circleTool(dir, sample)
-//                        val perpCircle2 = circleTool(base, sample)
-//                        val perpIntersect = intersectTwoPoints(perpCircle1, perpCircle2)
-//                        val perpIntersect1 = perpIntersect.first
-//                        val perpIntersect2 = perpIntersect.second
-//                        val perp = lineTool(perpIntersect1, perpIntersect2)
-//                        val intersection = intersectTwoPoints(perpCircle2, circle)
-//                        val point7 = intersection.first
-//                        val point8 = intersection.second
-//                        val line4 = lineTool(point7, point8)
-
-                        // Nope (E)
-                        // val lens1 = circleTool(center, sample)
-                        // val lens2 = circleTool(sample, center)
-
-                        // Nope...
-                        // Trying this again...
-                        // val perp = perpendicularTool(line, sample, probe = base)
-
-                        // Nope... actually, yup...
-                        // val perp = perpendicularTool(line, center, probe = base)
-
-                        // Likely next elements...
-//                        val point5 = intersectOnePoint(line, perp)
-//                        val circle2 = circleTool(point5, sample)
-//                        val intersection = intersectTwoPoints(circle2, circle)
-//                        val point7 = intersection.second
-//                        val point8 = intersection.first
-//                        val line3 = lineTool(point7, point8)
-
-                        // Nope...
-                        // val perp = perpendicularTool(line, center, probe = base)
-                        // val foot = intersectOnePoint(perp, line)
-                        // val meet = intersectTwoPoints(perp, circle).first
-                        // val measure = circleTool(foot, meet)
-
-                        // Nope...
-                        // val perp = perpendicularTool(line, center, probe = base)
-                        // val foot = intersectOnePoint(perp, line)
-                        // val measure = circleTool(foot, center)
-
-                        // Nope...
-                        // val perp = perpendicularTool(line, sample, probe = base)
-                        // val foot = intersectOnePoint(perp, line)
-                        // val measure = circleTool(foot, sample)
+                        val tangentPoints = intersectTwoPoints(circleKey, circle)
+                        val tangentPoint = tangentPoints.first
+//                        val diameter = lineTool(center, tangentPoint)
+//                        val solutionCenter = intersectOnePoint(diameter, line)
+                        // val solution = circleTool(solutionCenter, sample)
                     }
                     namer.nameReflected(context)
                     return setup to initialContext.withElements(elementsReflected(context))
@@ -287,27 +242,45 @@ class SolvePuzzle15_9Test {
 //        }
 
         override fun toolSequence(): List<EuclideaTool> {
-            // Euclidea 9E E-star moves hint
+            // Sub-optimal 11E steps
             return listOf(
                 EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.LineTool,
-
-                // Temporary extra steps, to find a 'line-heavy' suboptimal solution
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
+                EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
                 // This is skipped, just look for center of a solution
                 // EuclideaTool.CircleTool
             )
         }
+
+//        override fun toolSequence(): List<EuclideaTool> {
+//            // Euclidea 9E E-star moves hint
+//            return listOf(
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//
+//                // Temporary extra steps, to find a 'line-heavy' suboptimal solution
+//                EuclideaTool.LineTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                EuclideaTool.LineTool,
+//                // This is skipped, just look for center of a solution
+//                // EuclideaTool.CircleTool
+//            )
+//        }
 
 //        override fun toolSequence(): List<EuclideaTool> {
 //            // Euclidea 7L L-star moves hint
