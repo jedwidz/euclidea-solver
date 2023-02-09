@@ -18,16 +18,16 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 10
+        const val maxDepth = 11
     }
 
     @Test
     fun improveSolution() {
         // ?
         Solver().improveSolution(
-            maxExtraElements = 5,
+            maxExtraElements = 6,
             maxDepth = maxDepth,
-            maxUnfamiliarElements = 5,
+            maxUnfamiliarElements = 3,
             maxNonNewElements = 5,
             maxConsecutiveNonNewElements = 3,
             maxLinesPerHeading = 3,
@@ -297,7 +297,7 @@ class SolvePuzzle15_9Test {
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
-//                EuclideaTool.LineTool,
+                EuclideaTool.LineTool,
 
                 EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
@@ -414,7 +414,101 @@ class SolvePuzzle15_9Test {
                 suboptimal15ESolution(true),
                 suboptimal11ESolution(false),
                 suboptimal11ESolution(true),
+                suboptimal12ESolution(false),
+                suboptimal12ESolution(true),
+                suboptimal13ESolution(false),
+                suboptimal13ESolution(true),
             )
+        }
+
+        private fun suboptimal13ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            val circleBS = circleTool(base, sample)
+                            val baseOpp = intersectTwoPoints(circleBS, line).first
+                            val circleBSOpp = circleTool(baseOpp, sample)
+                            val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
+                            val perpSample = lineTool(sampleOpp, sample)
+                            val foot = intersectOnePoint(perpSample, line)
+                            val lens = intersectTwoPoints(circleBS, circle)
+                            val p9 = lens.first
+                            val p10 = lens.second
+                            val link = lineTool(p9, p10)
+                            val hub = intersectOnePoint(link, perpSample)
+
+                            val circleSF = circleTool(sample, foot)
+                            val circleFS = circleTool(foot, sample)
+                            val lensSF = intersectTwoPoints(circleSF, circleFS)
+                            val lensSF1 = lensSF.first
+                            val lensSF2 = lensSF.second
+                            val circleToHub1 = circleTool(lensSF1, hub)
+                            val circleToHub2 = circleTool(sample, hub)
+                            val down = intersectTwoPoints(circleToHub1, perpSample).first
+                            val circleSampleDown = circleTool(sample, down)
+                            val up = intersectTwoPoints(perpSample, circleSampleDown).second
+                            val circleFromUp = circleTool(up, lensSF2)
+                            val aim = intersectTwoPoints(circleToHub2, circleFromUp).first
+                            val circleKey = circleTool(hub, aim)
+
+                            val tangentPoints = intersectTwoPoints(circleKey, circle, other)
+                            val tangentPoint = tangentPoints.first
+                            val diameter = lineTool(center, tangentPoint)
+                            val solutionCenter = intersectOnePoint(diameter, line)
+                            // val solution = circleTool(solutionCenter, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
+                    }
+                }
+            }
+        }
+
+        private fun suboptimal12ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+            return { params, namer ->
+                val (setup, initialContext) = initialContext(
+                    params, namer
+                )
+                with(params) {
+                    with(setup) {
+                        @Suppress("unused") val context = object {
+                            val circleBS = circleTool(base, sample)
+                            val baseOpp = intersectTwoPoints(circleBS, line).first
+                            val circleBSOpp = circleTool(baseOpp, sample)
+                            val sampleOpp = intersectTwoPoints(circleBS, circleBSOpp).second
+                            val perpSample = lineTool(sampleOpp, sample)
+                            val foot = intersectOnePoint(perpSample, line)
+                            val lens = intersectTwoPoints(circleBS, circle)
+                            val lens1 = lens.first
+                            val lens2 = lens.second
+                            val link = lineTool(lens1, lens2)
+                            val hub = intersectOnePoint(link, perpSample)
+
+                            val circleFH = circleTool(foot, hub)
+                            val circleHF = circleTool(hub, foot)
+                            val lensHF1 = intersectTwoPoints(circleFH, circleHF).first
+                            val circleToOpp = circleTool(lensHF1, sampleOpp)
+                            val up = intersectTwoPoints(perpSample, circleToOpp).second
+                            val circleFromUp = circleTool(up, lensHF1)
+                            val circleSH = circleTool(sample, hub)
+                            val aim = intersectTwoPoints(circleSH, circleFromUp).first
+                            val circleKey = circleTool(hub, aim)
+
+                            val tangentPoints = intersectTwoPoints(circleKey, circle, other)
+                            val tangentPoint = tangentPoints.first
+                            val diameter = lineTool(center, tangentPoint)
+                            val solutionCenter = intersectOnePoint(diameter, line)
+                            // val solution = circleTool(solutionCenter, sample)
+                        }
+                        namer.nameReflected(context)
+                        setup to initialContext.withElements(elementsReflected(context))
+                    }
+                }
+            }
         }
 
         private fun optimal7LSolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
