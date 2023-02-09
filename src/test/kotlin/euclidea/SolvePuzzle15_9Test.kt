@@ -25,10 +25,10 @@ class SolvePuzzle15_9Test {
     fun improveSolution() {
         // ?
         Solver().improveSolution(
-            maxExtraElements = 0,
+            maxExtraElements = 6,
             maxDepth = maxDepth,
             maxUnfamiliarElements = 0,
-            maxNonNewElements = 4,
+            maxNonNewElements = 5,
             maxConsecutiveNonNewElements = 3,
             maxLinesPerHeading = 2,
             maxCirclesPerRadius = 2,
@@ -205,17 +205,17 @@ class SolvePuzzle15_9Test {
                         val foot = intersectOnePoint(perpSample, line)
                         val hub = intersectOnePoint(link, perpSample)
 
-                        val circleFS = circleTool(foot, sample)
-                        val circleSF = circleTool(sample, foot)
-                        val circleSH = circleTool(sample, hub)
-                        val hubOpp = intersectTwoPointsOther(perpSample, circleSH, hub)
-                        val side = intersectTwoPoints(line, circleFS).first
-                        val circleHubOppSide = circleTool(hubOpp, side)
-                        val aim = intersectTwoPoints(circleSF, circleHubOppSide).first
-                        val circleKey = circleTool(hub, aim)
-
-                        val tangentPoints = intersectTwoPoints(circleKey, circle)
-                        val tangentPoint = tangentPoints.first
+//                        val circleFS = circleTool(foot, sample)
+//                        val circleSF = circleTool(sample, foot)
+//                        val circleSH = circleTool(sample, hub)
+//                        val hubOpp = intersectTwoPointsOther(perpSample, circleSH, hub)
+//                        val side = intersectTwoPoints(line, circleFS).first
+//                        val circleHubOppSide = circleTool(hubOpp, side)
+//                        val aim = intersectTwoPoints(circleSF, circleHubOppSide).first
+//                        val circleKey = circleTool(hub, aim)
+//
+//                        val tangentPoints = intersectTwoPoints(circleKey, circle)
+//                        val tangentPoint = tangentPoints.first
 //                        val diameter = lineTool(center, tangentPoint)
 //                        val solutionCenter = intersectOnePoint(diameter, line)
                         // val solution = circleTool(solutionCenter, sample)
@@ -241,19 +241,24 @@ class SolvePuzzle15_9Test {
 //            }
 //        }
 
-        override fun toolSequence(): List<EuclideaTool> {
+        override fun toolsSequence(): List<Set<EuclideaTool>> {
             // Sub-optimal 11E steps
-            return listOf(
+            return toolsList(
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
-                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.CircleTool,
+//                EuclideaTool.LineTool,
+                setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
+                setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
                 EuclideaTool.LineTool,
+                setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
+                setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
                 // This is skipped, just look for center of a solution
                 // EuclideaTool.CircleTool
             )
