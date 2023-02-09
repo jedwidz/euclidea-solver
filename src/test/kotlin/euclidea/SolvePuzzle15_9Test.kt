@@ -18,20 +18,20 @@ class SolvePuzzle15_9Test {
     }
 
     companion object {
-        const val maxDepth = 8
+        const val maxDepth = 7
     }
 
     @Test
     fun improveSolution() {
-        // ?
+        // solution found!
         Solver().improveSolution(
-            maxExtraElements = 10,
+            maxExtraElements = 0,
             maxDepth = maxDepth,
             maxUnfamiliarElements = 0,
-            maxNonNewElements = 3,
-            maxConsecutiveNonNewElements = 2,
-            maxLinesPerHeading = 2,
-            maxCirclesPerRadius = 2,
+            maxNonNewElements = 2,
+            maxConsecutiveNonNewElements = 1,
+            maxLinesPerHeading = 1,
+            maxCirclesPerRadius = 1,
             useTargetConstruction = true,
             fillKnownElements = true
         )
@@ -242,22 +242,16 @@ class SolvePuzzle15_9Test {
 //        }
 
         override fun toolsSequence(): List<Set<EuclideaTool>> {
-            // Sub-optimal 10E steps
+            // Optimal 9E steps
             return toolsList(
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
                 EuclideaTool.CircleTool,
                 EuclideaTool.LineTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.CircleTool,
-//                EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
                 EuclideaTool.LineTool,
-                EuclideaTool.LineTool,
-                setOf(EuclideaTool.LineTool, EuclideaTool.CircleTool),
+                // Euclidea 9E hint has a line here
+                EuclideaTool.CircleTool,
                 // This is skipped, just look for center of a solution
                 // EuclideaTool.CircleTool
             )
@@ -389,8 +383,8 @@ class SolvePuzzle15_9Test {
                 optimal7LSolution(true),
                 suboptimal15ESolution(false),
                 suboptimal15ESolution(true),
-                suboptimal10ELinesSolution(false),
-                suboptimal10ELinesSolution(true),
+                optimal9ESolution(false),
+                optimal9ESolution(true),
                 suboptimal10ESolution(false),
                 suboptimal10ESolution(true),
                 suboptimal11ESolution(false),
@@ -745,7 +739,7 @@ class SolvePuzzle15_9Test {
             }
         }
 
-        private fun suboptimal10ELinesSolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
+        private fun optimal9ESolution(other: Boolean): (Params, Namer) -> Pair<Setup, EuclideaContext> {
             return { params, namer ->
                 val (setup, initialContext) = initialContext(
                     params, namer
@@ -765,7 +759,6 @@ class SolvePuzzle15_9Test {
                             val link = lineTool(lens1, lens2)
                             val hub = intersectOnePoint(link, perpSample)
 
-                            val circleSF = circleTool(sample, foot)
                             val lineHBo = lineTool(hub, baseOpp)
                             val p12 = intersectTwoPoints(circleBS, lineHBo).first
                             val p13 = intersectTwoPoints(line, circleBS).second
